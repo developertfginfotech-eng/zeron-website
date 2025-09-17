@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { MessageCircle, Send, Minimize2, Maximize2, Bot, Sparkles, TrendingUp, AlertTriangle, Users } from 'lucide-react'
+import { MessageCircle, Send, Minimize2, Maximize2, Bot, Sparkles, TrendingUp, AlertTriangle, Users, Wifi, WifiOff } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface ChatMessage {
@@ -13,6 +13,8 @@ interface ChatMessage {
   sender: 'user' | 'ai'
   timestamp: Date
   aiContext?: string
+  createdAt?: Date
+  userId?: string | null
 }
 
 interface AiSuggestion {
@@ -35,6 +37,10 @@ export function AiChatWidget() {
       aiContext: 'greeting'
     }
   ])
+  const [isConnected, setIsConnected] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  const [language, setLanguage] = useState<'en' | 'ar'>('en')
+  const wsRef = useRef<WebSocket | null>(null)
   const [suggestions] = useState<AiSuggestion[]>([
     {
       type: 'market',
@@ -59,30 +65,145 @@ export function AiChatWidget() {
     scrollToBottom()
   }, [messages])
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return
-
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      message,
-      sender: 'user',
-      timestamp: new Date()
+  // WebSocket connection effect
+  useEffect(() => {
+    if (isOpen) {
+      connectWebSocket()
+    } else {
+      disconnectWebSocket()
     }
+    
+    return () => {
+      disconnectWebSocket()
+    }
+  }, [isOpen])
 
-    setMessages(prev => [...prev, userMessage])
-    setMessage('')
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        message: getAiResponse(message),
-        sender: 'ai',
-        timestamp: new Date(),
-        aiContext: 'response'
+  const connectWebSocket = () => {
+    try {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsUrl = `${protocol}//${window.location.host}`
+      
+      wsRef.current = new WebSocket(wsUrl)
+      
+      wsRef.current.onopen = () => {
+        console.log('WebSocket connected')
+        setIsConnected(true)
+        
+        // Join the chat session
+        wsRef.current?.send(JSON.stringify({
+          type: 'join',
+          data: { userId: 'admin-user' }
+        }))
       }
-      setMessages(prev => [...prev, aiResponse])
-    }, 1000)
+      
+      wsRef.current.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+        handleWebSocketMessage(data)
+      }
+      
+      wsRef.current.onclose = () => {
+        console.log('WebSocket disconnected')
+        setIsConnected(false)
+        
+        // Auto-reconnect after 3 seconds
+        setTimeout(() => {
+          if (isOpen) {
+            connectWebSocket()
+          }
+        }, 3000)
+      }
+      
+      wsRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error)
+        setIsConnected(false)
+      }
+    } catch (error) {
+      console.error('Failed to connect WebSocket:', error)
+      setIsConnected(false)
+    }
+  }
+  
+  const disconnectWebSocket = () => {
+    if (wsRef.current) {
+      wsRef.current.close()
+      wsRef.current = null
+      setIsConnected(false)
+    }
+  }
+  
+  const handleWebSocketMessage = (data: any) => {
+    switch (data.type) {
+      case 'message':
+        const newMessage: ChatMessage = {
+          ...data.data,
+          timestamp: new Date(data.data.createdAt || new Date())
+        }
+        setMessages(prev => [...prev, newMessage])
+        setIsTyping(false)
+        break
+        
+      case 'history':
+        const historyMessages = data.data.messages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.createdAt || new Date())
+        }))
+        setMessages(prev => [...prev, ...historyMessages])
+        break
+        
+      case 'typing':
+        setIsTyping(true)
+        setTimeout(() => setIsTyping(false), 3000)
+        break
+        
+      case 'error':
+        console.error('Chat error:', data.data.message)
+        setIsTyping(false)
+        break
+    }
+  }
+
+  const handleSendMessage = () => {
+    if (!message.trim() || !isConnected) return
+
+    const messageText = message.trim()
+    setMessage('')
+    setIsTyping(true)
+
+    try {
+      // Send message via WebSocket
+      wsRef.current?.send(JSON.stringify({
+        type: 'chat',
+        data: {
+          message: messageText,
+          userId: 'admin-user',
+          language
+        }
+      }))
+    } catch (error) {
+      console.error('Error sending message:', error)
+      setIsTyping(false)
+      
+      // Fallback to mock response if WebSocket fails
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        message: messageText,
+        sender: 'user',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, userMessage])
+      
+      setTimeout(() => {
+        const aiResponse: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          message: getAiResponse(messageText),
+          sender: 'ai',
+          timestamp: new Date(),
+          aiContext: 'response'
+        }
+        setMessages(prev => [...prev, aiResponse])
+        setIsTyping(false)
+      }, 1000)
+    }
   }
 
   const getAiResponse = (userMessage: string): string => {
@@ -143,10 +264,35 @@ export function AiChatWidget() {
                 زارون Zaron
                 <Sparkles className="h-4 w-4 text-primary animate-pulse" />
               </CardTitle>
-              <p className="text-xs text-muted-foreground">AI Investment Assistant</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">AI Investment Assistant</p>
+                <div className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span className="text-xs text-muted-foreground">
+                    {isConnected ? 'Live' : 'Offline'}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+              className="h-8 w-8 p-0"
+              title="Switch Language"
+            >
+              {language === 'ar' ? '🇬🇧' : '🇸🇦'}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 w-8 p-0 ${isConnected ? 'text-green-600' : 'text-red-600'}`}
+              title={isConnected ? 'Connected' : 'Disconnected'}
+            >
+              {isConnected ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -240,6 +386,35 @@ export function AiChatWidget() {
                       </div>
                     </motion.div>
                   ))}
+                  
+                  {/* Typing indicator */}
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-start"
+                    >
+                      <div className="flex items-start gap-2 max-w-[80%]">
+                        <Avatar className="h-6 w-6 border border-primary/20">
+                          <AvatarFallback className="bg-gradient-to-r from-primary/20 to-primary/10 text-xs">
+                            🇸🇦
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="p-3 rounded-lg bg-muted">
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm">
+                              {language === 'ar' ? 'يكتب...' : 'Typing...'}
+                            </span>
+                            <div className="flex gap-1">
+                              <div className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <div className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <div className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
 
@@ -249,22 +424,31 @@ export function AiChatWidget() {
                     <Input
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="اكتب رسالتك... Type your message..."
+                      placeholder={language === 'ar' ? 'اكتب رسالتك...' : 'Type your message...'}
                       className="flex-1"
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      disabled={!isConnected}
                       data-testid="input-chat-message"
                     />
                     <Button 
                       onClick={handleSendMessage}
                       className="neon-glow"
-                      disabled={!message.trim()}
+                      disabled={!message.trim() || !isConnected}
                       data-testid="button-send-message"
                     >
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Powered by AI • Responds in Arabic & English
+                    {isConnected ? (
+                      language === 'ar' 
+                        ? 'مدعوم بالذكاء الاصطناعي • يجيب بالعربية والإنجليزية'
+                        : 'Powered by AI • Responds in Arabic & English'
+                    ) : (
+                      language === 'ar'
+                        ? 'غير متصل • جاري إعادة الاتصال...'
+                        : 'Offline • Reconnecting...'
+                    )}
                   </p>
                 </div>
               </CardContent>
