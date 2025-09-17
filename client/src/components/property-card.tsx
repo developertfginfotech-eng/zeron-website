@@ -28,15 +28,21 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
   }
 
   return (
-    <Card className="hover-elevate" data-testid={`card-property-${property.id}`}>
+    <Card className="enhanced-card animate-scale-up group overflow-hidden" data-testid={`card-property-${property.id}`}>
       {property.images && property.images.length > 0 && (
         <div className="aspect-video relative overflow-hidden rounded-t-lg">
           <img
             src={property.images[0]}
             alt={property.title}
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
             data-testid={`img-property-${property.id}`}
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Badge className={`${statusColors[property.status as keyof typeof statusColors]} backdrop-blur-sm`}>
+              {property.status}
+            </Badge>
+          </div>
         </div>
       )}
       

@@ -79,11 +79,18 @@ export function AppSidebar() {
   const [location] = useLocation()
 
   return (
-    <Sidebar>
-      <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-6 py-4">
-          <Building2 className="h-6 w-6 text-primary" />
-          <span className="text-lg font-semibold text-sidebar-foreground">Zaron</span>
+    <Sidebar className="glass-card border-r-0">
+      <SidebarHeader className="border-b border-sidebar-border/50 bg-gradient-to-r from-primary/5 to-transparent">
+        <div className="flex items-center gap-3 px-6 py-5">
+          <div className="p-2 rounded-xl bg-primary/10 backdrop-blur-sm neon-glow">
+            <Building2 className="h-6 w-6 text-primary animate-pulse-slow" />
+          </div>
+          <div>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Zaron
+            </span>
+            <div className="text-xs text-muted-foreground/80">Admin Panel</div>
+          </div>
         </div>
       </SidebarHeader>
       <SidebarContent>

@@ -60,16 +60,28 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="p-6 space-y-6" data-testid="page-dashboard">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold" data-testid="text-dashboard-title">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome to Zaron Admin Panel</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 modern-scrollbar">
+      <div className="p-6 space-y-8" data-testid="page-dashboard">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground via-primary to-primary/70 bg-clip-text text-transparent animate-float" data-testid="text-dashboard-title">
+              Dashboard
+            </h1>
+            <p className="text-lg text-muted-foreground/80">Welcome to Zaron Admin Panel</p>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              System is running smoothly
+            </div>
+          </div>
+          <Button 
+            onClick={handleRefresh} 
+            disabled={refreshing} 
+            className="neon-glow hover:scale-105 transition-transform duration-300"
+            data-testid="button-refresh-dashboard"
+          >
+            {refreshing ? "Refreshing..." : "Refresh Data"}
+          </Button>
         </div>
-        <Button onClick={handleRefresh} disabled={refreshing} data-testid="button-refresh-dashboard">
-          {refreshing ? "Refreshing..." : "Refresh Data"}
-        </Button>
-      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -192,5 +204,6 @@ export default function Dashboard() {
         </Card>
       </div>
     </div>
+  </div>
   )
 }

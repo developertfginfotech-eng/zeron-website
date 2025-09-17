@@ -52,16 +52,32 @@ export default function App() {
             <div className="flex h-screen w-full">
               <AppSidebar />
               <div className="flex flex-col flex-1">
-                <header className="flex items-center justify-between p-4 border-b border-sidebar-border bg-background">
+                <header className="flex items-center justify-between p-4 border-b border-sidebar-border/50 glass-card backdrop-blur-xl">
                   <div className="flex items-center gap-4">
-                    <SidebarTrigger data-testid="button-sidebar-toggle" />
-                    <div className="text-sm text-muted-foreground">
-                      Zaron Admin Panel
+                    <SidebarTrigger 
+                      className="hover:bg-primary/10 transition-colors duration-300" 
+                      data-testid="button-sidebar-toggle" 
+                    />
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <div className="text-sm font-medium bg-gradient-to-r from-foreground to-primary/80 bg-clip-text text-transparent">
+                        Zaron Admin Panel
+                      </div>
                     </div>
                   </div>
-                  <ThemeToggle />
+                  <div className="flex items-center gap-3">
+                    <div className="text-xs text-muted-foreground/60">
+                      {new Date().toLocaleDateString('en-US', { 
+                        weekday: 'short', 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </div>
+                    <ThemeToggle />
+                  </div>
                 </header>
-                <main className="flex-1 overflow-auto bg-background">
+                <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-primary/3 modern-scrollbar">
                   <Router />
                 </main>
               </div>
