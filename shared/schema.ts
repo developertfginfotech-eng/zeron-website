@@ -74,10 +74,17 @@ export const transactions = pgTable("transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   investorId: varchar("investor_id").references(() => investors.id),
   propertyId: varchar("property_id").references(() => properties.id),
-  type: text("type").notNull(), // "investment", "payout", "withdrawal"
+  type: text("type").notNull(), // "investment", "payout", "withdrawal", "dividend", "fee"
   amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
-  status: text("status").notNull().default("pending"),
+  fee: decimal("fee", { precision: 10, scale: 2 }).default("0"),
+  description: text("description"),
+  reference: text("reference"), // Transaction reference number
+  status: text("status").notNull().default("pending"), // "pending", "completed", "failed", "cancelled"
+  paymentMethod: text("payment_method"), // "bank_transfer", "card", "wallet"
+  bankDetails: text("bank_details"), // JSON string of bank details
+  processedAt: timestamp("processed_at"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const kycDocuments = pgTable("kyc_documents", {
@@ -113,9 +120,41 @@ export const chatMessages = pgTable("chat_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const investments = pgTable("investments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  investorId: varchar("investor_id").references(() => investors.id),
+  propertyId: varchar("property_id").references(() => properties.id),
+  investmentAmount: decimal("investment_amount", { precision: 12, scale: 2 }).notNull(),
+  ownershipPercentage: decimal("ownership_percentage", { precision: 5, scale: 2 }).notNull(),
+  expectedReturn: decimal("expected_return", { precision: 5, scale: 2 }), // Annual percentage
+  currentValue: decimal("current_value", { precision: 12, scale: 2 }),
+  totalReturns: decimal("total_returns", { precision: 12, scale: 2 }).default("0"),
+  totalDividends: decimal("total_dividends", { precision: 12, scale: 2 }).default("0"),
+  status: text("status").notNull().default("active"), // "active", "sold", "liquidated"
+  investmentDate: timestamp("investment_date").defaultNow(),
+  exitDate: timestamp("exit_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const portfolioSummary = pgTable("portfolio_summary", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  investorId: varchar("investor_id").references(() => investors.id).unique(),
+  totalInvestment: decimal("total_investment", { precision: 12, scale: 2 }).default("0"),
+  currentValue: decimal("current_value", { precision: 12, scale: 2 }).default("0"),
+  totalReturns: decimal("total_returns", { precision: 12, scale: 2 }).default("0"),
+  totalDividends: decimal("total_dividends", { precision: 12, scale: 2 }).default("0"),
+  totalWithdrawals: decimal("total_withdrawals", { precision: 12, scale: 2 }).default("0"),
+  unrealizedGains: decimal("unrealized_gains", { precision: 12, scale: 2 }).default("0"),
+  realizedGains: decimal("realized_gains", { precision: 12, scale: 2 }).default("0"),
+  riskScore: integer("risk_score").default(50), // 1-100 scale
+  performanceScore: integer("performance_score").default(50), // 1-100 scale
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
 export const aiInsights = pgTable("ai_insights", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  type: text("type").notNull(), // "market", "customer", "property", "risk"
+  type: text("type").notNull(), // "market", "customer", "property", "risk", "portfolio"
   title: text("title").notNull(),
   content: text("content").notNull(),
   confidence: decimal("confidence", { precision: 3, scale: 2 }),
@@ -162,6 +201,17 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
   createdAt: true,
 });
 
+export const insertInvestmentSchema = createInsertSchema(investments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPortfolioSummarySchema = createInsertSchema(portfolioSummary).omit({
+  id: true,
+  lastUpdated: true,
+});
+
 export const insertAiInsightSchema = createInsertSchema(aiInsights).omit({
   id: true,
   createdAt: true,
@@ -183,5 +233,9 @@ export type Notification = typeof notifications.$inferSelect;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type Investment = typeof investments.$inferSelect;
+export type InsertInvestment = z.infer<typeof insertInvestmentSchema>;
+export type PortfolioSummary = typeof portfolioSummary.$inferSelect;
+export type InsertPortfolioSummary = z.infer<typeof insertPortfolioSummarySchema>;
 export type AiInsight = typeof aiInsights.$inferSelect;
 export type InsertAiInsight = z.infer<typeof insertAiInsightSchema>;

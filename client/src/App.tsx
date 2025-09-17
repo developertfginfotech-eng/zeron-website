@@ -11,6 +11,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 // Pages
 import Dashboard from "@/pages/dashboard";
 import Users from "@/pages/users";
+import Investors from "@/pages/investors";
 import Properties from "@/pages/properties";
 import Transactions from "@/pages/transactions";
 import Documents from "@/pages/documents";
@@ -25,6 +26,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/users" component={Users} />
+      <Route path="/investors" component={Investors} />
       <Route path="/properties" component={Properties} />
       <Route path="/transactions" component={Transactions} />
       <Route path="/documents" component={Documents} />

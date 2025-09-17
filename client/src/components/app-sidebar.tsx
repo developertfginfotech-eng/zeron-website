@@ -1,6 +1,7 @@
 import { 
   Building2, 
   Users, 
+  UserCheck,
   TrendingUp, 
   FileText, 
   Bell, 
@@ -31,9 +32,14 @@ const items = [
     icon: Home,
   },
   {
-    title: "Users & KYC",
+    title: "Admin Users",
     url: "/users",
     icon: Users,
+  },
+  {
+    title: "Investors",
+    url: "/investors",
+    icon: UserCheck,
   },
   {
     title: "Properties",
@@ -46,7 +52,7 @@ const items = [
     icon: TrendingUp,
   },
   {
-    title: "Documents",
+    title: "KYC Documents",
     url: "/documents",
     icon: FileText,
   },
