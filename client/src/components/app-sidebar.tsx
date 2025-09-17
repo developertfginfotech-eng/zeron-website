@@ -1,6 +1,5 @@
 import { 
   Building2, 
-  Users, 
   UserCheck,
   TrendingUp, 
   FileText, 
@@ -30,11 +29,6 @@ const items = [
     title: "Dashboard",
     url: "/",
     icon: Home,
-  },
-  {
-    title: "Admin Users",
-    url: "/users",
-    icon: Users,
   },
   {
     title: "Investors",
