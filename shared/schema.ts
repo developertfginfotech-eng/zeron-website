@@ -85,10 +85,38 @@ export const transactions = pgTable("transactions", {
   fee: decimal("fee", { precision: 10, scale: 2 }).default("0"),
   description: text("description"),
   reference: text("reference"), // Transaction reference number
-  status: text("status").notNull().default("pending"), // "pending", "completed", "failed", "cancelled"
+  status: text("status").notNull().default("pending"), // "pending", "completed", "failed", "cancelled", "rejected"
   paymentMethod: text("payment_method"), // "bank_transfer", "card", "wallet"
   bankDetails: text("bank_details"), // JSON string of bank details
   processedAt: timestamp("processed_at"),
+  processedBy: varchar("processed_by").references(() => adminUsers.id), // Admin who processed
+  rejectionReason: text("rejection_reason"), // Reason for rejection
+  rejectionComment: text("rejection_comment"), // Additional comments for rejection
+  aiAnalysis: text("ai_analysis"), // AI analysis of transaction
+  aiRiskScore: integer("ai_risk_score"), // AI calculated risk score 1-100
+  aiRecommendation: text("ai_recommendation"), // AI recommendation
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const withdrawalRequests = pgTable("withdrawal_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  investorId: varchar("investor_id").references(() => investors.id).notNull(),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  reason: text("reason"), // Reason for withdrawal
+  bankAccount: text("bank_account").notNull(), // Bank account details (JSON)
+  status: text("status").notNull().default("pending"), // "pending", "approved", "rejected", "processing", "completed"
+  requestedAt: timestamp("requested_at").defaultNow(),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewedBy: varchar("reviewed_by").references(() => adminUsers.id),
+  rejectionReason: text("rejection_reason"), // Standardized rejection reason
+  rejectionComment: text("rejection_comment"), // Additional rejection comments
+  processedAt: timestamp("processed_at"),
+  transactionId: varchar("transaction_id").references(() => transactions.id), // Linked transaction when processed
+  aiAnalysis: text("ai_analysis"), // AI analysis of withdrawal request
+  aiRiskScore: integer("ai_risk_score"), // AI risk assessment
+  aiRecommendation: text("ai_recommendation"), // AI recommendation
+  priority: text("priority").default("normal"), // "low", "normal", "high", "urgent"
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -200,6 +228,13 @@ export const insertKycDocumentSchema = createInsertSchema(kycDocuments).omit({
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWithdrawalRequestSchema = createInsertSchema(withdrawalRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
@@ -233,6 +268,8 @@ export type InsertInvestor = z.infer<typeof insertInvestorSchema>;
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type WithdrawalRequest = typeof withdrawalRequests.$inferSelect;
+export type InsertWithdrawalRequest = z.infer<typeof insertWithdrawalRequestSchema>;
 export type KycDocument = typeof kycDocuments.$inferSelect;
 export type InsertKycDocument = z.infer<typeof insertKycDocumentSchema>;
 export type Notification = typeof notifications.$inferSelect;
