@@ -57,6 +57,10 @@ export const investors = pgTable("investors", {
   gender: text("gender"), // "male", "female", "other"
   dateOfBirth: timestamp("date_of_birth"),
   occupation: text("occupation"),
+  jobCategory: text("job_category"), // "executive", "management", "professional", "skilled_worker", "entry_level", "labor"
+  jobTitle: text("job_title"),
+  company: text("company"),
+  workExperience: integer("work_experience"), // years of experience
   city: text("city"),
   country: text("country"),
   address: text("address"),
@@ -65,7 +69,9 @@ export const investors = pgTable("investors", {
   appDownloadedAt: timestamp("app_downloaded_at"),
   kycSubmittedAt: timestamp("kyc_submitted_at"),
   aiRiskScore: integer("ai_risk_score"), // 1-100 AI calculated risk score
+  investorTier: text("investor_tier"), // "top", "medium", "low"
   preferredLanguage: text("preferred_language").default("en"),
+  languagesSpoken: text("languages_spoken").array().default(sql`ARRAY[]::text[]`), // array of language codes
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

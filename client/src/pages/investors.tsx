@@ -39,136 +39,178 @@ interface InvestorWithPortfolio extends Investor {
 export default function Investors() {
   const [searchTerm, setSearchTerm] = useState("")
   const [riskFilter, setRiskFilter] = useState("all")
+  const [jobCategoryFilter, setJobCategoryFilter] = useState("all")
+  const [investorTierFilter, setInvestorTierFilter] = useState("all")
+  const [languageFilter, setLanguageFilter] = useState("all")
   const [selectedInvestor, setSelectedInvestor] = useState<InvestorWithPortfolio | null>(null)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
   // Comprehensive mock investors data - only KYC approved customers
   const mockInvestors: InvestorWithPortfolio[] = [
+    // TOP TIER INVESTORS (Executives)
     {
-      // Basic investor info
+      // Executive - High Investment
       id: '1',
       name: 'Ahmed Al-Mansouri',
       firstName: 'Ahmed',
       lastName: 'Al-Mansouri',
-      email: 'ahmed.mansouri@gmail.com',
+      email: 'ahmed.mansouri@aramco.com',
       phone: '+966 50 123 4567',
       salutation: 'Mr',
       gender: 'male',
-      dateOfBirth: new Date('1985-03-15'),
-      occupation: 'Senior Software Engineer',
+      dateOfBirth: new Date('1975-03-15'),
+      occupation: 'Chief Technology Officer',
+      jobCategory: 'executive',
+      jobTitle: 'Chief Technology Officer',
+      company: 'Saudi Aramco',
+      workExperience: 25,
       city: 'Riyadh',
       country: 'Saudi Arabia',
-      address: 'Al-Malaz District, Riyadh',
+      address: 'King Fahd District, Riyadh',
       nationality: 'Saudi Arabia',
       profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       kycStatus: 'approved',
-      totalInvested: '485000',
-      activeProperties: 3,
-      monthlyIncome: '18500',
+      totalInvested: '2850000',
+      activeProperties: 8,
+      monthlyIncome: '85000',
       documentsUploaded: true,
       applicationProgress: 100,
-      appDownloadedAt: new Date('2024-01-10T08:30:00Z'),
-      kycSubmittedAt: new Date('2024-01-15T14:22:00Z'),
-      aiRiskScore: 25,
+      appDownloadedAt: new Date('2024-01-05T08:30:00Z'),
+      kycSubmittedAt: new Date('2024-01-10T14:22:00Z'),
+      aiRiskScore: 8,
+      investorTier: 'top',
       preferredLanguage: 'en',
-      createdAt: new Date('2024-01-10'),
-      updatedAt: new Date('2024-01-20'),
+      languagesSpoken: ['en', 'ar'],
+      createdAt: new Date('2024-01-05'),
+      updatedAt: new Date('2024-01-15'),
 
-      // Portfolio summary
+      // Portfolio summary - High tier investor
       portfolio: {
         id: 'port1',
         investorId: '1',
-        totalInvestment: '485000',
-        currentValue: '522500',
-        totalReturns: '37500',
-        totalDividends: '15200',
-        totalWithdrawals: '8000',
-        unrealizedGains: '22300',
-        realizedGains: '15200',
-        riskScore: 25,
-        performanceScore: 85,
-        lastUpdated: new Date('2024-01-20'),
+        totalInvestment: '2850000',
+        currentValue: '3265000',
+        totalReturns: '415000',
+        totalDividends: '128500',
+        totalWithdrawals: '50000',
+        unrealizedGains: '286500',
+        realizedGains: '128500',
+        riskScore: 8,
+        performanceScore: 96,
+        lastUpdated: new Date('2024-04-15'),
       },
 
-      // Investments
+      // Investments - Multiple large properties
       investments: [
         {
           id: 'inv1',
           investorId: '1',
           propertyId: 'prop1',
-          investmentAmount: '200000',
-          ownershipPercentage: '15.5',
+          investmentAmount: '800000',
+          ownershipPercentage: '25.5',
           expectedReturn: '8.2',
-          currentValue: '218000',
-          totalReturns: '18000',
-          totalDividends: '6500',
+          currentValue: '912000',
+          totalReturns: '112000',
+          totalDividends: '42000',
           status: 'active',
-          investmentDate: new Date('2024-01-20T10:30:00Z'),
+          investmentDate: new Date('2024-01-10T10:30:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-01-20'),
-          updatedAt: new Date('2024-01-20'),
+          createdAt: new Date('2024-01-10'),
+          updatedAt: new Date('2024-01-10'),
         },
         {
           id: 'inv2',
           investorId: '1',
           propertyId: 'prop2',
-          investmentAmount: '185000',
-          ownershipPercentage: '12.3',
+          investmentAmount: '650000',
+          ownershipPercentage: '22.3',
           expectedReturn: '7.8',
-          currentValue: '195500',
-          totalReturns: '10500',
-          totalDividends: '5200',
+          currentValue: '739000',
+          totalReturns: '89000',
+          totalDividends: '35500',
           status: 'active',
-          investmentDate: new Date('2024-02-15T14:20:00Z'),
+          investmentDate: new Date('2024-01-25T14:20:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-02-15'),
-          updatedAt: new Date('2024-02-15'),
+          createdAt: new Date('2024-01-25'),
+          updatedAt: new Date('2024-01-25'),
         },
         {
           id: 'inv3',
           investorId: '1',
           propertyId: 'prop3',
-          investmentAmount: '100000',
-          ownershipPercentage: '8.7',
+          investmentAmount: '500000',
+          ownershipPercentage: '18.7',
           expectedReturn: '9.1',
-          currentValue: '109000',
-          totalReturns: '9000',
-          totalDividends: '3500',
+          currentValue: '585000',
+          totalReturns: '85000',
+          totalDividends: '28500',
           status: 'active',
-          investmentDate: new Date('2024-03-10T16:45:00Z'),
+          investmentDate: new Date('2024-02-15T16:45:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-03-10'),
-          updatedAt: new Date('2024-03-10'),
+          createdAt: new Date('2024-02-15'),
+          updatedAt: new Date('2024-02-15'),
+        },
+        {
+          id: 'inv4',
+          investorId: '1',
+          propertyId: 'prop4',
+          investmentAmount: '450000',
+          ownershipPercentage: '16.2',
+          expectedReturn: '8.5',
+          currentValue: '518000',
+          totalReturns: '68000',
+          totalDividends: '22500',
+          status: 'active',
+          investmentDate: new Date('2024-03-01T11:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-01'),
+          updatedAt: new Date('2024-03-01'),
+        },
+        {
+          id: 'inv5',
+          investorId: '1',
+          propertyId: 'prop5',
+          investmentAmount: '450000',
+          ownershipPercentage: '15.8',
+          expectedReturn: '7.9',
+          currentValue: '511000',
+          totalReturns: '61000',
+          totalDividends: '19000',
+          status: 'active',
+          investmentDate: new Date('2024-03-20T09:15:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-20'),
+          updatedAt: new Date('2024-03-20'),
         }
       ],
 
-      // Transactions
+      // Transactions - High value transactions
       transactions: [
         {
           id: 'tx1',
           investorId: '1',
           propertyId: 'prop1',
           type: 'investment',
-          amount: '200000',
-          fee: '2000',
-          description: 'Initial investment in Luxury Residential Complex',
+          amount: '800000',
+          fee: '8000',
+          description: 'Major investment in Premium Commercial Tower',
           reference: 'INV-001-2024',
           status: 'completed',
           paymentMethod: 'bank_transfer',
           bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****4567' }),
-          processedAt: new Date('2024-01-20T10:30:00Z'),
-          createdAt: new Date('2024-01-20T08:15:00Z'),
-          updatedAt: new Date('2024-01-20T10:30:00Z'),
+          processedAt: new Date('2024-01-10T10:30:00Z'),
+          createdAt: new Date('2024-01-10T08:15:00Z'),
+          updatedAt: new Date('2024-01-10T10:30:00Z'),
         },
         {
           id: 'tx2',
           investorId: '1',
-          propertyId: 'prop1',
+          propertyId: null,
           type: 'dividend',
-          amount: '6500',
+          amount: '128500',
           fee: '0',
-          description: 'Quarterly dividend payment',
-          reference: 'DIV-Q1-2024',
+          description: 'Quarterly dividend payments (all properties)',
+          reference: 'DIV-Q1-2024-ALL',
           status: 'completed',
           paymentMethod: 'bank_transfer',
           bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****4567' }),
@@ -181,9 +223,9 @@ export default function Investors() {
           investorId: '1',
           propertyId: null,
           type: 'withdrawal',
-          amount: '8000',
-          fee: '100',
-          description: 'Partial profit withdrawal',
+          amount: '50000',
+          fee: '500',
+          description: 'Partial profit withdrawal for personal use',
           reference: 'WTH-001-2024',
           status: 'completed',
           paymentMethod: 'bank_transfer',
@@ -194,83 +236,122 @@ export default function Investors() {
         }
       ]
     },
+
+    // SECOND TOP TIER INVESTOR (Executive - International)
     {
-      // Second investor
       id: '2',
-      name: 'Fatima Al-Zahra',
-      firstName: 'Fatima',
-      lastName: 'Al-Zahra',
-      email: 'fatima.zahra@hotmail.com',
-      phone: '+966 55 987 6543',
-      salutation: 'Mrs',
+      name: 'Dr. Sarah Al-Qahtani',
+      firstName: 'Sarah',
+      lastName: 'Al-Qahtani',
+      email: 'sarah.qahtani@kfsh.med.sa',
+      phone: '+966 55 234 5678',
+      salutation: 'Dr',
       gender: 'female',
-      dateOfBirth: new Date('1990-07-22'),
-      occupation: 'Marketing Manager',
-      city: 'Jeddah',
+      dateOfBirth: new Date('1978-11-22'),
+      occupation: 'Hospital Chief Executive',
+      jobCategory: 'executive',
+      jobTitle: 'Chief Executive Officer',
+      company: 'King Faisal Specialist Hospital',
+      workExperience: 22,
+      city: 'Riyadh',
       country: 'Saudi Arabia',
-      address: 'Al-Hamra District, Jeddah',
+      address: 'Diplomatic Quarter, Riyadh',
       nationality: 'Saudi Arabia',
       profilePicture: 'https://images.unsplash.com/photo-1494790108755-2616b5b0c8d1?w=150&h=150&fit=crop&crop=face',
       kycStatus: 'approved',
-      totalInvested: '325000',
-      activeProperties: 2,
-      monthlyIncome: '15200',
+      totalInvested: '1950000',
+      activeProperties: 6,
+      monthlyIncome: '72000',
       documentsUploaded: true,
       applicationProgress: 100,
-      appDownloadedAt: new Date('2024-01-05T12:15:00Z'),
-      kycSubmittedAt: new Date('2024-01-08T16:45:00Z'),
-      aiRiskScore: 15,
+      appDownloadedAt: new Date('2024-01-08T09:15:00Z'),
+      kycSubmittedAt: new Date('2024-01-12T16:30:00Z'),
+      aiRiskScore: 12,
+      investorTier: 'top',
       preferredLanguage: 'ar',
-      createdAt: new Date('2024-01-05'),
+      languagesSpoken: ['ar', 'en', 'fr'],
+      createdAt: new Date('2024-01-08'),
       updatedAt: new Date('2024-01-18'),
 
       portfolio: {
         id: 'port2',
         investorId: '2',
-        totalInvestment: '325000',
-        currentValue: '358750',
-        totalReturns: '33750',
-        totalDividends: '12800',
-        totalWithdrawals: '5000',
-        unrealizedGains: '20950',
-        realizedGains: '12800',
-        riskScore: 15,
-        performanceScore: 92,
-        lastUpdated: new Date('2024-01-18'),
+        totalInvestment: '1950000',
+        currentValue: '2243000',
+        totalReturns: '293000',
+        totalDividends: '89500',
+        totalWithdrawals: '25000',
+        unrealizedGains: '203500',
+        realizedGains: '89500',
+        riskScore: 12,
+        performanceScore: 94,
+        lastUpdated: new Date('2024-04-10'),
       },
 
       investments: [
         {
-          id: 'inv4',
+          id: 'inv6',
           investorId: '2',
-          propertyId: 'prop2',
-          investmentAmount: '175000',
-          ownershipPercentage: '11.6',
+          propertyId: 'prop6',
+          investmentAmount: '600000',
+          ownershipPercentage: '21.5',
           expectedReturn: '8.5',
-          currentValue: '189250',
-          totalReturns: '14250',
-          totalDividends: '7200',
+          currentValue: '696000',
+          totalReturns: '96000',
+          totalDividends: '32000',
           status: 'active',
-          investmentDate: new Date('2024-01-12T09:15:00Z'),
+          investmentDate: new Date('2024-01-18T13:20:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-01-12'),
-          updatedAt: new Date('2024-01-12'),
+          createdAt: new Date('2024-01-18'),
+          updatedAt: new Date('2024-01-18'),
         },
         {
-          id: 'inv5',
+          id: 'inv7',
           investorId: '2',
-          propertyId: 'prop4',
-          investmentAmount: '150000',
-          ownershipPercentage: '9.8',
-          expectedReturn: '9.2',
-          currentValue: '169500',
-          totalReturns: '19500',
-          totalDividends: '5600',
+          propertyId: 'prop7',
+          investmentAmount: '450000',
+          ownershipPercentage: '17.4',
+          expectedReturn: '9.1',
+          currentValue: '531000',
+          totalReturns: '81000',
+          totalDividends: '28500',
           status: 'active',
-          investmentDate: new Date('2024-02-08T11:30:00Z'),
+          investmentDate: new Date('2024-02-05T10:45:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-02-08'),
-          updatedAt: new Date('2024-02-08'),
+          createdAt: new Date('2024-02-05'),
+          updatedAt: new Date('2024-02-05'),
+        },
+        {
+          id: 'inv8',
+          investorId: '2',
+          propertyId: 'prop8',
+          investmentAmount: '450000',
+          ownershipPercentage: '16.8',
+          expectedReturn: '7.9',
+          currentValue: '512000',
+          totalReturns: '62000',
+          totalDividends: '29000',
+          status: 'active',
+          investmentDate: new Date('2024-02-25T15:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-02-25'),
+          updatedAt: new Date('2024-02-25'),
+        },
+        {
+          id: 'inv9',
+          investorId: '2',
+          propertyId: 'prop9',
+          investmentAmount: '450000',
+          ownershipPercentage: '15.2',
+          expectedReturn: '8.3',
+          currentValue: '504000',
+          totalReturns: '54000',
+          totalDividends: '18500',
+          status: 'active',
+          investmentDate: new Date('2024-03-12T12:00:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-12'),
+          updatedAt: new Date('2024-03-12'),
         }
       ],
 
@@ -278,27 +359,27 @@ export default function Investors() {
         {
           id: 'tx4',
           investorId: '2',
-          propertyId: 'prop2',
+          propertyId: 'prop6',
           type: 'investment',
-          amount: '175000',
-          fee: '1750',
-          description: 'Investment in Commercial Complex',
+          amount: '600000',
+          fee: '6000',
+          description: 'Investment in Medical District Complex',
           reference: 'INV-002-2024',
           status: 'completed',
           paymentMethod: 'bank_transfer',
           bankDetails: JSON.stringify({ bank: 'SABB Bank', account: '****9876' }),
-          processedAt: new Date('2024-01-12T09:15:00Z'),
-          createdAt: new Date('2024-01-12T08:00:00Z'),
-          updatedAt: new Date('2024-01-12T09:15:00Z'),
+          processedAt: new Date('2024-01-18T13:20:00Z'),
+          createdAt: new Date('2024-01-18T11:00:00Z'),
+          updatedAt: new Date('2024-01-18T13:20:00Z'),
         },
         {
           id: 'tx5',
           investorId: '2',
-          propertyId: 'prop2',
+          propertyId: null,
           type: 'dividend',
-          amount: '7200',
+          amount: '89500',
           fee: '0',
-          description: 'Quarterly dividend payment',
+          description: 'Quarterly dividend payments',
           reference: 'DIV-Q1-2024',
           status: 'completed',
           paymentMethod: 'bank_transfer',
@@ -309,99 +390,122 @@ export default function Investors() {
         }
       ]
     },
+
+    // MANAGEMENT TIER INVESTORS
     {
-      // Third investor
       id: '3',
       name: 'Khalid Al-Mutairi',
       firstName: 'Khalid',
       lastName: 'Al-Mutairi',
-      email: 'khalid.mutairi@gmail.com',
+      email: 'khalid.mutairi@sabic.com',
       phone: '+966 53 345 6789',
-      salutation: 'Dr',
+      salutation: 'Eng',
       gender: 'male',
-      dateOfBirth: new Date('1979-09-30'),
-      occupation: 'Medical Doctor',
-      city: 'Mecca',
+      dateOfBirth: new Date('1982-09-30'),
+      occupation: 'Regional Operations Manager',
+      jobCategory: 'management',
+      jobTitle: 'Regional Operations Manager',
+      company: 'SABIC',
+      workExperience: 18,
+      city: 'Dammam',
       country: 'Saudi Arabia',
-      address: 'Al-Aziziyyah, Mecca',
+      address: 'Al-Khobar, Eastern Province',
       nationality: 'Saudi Arabia',
       profilePicture: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
       kycStatus: 'approved',
-      totalInvested: '750000',
+      totalInvested: '875000',
       activeProperties: 4,
       monthlyIncome: '35000',
       documentsUploaded: true,
       applicationProgress: 100,
-      appDownloadedAt: new Date('2024-01-08T07:20:00Z'),
-      kycSubmittedAt: new Date('2024-01-16T12:45:00Z'),
-      aiRiskScore: 12,
+      appDownloadedAt: new Date('2024-01-12T07:20:00Z'),
+      kycSubmittedAt: new Date('2024-01-18T12:45:00Z'),
+      aiRiskScore: 18,
+      investorTier: 'medium',
       preferredLanguage: 'ar',
-      createdAt: new Date('2024-01-08'),
-      updatedAt: new Date('2024-01-16'),
+      languagesSpoken: ['ar', 'en'],
+      createdAt: new Date('2024-01-12'),
+      updatedAt: new Date('2024-01-25'),
 
       portfolio: {
         id: 'port3',
         investorId: '3',
-        totalInvestment: '750000',
-        currentValue: '847500',
-        totalReturns: '97500',
-        totalDividends: '28300',
+        totalInvestment: '875000',
+        currentValue: '1015000',
+        totalReturns: '140000',
+        totalDividends: '52500',
         totalWithdrawals: '15000',
-        unrealizedGains: '69200',
-        realizedGains: '28300',
-        riskScore: 12,
-        performanceScore: 96,
-        lastUpdated: new Date('2024-01-16'),
+        unrealizedGains: '87500',
+        realizedGains: '52500',
+        riskScore: 18,
+        performanceScore: 88,
+        lastUpdated: new Date('2024-04-08'),
       },
 
       investments: [
         {
-          id: 'inv6',
+          id: 'inv10',
           investorId: '3',
-          propertyId: 'prop1',
-          investmentAmount: '250000',
+          propertyId: 'prop10',
+          investmentAmount: '300000',
           ownershipPercentage: '19.3',
           expectedReturn: '8.2',
-          currentValue: '281250',
-          totalReturns: '31250',
-          totalDividends: '10200',
+          currentValue: '345000',
+          totalReturns: '45000',
+          totalDividends: '18200',
           status: 'active',
-          investmentDate: new Date('2024-01-18T13:20:00Z'),
+          investmentDate: new Date('2024-01-25T13:20:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-01-18'),
-          updatedAt: new Date('2024-01-18'),
+          createdAt: new Date('2024-01-25'),
+          updatedAt: new Date('2024-01-25'),
         },
         {
-          id: 'inv7',
+          id: 'inv11',
           investorId: '3',
-          propertyId: 'prop3',
-          investmentAmount: '200000',
+          propertyId: 'prop11',
+          investmentAmount: '250000',
           ownershipPercentage: '17.4',
           expectedReturn: '9.1',
-          currentValue: '230000',
-          totalReturns: '30000',
-          totalDividends: '8500',
+          currentValue: '290000',
+          totalReturns: '40000',
+          totalDividends: '15500',
           status: 'active',
-          investmentDate: new Date('2024-02-02T10:45:00Z'),
+          investmentDate: new Date('2024-02-10T10:45:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-02-02'),
-          updatedAt: new Date('2024-02-02'),
+          createdAt: new Date('2024-02-10'),
+          updatedAt: new Date('2024-02-10'),
         },
         {
-          id: 'inv8',
+          id: 'inv12',
           investorId: '3',
-          propertyId: 'prop5',
-          investmentAmount: '300000',
-          ownershipPercentage: '22.1',
+          propertyId: 'prop12',
+          investmentAmount: '175000',
+          ownershipPercentage: '12.1',
           expectedReturn: '7.9',
-          currentValue: '336250',
-          totalReturns: '36250',
-          totalDividends: '9600',
+          currentValue: '196000',
+          totalReturns: '21000',
+          totalDividends: '9800',
           status: 'active',
-          investmentDate: new Date('2024-02-20T15:30:00Z'),
+          investmentDate: new Date('2024-03-05T15:30:00Z'),
           exitDate: null,
-          createdAt: new Date('2024-02-20'),
-          updatedAt: new Date('2024-02-20'),
+          createdAt: new Date('2024-03-05'),
+          updatedAt: new Date('2024-03-05'),
+        },
+        {
+          id: 'inv13',
+          investorId: '3',
+          propertyId: 'prop13',
+          investmentAmount: '150000',
+          ownershipPercentage: '11.2',
+          expectedReturn: '8.7',
+          currentValue: '184000',
+          totalReturns: '34000',
+          totalDividends: '9000',
+          status: 'active',
+          investmentDate: new Date('2024-03-22T12:00:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-22'),
+          updatedAt: new Date('2024-03-22'),
         }
       ],
 
@@ -409,50 +513,1458 @@ export default function Investors() {
         {
           id: 'tx6',
           investorId: '3',
-          propertyId: 'prop1',
+          propertyId: 'prop10',
           type: 'investment',
-          amount: '250000',
-          fee: '2500',
-          description: 'Major investment in Luxury Residential Complex',
+          amount: '300000',
+          fee: '3000',
+          description: 'Investment in Eastern Province Industrial Complex',
           reference: 'INV-003-2024',
           status: 'completed',
           paymentMethod: 'bank_transfer',
           bankDetails: JSON.stringify({ bank: 'NCB Bank', account: '****1234' }),
-          processedAt: new Date('2024-01-18T13:20:00Z'),
-          createdAt: new Date('2024-01-18T11:00:00Z'),
-          updatedAt: new Date('2024-01-18T13:20:00Z'),
+          processedAt: new Date('2024-01-25T13:20:00Z'),
+          createdAt: new Date('2024-01-25T11:00:00Z'),
+          updatedAt: new Date('2024-01-25T13:20:00Z'),
         },
         {
           id: 'tx7',
           investorId: '3',
           propertyId: null,
           type: 'dividend',
-          amount: '28300',
+          amount: '52500',
           fee: '0',
           description: 'Quarterly dividend payments (all properties)',
-          reference: 'DIV-Q1-2024-ALL',
+          reference: 'DIV-Q1-2024',
           status: 'completed',
           paymentMethod: 'bank_transfer',
           bankDetails: JSON.stringify({ bank: 'NCB Bank', account: '****1234' }),
           processedAt: new Date('2024-04-01T12:00:00Z'),
           createdAt: new Date('2024-04-01T11:00:00Z'),
           updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '4',
+      name: 'Fatima Al-Zahra',
+      firstName: 'Fatima',
+      lastName: 'Al-Zahra',
+      email: 'fatima.zahra@stc.com.sa',
+      phone: '+966 55 987 6543',
+      salutation: 'Mrs',
+      gender: 'female',
+      dateOfBirth: new Date('1985-07-22'),
+      occupation: 'Marketing Director',
+      jobCategory: 'management',
+      jobTitle: 'Marketing Director',
+      company: 'Saudi Telecom Company',
+      workExperience: 15,
+      city: 'Jeddah',
+      country: 'Saudi Arabia',
+      address: 'Al-Hamra District, Jeddah',
+      nationality: 'Saudi Arabia',
+      profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '625000',
+      activeProperties: 3,
+      monthlyIncome: '28500',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-01-15T12:15:00Z'),
+      kycSubmittedAt: new Date('2024-01-20T16:45:00Z'),
+      aiRiskScore: 22,
+      investorTier: 'medium',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ar', 'en'],
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date('2024-01-28'),
+
+      portfolio: {
+        id: 'port4',
+        investorId: '4',
+        totalInvestment: '625000',
+        currentValue: '718750',
+        totalReturns: '93750',
+        totalDividends: '38200',
+        totalWithdrawals: '0',
+        unrealizedGains: '55550',
+        realizedGains: '38200',
+        riskScore: 22,
+        performanceScore: 91,
+        lastUpdated: new Date('2024-04-05'),
+      },
+
+      investments: [
+        {
+          id: 'inv14',
+          investorId: '4',
+          propertyId: 'prop14',
+          investmentAmount: '275000',
+          ownershipPercentage: '16.6',
+          expectedReturn: '8.5',
+          currentValue: '315000',
+          totalReturns: '40000',
+          totalDividends: '16200',
+          status: 'active',
+          investmentDate: new Date('2024-01-28T09:15:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-01-28'),
+          updatedAt: new Date('2024-01-28'),
         },
         {
+          id: 'inv15',
+          investorId: '4',
+          propertyId: 'prop15',
+          investmentAmount: '200000',
+          ownershipPercentage: '13.8',
+          expectedReturn: '9.2',
+          currentValue: '235000',
+          totalReturns: '35000',
+          totalDividends: '12500',
+          status: 'active',
+          investmentDate: new Date('2024-02-18T11:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-02-18'),
+          updatedAt: new Date('2024-02-18'),
+        },
+        {
+          id: 'inv16',
+          investorId: '4',
+          propertyId: 'prop16',
+          investmentAmount: '150000',
+          ownershipPercentage: '11.2',
+          expectedReturn: '7.8',
+          currentValue: '168750',
+          totalReturns: '18750',
+          totalDividends: '9500',
+          status: 'active',
+          investmentDate: new Date('2024-03-08T14:45:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-08'),
+          updatedAt: new Date('2024-03-08'),
+        }
+      ],
+
+      transactions: [
+        {
           id: 'tx8',
-          investorId: '3',
-          propertyId: null,
-          type: 'withdrawal',
-          amount: '15000',
-          fee: '150',
-          description: 'Profit withdrawal',
-          reference: 'WTH-002-2024',
+          investorId: '4',
+          propertyId: 'prop14',
+          type: 'investment',
+          amount: '275000',
+          fee: '2750',
+          description: 'Investment in Jeddah Commercial Hub',
+          reference: 'INV-004-2024',
           status: 'completed',
           paymentMethod: 'bank_transfer',
-          bankDetails: JSON.stringify({ bank: 'NCB Bank', account: '****1234' }),
-          processedAt: new Date('2024-03-25T16:10:00Z'),
-          createdAt: new Date('2024-03-25T14:00:00Z'),
-          updatedAt: new Date('2024-03-25T16:10:00Z'),
+          bankDetails: JSON.stringify({ bank: 'Arab National Bank', account: '****5432' }),
+          processedAt: new Date('2024-01-28T09:15:00Z'),
+          createdAt: new Date('2024-01-28T08:00:00Z'),
+          updatedAt: new Date('2024-01-28T09:15:00Z'),
+        },
+        {
+          id: 'tx9',
+          investorId: '4',
+          propertyId: null,
+          type: 'dividend',
+          amount: '38200',
+          fee: '0',
+          description: 'Quarterly dividend payments',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Arab National Bank', account: '****5432' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    // PROFESSIONAL TIER INVESTORS
+    {
+      id: '5',
+      name: 'Dr. Omar Al-Rashid',
+      firstName: 'Omar',
+      lastName: 'Al-Rashid',
+      email: 'omar.rashid@ksu.edu.sa',
+      phone: '+966 56 456 7890',
+      salutation: 'Dr',
+      gender: 'male',
+      dateOfBirth: new Date('1980-04-12'),
+      occupation: 'Petroleum Engineer',
+      jobCategory: 'professional',
+      jobTitle: 'Senior Petroleum Engineer',
+      company: 'King Saud University',
+      workExperience: 20,
+      city: 'Riyadh',
+      country: 'Saudi Arabia',
+      address: 'Al-Narjis District, Riyadh',
+      nationality: 'Saudi Arabia',
+      profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '485000',
+      activeProperties: 3,
+      monthlyIncome: '22500',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-01-20T10:30:00Z'),
+      kycSubmittedAt: new Date('2024-01-25T14:22:00Z'),
+      aiRiskScore: 28,
+      investorTier: 'medium',
+      preferredLanguage: 'en',
+      languagesSpoken: ['en', 'ar'],
+      createdAt: new Date('2024-01-20'),
+      updatedAt: new Date('2024-02-05'),
+
+      portfolio: {
+        id: 'port5',
+        investorId: '5',
+        totalInvestment: '485000',
+        currentValue: '548000',
+        totalReturns: '63000',
+        totalDividends: '28500',
+        totalWithdrawals: '8000',
+        unrealizedGains: '34500',
+        realizedGains: '28500',
+        riskScore: 28,
+        performanceScore: 82,
+        lastUpdated: new Date('2024-04-02'),
+      },
+
+      investments: [
+        {
+          id: 'inv17',
+          investorId: '5',
+          propertyId: 'prop17',
+          investmentAmount: '200000',
+          ownershipPercentage: '14.5',
+          expectedReturn: '8.2',
+          currentValue: '225000',
+          totalReturns: '25000',
+          totalDividends: '12500',
+          status: 'active',
+          investmentDate: new Date('2024-02-05T10:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-02-05'),
+          updatedAt: new Date('2024-02-05'),
+        },
+        {
+          id: 'inv18',
+          investorId: '5',
+          propertyId: 'prop18',
+          investmentAmount: '185000',
+          ownershipPercentage: '12.8',
+          expectedReturn: '7.9',
+          currentValue: '205000',
+          totalReturns: '20000',
+          totalDividends: '9500',
+          status: 'active',
+          investmentDate: new Date('2024-02-20T14:20:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-02-20'),
+          updatedAt: new Date('2024-02-20'),
+        },
+        {
+          id: 'inv19',
+          investorId: '5',
+          propertyId: 'prop19',
+          investmentAmount: '100000',
+          ownershipPercentage: '8.2',
+          expectedReturn: '9.0',
+          currentValue: '118000',
+          totalReturns: '18000',
+          totalDividends: '6500',
+          status: 'active',
+          investmentDate: new Date('2024-03-10T16:45:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-10'),
+          updatedAt: new Date('2024-03-10'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx10',
+          investorId: '5',
+          propertyId: 'prop17',
+          type: 'investment',
+          amount: '200000',
+          fee: '2000',
+          description: 'Investment in Engineering Hub Complex',
+          reference: 'INV-005-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Banque Saudi Fransi', account: '****7890' }),
+          processedAt: new Date('2024-02-05T10:30:00Z'),
+          createdAt: new Date('2024-02-05T08:15:00Z'),
+          updatedAt: new Date('2024-02-05T10:30:00Z'),
+        },
+        {
+          id: 'tx11',
+          investorId: '5',
+          propertyId: null,
+          type: 'dividend',
+          amount: '28500',
+          fee: '0',
+          description: 'Quarterly dividend payments',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Banque Saudi Fransi', account: '****7890' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '6',
+      name: 'Amina Khoury',
+      firstName: 'Amina',
+      lastName: 'Khoury',
+      email: 'amina.khoury@health.gov.sa',
+      phone: '+966 57 567 8901',
+      salutation: 'Dr',
+      gender: 'female',
+      dateOfBirth: new Date('1983-09-18'),
+      occupation: 'Cardiologist',
+      jobCategory: 'professional',
+      jobTitle: 'Senior Cardiologist',
+      company: 'Ministry of Health',
+      workExperience: 16,
+      city: 'Mecca',
+      country: 'Saudi Arabia',
+      address: 'Al-Aziziyyah, Mecca',
+      nationality: 'Lebanon',
+      profilePicture: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '365000',
+      activeProperties: 2,
+      monthlyIncome: '28000',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-02-01T11:45:00Z'),
+      kycSubmittedAt: new Date('2024-02-08T15:30:00Z'),
+      aiRiskScore: 32,
+      investorTier: 'medium',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ar', 'en', 'fr'],
+      createdAt: new Date('2024-02-01'),
+      updatedAt: new Date('2024-02-15'),
+
+      portfolio: {
+        id: 'port6',
+        investorId: '6',
+        totalInvestment: '365000',
+        currentValue: '405000',
+        totalReturns: '40000',
+        totalDividends: '22500',
+        totalWithdrawals: '5000',
+        unrealizedGains: '17500',
+        realizedGains: '22500',
+        riskScore: 32,
+        performanceScore: 78,
+        lastUpdated: new Date('2024-03-28'),
+      },
+
+      investments: [
+        {
+          id: 'inv20',
+          investorId: '6',
+          propertyId: 'prop20',
+          investmentAmount: '200000',
+          ownershipPercentage: '13.2',
+          expectedReturn: '8.1',
+          currentValue: '218000',
+          totalReturns: '18000',
+          totalDividends: '12000',
+          status: 'active',
+          investmentDate: new Date('2024-02-15T09:15:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-02-15'),
+          updatedAt: new Date('2024-02-15'),
+        },
+        {
+          id: 'inv21',
+          investorId: '6',
+          propertyId: 'prop21',
+          investmentAmount: '165000',
+          ownershipPercentage: '11.4',
+          expectedReturn: '7.8',
+          currentValue: '187000',
+          totalReturns: '22000',
+          totalDividends: '10500',
+          status: 'active',
+          investmentDate: new Date('2024-03-05T11:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-05'),
+          updatedAt: new Date('2024-03-05'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx12',
+          investorId: '6',
+          propertyId: 'prop20',
+          type: 'investment',
+          amount: '200000',
+          fee: '2000',
+          description: 'Investment in Healthcare District',
+          reference: 'INV-006-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Bilad Bank', account: '****2345' }),
+          processedAt: new Date('2024-02-15T09:15:00Z'),
+          createdAt: new Date('2024-02-15T08:00:00Z'),
+          updatedAt: new Date('2024-02-15T09:15:00Z'),
+        },
+        {
+          id: 'tx13',
+          investorId: '6',
+          propertyId: null,
+          type: 'dividend',
+          amount: '22500',
+          fee: '0',
+          description: 'Quarterly dividend payments',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Bilad Bank', account: '****2345' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '7',
+      name: 'Rajesh Patel',
+      firstName: 'Rajesh',
+      lastName: 'Patel',
+      email: 'rajesh.patel@aramco.com',
+      phone: '+966 58 678 9012',
+      salutation: 'Mr',
+      gender: 'male',
+      dateOfBirth: new Date('1987-02-14'),
+      occupation: 'IT Architect',
+      jobCategory: 'professional',
+      jobTitle: 'Senior IT Architect',
+      company: 'Saudi Aramco',
+      workExperience: 12,
+      city: 'Dhahran',
+      country: 'Saudi Arabia',
+      address: 'Aramco Compound, Dhahran',
+      nationality: 'India',
+      profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '275000',
+      activeProperties: 2,
+      monthlyIncome: '19500',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-02-10T13:20:00Z'),
+      kycSubmittedAt: new Date('2024-02-18T16:45:00Z'),
+      aiRiskScore: 35,
+      investorTier: 'medium',
+      preferredLanguage: 'en',
+      languagesSpoken: ['en', 'hi', 'ar'],
+      createdAt: new Date('2024-02-10'),
+      updatedAt: new Date('2024-02-25'),
+
+      portfolio: {
+        id: 'port7',
+        investorId: '7',
+        totalInvestment: '275000',
+        currentValue: '301500',
+        totalReturns: '26500',
+        totalDividends: '16200',
+        totalWithdrawals: '0',
+        unrealizedGains: '10300',
+        realizedGains: '16200',
+        riskScore: 35,
+        performanceScore: 75,
+        lastUpdated: new Date('2024-03-25'),
+      },
+
+      investments: [
+        {
+          id: 'inv22',
+          investorId: '7',
+          propertyId: 'prop22',
+          investmentAmount: '150000',
+          ownershipPercentage: '10.8',
+          expectedReturn: '8.4',
+          currentValue: '165000',
+          totalReturns: '15000',
+          totalDividends: '9200',
+          status: 'active',
+          investmentDate: new Date('2024-02-25T12:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-02-25'),
+          updatedAt: new Date('2024-02-25'),
+        },
+        {
+          id: 'inv23',
+          investorId: '7',
+          propertyId: 'prop23',
+          investmentAmount: '125000',
+          ownershipPercentage: '9.2',
+          expectedReturn: '7.6',
+          currentValue: '136500',
+          totalReturns: '11500',
+          totalDividends: '7000',
+          status: 'active',
+          investmentDate: new Date('2024-03-15T14:45:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-15'),
+          updatedAt: new Date('2024-03-15'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx14',
+          investorId: '7',
+          propertyId: 'prop22',
+          type: 'investment',
+          amount: '150000',
+          fee: '1500',
+          description: 'Investment in Tech Park Complex',
+          reference: 'INV-007-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'SAMBA Bank', account: '****3456' }),
+          processedAt: new Date('2024-02-25T12:30:00Z'),
+          createdAt: new Date('2024-02-25T11:00:00Z'),
+          updatedAt: new Date('2024-02-25T12:30:00Z'),
+        },
+        {
+          id: 'tx15',
+          investorId: '7',
+          propertyId: null,
+          type: 'dividend',
+          amount: '16200',
+          fee: '0',
+          description: 'Quarterly dividend payments',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'SAMBA Bank', account: '****3456' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    // SKILLED WORKER TIER INVESTORS  
+    {
+      id: '8',
+      name: 'Nadia Al-Harbi',
+      firstName: 'Nadia',
+      lastName: 'Al-Harbi',
+      email: 'nadia.harbi@education.gov.sa',
+      phone: '+966 59 789 0123',
+      salutation: 'Ms',
+      gender: 'female',
+      dateOfBirth: new Date('1988-06-25'),
+      occupation: 'High School Teacher',
+      jobCategory: 'skilled_worker',
+      jobTitle: 'Mathematics Teacher',
+      company: 'Ministry of Education',
+      workExperience: 10,
+      city: 'Medina',
+      country: 'Saudi Arabia',
+      address: 'Al-Haram District, Medina',
+      nationality: 'Saudi Arabia',
+      profilePicture: 'https://images.unsplash.com/photo-1494790108755-2616b5b0c8d1?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '125000',
+      activeProperties: 2,
+      monthlyIncome: '9500',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-02-18T14:15:00Z'),
+      kycSubmittedAt: new Date('2024-02-25T10:30:00Z'),
+      aiRiskScore: 42,
+      investorTier: 'low',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ar', 'en'],
+      createdAt: new Date('2024-02-18'),
+      updatedAt: new Date('2024-03-02'),
+
+      portfolio: {
+        id: 'port8',
+        investorId: '8',
+        totalInvestment: '125000',
+        currentValue: '133000',
+        totalReturns: '8000',
+        totalDividends: '7200',
+        totalWithdrawals: '0',
+        unrealizedGains: '800',
+        realizedGains: '7200',
+        riskScore: 42,
+        performanceScore: 68,
+        lastUpdated: new Date('2024-03-20'),
+      },
+
+      investments: [
+        {
+          id: 'inv24',
+          investorId: '8',
+          propertyId: 'prop24',
+          investmentAmount: '75000',
+          ownershipPercentage: '6.8',
+          expectedReturn: '7.2',
+          currentValue: '79500',
+          totalReturns: '4500',
+          totalDividends: '4200',
+          status: 'active',
+          investmentDate: new Date('2024-03-02T11:20:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-02'),
+          updatedAt: new Date('2024-03-02'),
+        },
+        {
+          id: 'inv25',
+          investorId: '8',
+          propertyId: 'prop25',
+          investmentAmount: '50000',
+          ownershipPercentage: '4.9',
+          expectedReturn: '6.8',
+          currentValue: '53500',
+          totalReturns: '3500',
+          totalDividends: '3000',
+          status: 'active',
+          investmentDate: new Date('2024-03-18T09:45:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-18'),
+          updatedAt: new Date('2024-03-18'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx16',
+          investorId: '8',
+          propertyId: 'prop24',
+          type: 'investment',
+          amount: '75000',
+          fee: '750',
+          description: 'Investment in Educational Hub',
+          reference: 'INV-008-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Alinma Bank', account: '****4567' }),
+          processedAt: new Date('2024-03-02T11:20:00Z'),
+          createdAt: new Date('2024-03-02T10:00:00Z'),
+          updatedAt: new Date('2024-03-02T11:20:00Z'),
+        },
+        {
+          id: 'tx17',
+          investorId: '8',
+          propertyId: null,
+          type: 'dividend',
+          amount: '7200',
+          fee: '0',
+          description: 'Quarterly dividend payments',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Alinma Bank', account: '****4567' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '9',
+      name: 'Mohammad Al-Sayed',
+      firstName: 'Mohammad',
+      lastName: 'Al-Sayed',
+      email: 'mohammad.sayed@gmail.com',
+      phone: '+966 50 890 1234',
+      salutation: 'Mr',
+      gender: 'male',
+      dateOfBirth: new Date('1984-12-03'),
+      occupation: 'Aircraft Mechanic',
+      jobCategory: 'skilled_worker',
+      jobTitle: 'Senior Aircraft Mechanic',
+      company: 'Saudia Airlines',
+      workExperience: 16,
+      city: 'Jeddah',
+      country: 'Saudi Arabia',
+      address: 'King Abdulaziz International Airport',
+      nationality: 'Saudi Arabia',
+      profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '185000',
+      activeProperties: 2,
+      monthlyIncome: '12500',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-02-22T16:30:00Z'),
+      kycSubmittedAt: new Date('2024-03-01T14:15:00Z'),
+      aiRiskScore: 38,
+      investorTier: 'low',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ar', 'en'],
+      createdAt: new Date('2024-02-22'),
+      updatedAt: new Date('2024-03-08'),
+
+      portfolio: {
+        id: 'port9',
+        investorId: '9',
+        totalInvestment: '185000',
+        currentValue: '198500',
+        totalReturns: '13500',
+        totalDividends: '11800',
+        totalWithdrawals: '2500',
+        unrealizedGains: '1700',
+        realizedGains: '11800',
+        riskScore: 38,
+        performanceScore: 72,
+        lastUpdated: new Date('2024-03-15'),
+      },
+
+      investments: [
+        {
+          id: 'inv26',
+          investorId: '9',
+          propertyId: 'prop26',
+          investmentAmount: '100000',
+          ownershipPercentage: '8.5',
+          expectedReturn: '7.5',
+          currentValue: '107000',
+          totalReturns: '7000',
+          totalDividends: '6500',
+          status: 'active',
+          investmentDate: new Date('2024-03-08T13:40:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-08'),
+          updatedAt: new Date('2024-03-08'),
+        },
+        {
+          id: 'inv27',
+          investorId: '9',
+          propertyId: 'prop27',
+          investmentAmount: '85000',
+          ownershipPercentage: '7.2',
+          expectedReturn: '7.8',
+          currentValue: '91500',
+          totalReturns: '6500',
+          totalDividends: '5300',
+          status: 'active',
+          investmentDate: new Date('2024-03-25T15:20:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-25'),
+          updatedAt: new Date('2024-03-25'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx18',
+          investorId: '9',
+          propertyId: 'prop26',
+          type: 'investment',
+          amount: '100000',
+          fee: '1000',
+          description: 'Investment in Airport Commercial Zone',
+          reference: 'INV-009-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****5678' }),
+          processedAt: new Date('2024-03-08T13:40:00Z'),
+          createdAt: new Date('2024-03-08T12:00:00Z'),
+          updatedAt: new Date('2024-03-08T13:40:00Z'),
+        },
+        {
+          id: 'tx19',
+          investorId: '9',
+          propertyId: null,
+          type: 'dividend',
+          amount: '11800',
+          fee: '0',
+          description: 'Quarterly dividend payments',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****5678' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        },
+        {
+          id: 'tx20',
+          investorId: '9',
+          propertyId: null,
+          type: 'withdrawal',
+          amount: '2500',
+          fee: '25',
+          description: 'Small withdrawal for family expenses',
+          reference: 'WTH-003-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****5678' }),
+          processedAt: new Date('2024-03-22T10:15:00Z'),
+          createdAt: new Date('2024-03-22T09:30:00Z'),
+          updatedAt: new Date('2024-03-22T10:15:00Z'),
+        }
+      ]
+    },
+
+    // ENTRY LEVEL WORKERS
+    {
+      id: '10',
+      name: 'Yusuf Chen',
+      firstName: 'Yusuf',
+      lastName: 'Chen',
+      email: 'yusuf.chen@outlook.com',
+      phone: '+966 51 901 2345',
+      salutation: 'Mr',
+      gender: 'male',
+      dateOfBirth: new Date('1993-08-15'),
+      occupation: 'Junior Accountant',
+      jobCategory: 'entry_level',
+      jobTitle: 'Junior Accountant',
+      company: 'Local Accounting Firm',
+      workExperience: 3,
+      city: 'Abha',
+      country: 'Saudi Arabia',
+      address: 'Al-Manhal District, Abha',
+      nationality: 'China',
+      profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '45000',
+      activeProperties: 1,
+      monthlyIncome: '4200',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-03-05T08:45:00Z'),
+      kycSubmittedAt: new Date('2024-03-12T11:20:00Z'),
+      aiRiskScore: 58,
+      investorTier: 'low',
+      preferredLanguage: 'en',
+      languagesSpoken: ['en', 'ar', 'zh'],
+      createdAt: new Date('2024-03-05'),
+      updatedAt: new Date('2024-03-18'),
+
+      portfolio: {
+        id: 'port10',
+        investorId: '10',
+        totalInvestment: '45000',
+        currentValue: '47500',
+        totalReturns: '2500',
+        totalDividends: '2100',
+        totalWithdrawals: '0',
+        unrealizedGains: '400',
+        realizedGains: '2100',
+        riskScore: 58,
+        performanceScore: 62,
+        lastUpdated: new Date('2024-03-30'),
+      },
+
+      investments: [
+        {
+          id: 'inv28',
+          investorId: '10',
+          propertyId: 'prop28',
+          investmentAmount: '45000',
+          ownershipPercentage: '3.8',
+          expectedReturn: '6.9',
+          currentValue: '47500',
+          totalReturns: '2500',
+          totalDividends: '2100',
+          status: 'active',
+          investmentDate: new Date('2024-03-18T14:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-18'),
+          updatedAt: new Date('2024-03-18'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx21',
+          investorId: '10',
+          propertyId: 'prop28',
+          type: 'investment',
+          amount: '45000',
+          fee: '450',
+          description: 'First investment in Residential Complex',
+          reference: 'INV-010-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Bank AlJazira', account: '****6789' }),
+          processedAt: new Date('2024-03-18T14:30:00Z'),
+          createdAt: new Date('2024-03-18T13:15:00Z'),
+          updatedAt: new Date('2024-03-18T14:30:00Z'),
+        },
+        {
+          id: 'tx22',
+          investorId: '10',
+          propertyId: 'prop28',
+          type: 'dividend',
+          amount: '2100',
+          fee: '0',
+          description: 'First dividend payment',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Bank AlJazira', account: '****6789' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '11',
+      name: 'Layla Al-Dosari',
+      firstName: 'Layla',
+      lastName: 'Al-Dosari',
+      email: 'layla.dosari@gmail.com',
+      phone: '+966 52 012 3456',
+      salutation: 'Ms',
+      gender: 'female',
+      dateOfBirth: new Date('1996-01-20'),
+      occupation: 'Customer Service Representative',
+      jobCategory: 'entry_level',
+      jobTitle: 'Customer Service Representative',
+      company: 'STC Customer Care',
+      workExperience: 2,
+      city: 'Tabuk',
+      country: 'Saudi Arabia',
+      address: 'Prince Fahd bin Sultan, Tabuk',
+      nationality: 'Saudi Arabia',
+      profilePicture: 'https://images.unsplash.com/photo-1494790108755-2616b5b0c8d1?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '32000',
+      activeProperties: 1,
+      monthlyIncome: '3800',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-03-08T10:15:00Z'),
+      kycSubmittedAt: new Date('2024-03-15T14:40:00Z'),
+      aiRiskScore: 62,
+      investorTier: 'low',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ar', 'en'],
+      createdAt: new Date('2024-03-08'),
+      updatedAt: new Date('2024-03-22'),
+
+      portfolio: {
+        id: 'port11',
+        investorId: '11',
+        totalInvestment: '32000',
+        currentValue: '33200',
+        totalReturns: '1200',
+        totalDividends: '1800',
+        totalWithdrawals: '0',
+        unrealizedGains: '-600',
+        realizedGains: '1800',
+        riskScore: 62,
+        performanceScore: 58,
+        lastUpdated: new Date('2024-03-28'),
+      },
+
+      investments: [
+        {
+          id: 'inv29',
+          investorId: '11',
+          propertyId: 'prop29',
+          investmentAmount: '32000',
+          ownershipPercentage: '2.9',
+          expectedReturn: '6.5',
+          currentValue: '33200',
+          totalReturns: '1200',
+          totalDividends: '1800',
+          status: 'active',
+          investmentDate: new Date('2024-03-22T16:20:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-22'),
+          updatedAt: new Date('2024-03-22'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx23',
+          investorId: '11',
+          propertyId: 'prop29',
+          type: 'investment',
+          amount: '32000',
+          fee: '320',
+          description: 'Initial small investment',
+          reference: 'INV-011-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Riyad Bank', account: '****7890' }),
+          processedAt: new Date('2024-03-22T16:20:00Z'),
+          createdAt: new Date('2024-03-22T15:00:00Z'),
+          updatedAt: new Date('2024-03-22T16:20:00Z'),
+        },
+        {
+          id: 'tx24',
+          investorId: '11',
+          propertyId: 'prop29',
+          type: 'dividend',
+          amount: '1800',
+          fee: '0',
+          description: 'First dividend payment',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Riyad Bank', account: '****7890' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '12',
+      name: 'Ahmed Hassan',
+      firstName: 'Ahmed',
+      lastName: 'Hassan',
+      email: 'ahmed.hassan@retailco.sa',
+      phone: '+966 53 123 4567',
+      salutation: 'Mr',
+      gender: 'male',
+      dateOfBirth: new Date('1991-11-08'),
+      occupation: 'Retail Sales Associate',
+      jobCategory: 'entry_level',
+      jobTitle: 'Senior Sales Associate',
+      company: 'Electronics Retail Chain',
+      workExperience: 5,
+      city: 'Riyadh',
+      country: 'Saudi Arabia',
+      address: 'Al-Suwaidi District, Riyadh',
+      nationality: 'Egypt',
+      profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '65000',
+      activeProperties: 1,
+      monthlyIncome: '5200',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-03-12T12:30:00Z'),
+      kycSubmittedAt: new Date('2024-03-20T09:15:00Z'),
+      aiRiskScore: 55,
+      investorTier: 'low',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ar', 'en'],
+      createdAt: new Date('2024-03-12'),
+      updatedAt: new Date('2024-03-26'),
+
+      portfolio: {
+        id: 'port12',
+        investorId: '12',
+        totalInvestment: '65000',
+        currentValue: '68500',
+        totalReturns: '3500',
+        totalDividends: '3200',
+        totalWithdrawals: '1000',
+        unrealizedGains: '300',
+        realizedGains: '3200',
+        riskScore: 55,
+        performanceScore: 64,
+        lastUpdated: new Date('2024-03-25'),
+      },
+
+      investments: [
+        {
+          id: 'inv30',
+          investorId: '12',
+          propertyId: 'prop30',
+          investmentAmount: '65000',
+          ownershipPercentage: '5.2',
+          expectedReturn: '7.1',
+          currentValue: '68500',
+          totalReturns: '3500',
+          totalDividends: '3200',
+          status: 'active',
+          investmentDate: new Date('2024-03-26T11:45:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-03-26'),
+          updatedAt: new Date('2024-03-26'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx25',
+          investorId: '12',
+          propertyId: 'prop30',
+          type: 'investment',
+          amount: '65000',
+          fee: '650',
+          description: 'Investment in Mixed-Use Development',
+          reference: 'INV-012-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****8901' }),
+          processedAt: new Date('2024-03-26T11:45:00Z'),
+          createdAt: new Date('2024-03-26T10:30:00Z'),
+          updatedAt: new Date('2024-03-26T11:45:00Z'),
+        },
+        {
+          id: 'tx26',
+          investorId: '12',
+          propertyId: 'prop30',
+          type: 'dividend',
+          amount: '3200',
+          fee: '0',
+          description: 'Quarterly dividend payment',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****8901' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        },
+        {
+          id: 'tx27',
+          investorId: '12',
+          propertyId: null,
+          type: 'withdrawal',
+          amount: '1000',
+          fee: '10',
+          description: 'Small emergency withdrawal',
+          reference: 'WTH-004-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****8901' }),
+          processedAt: new Date('2024-03-30T14:20:00Z'),
+          createdAt: new Date('2024-03-30T13:45:00Z'),
+          updatedAt: new Date('2024-03-30T14:20:00Z'),
+        }
+      ]
+    },
+
+    // LABOR TIER WORKERS
+    {
+      id: '13',
+      name: 'Rizwan Ali',
+      firstName: 'Rizwan',
+      lastName: 'Ali', 
+      email: 'rizwan.ali@constructionco.sa',
+      phone: '+966 54 234 5678',
+      salutation: 'Mr',
+      gender: 'male',
+      dateOfBirth: new Date('1986-05-12'),
+      occupation: 'Construction Worker',
+      jobCategory: 'labor',
+      jobTitle: 'Senior Construction Worker',
+      company: 'Al-Rashid Construction',
+      workExperience: 8,
+      city: 'Riyadh',
+      country: 'Saudi Arabia',
+      address: 'Workers Housing, Industrial District',
+      nationality: 'Pakistan',
+      profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '15000',
+      activeProperties: 1,
+      monthlyIncome: '2800',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-03-18T17:45:00Z'),
+      kycSubmittedAt: new Date('2024-03-25T16:30:00Z'),
+      aiRiskScore: 68,
+      investorTier: 'low',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ur', 'ar', 'en'],
+      createdAt: new Date('2024-03-18'),
+      updatedAt: new Date('2024-04-02'),
+
+      portfolio: {
+        id: 'port13',
+        investorId: '13',
+        totalInvestment: '15000',
+        currentValue: '15400',
+        totalReturns: '400',
+        totalDividends: '650',
+        totalWithdrawals: '0',
+        unrealizedGains: '-250',
+        realizedGains: '650',
+        riskScore: 68,
+        performanceScore: 52,
+        lastUpdated: new Date('2024-04-01'),
+      },
+
+      investments: [
+        {
+          id: 'inv31',
+          investorId: '13',
+          propertyId: 'prop31',
+          investmentAmount: '15000',
+          ownershipPercentage: '1.8',
+          expectedReturn: '6.2',
+          currentValue: '15400',
+          totalReturns: '400',
+          totalDividends: '650',
+          status: 'active',
+          investmentDate: new Date('2024-04-02T08:30:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-04-02'),
+          updatedAt: new Date('2024-04-02'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx28',
+          investorId: '13',
+          propertyId: 'prop31',
+          type: 'investment',
+          amount: '15000',
+          fee: '150',
+          description: 'Small worker investment',
+          reference: 'INV-013-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****9012' }),
+          processedAt: new Date('2024-04-02T08:30:00Z'),
+          createdAt: new Date('2024-04-02T07:45:00Z'),
+          updatedAt: new Date('2024-04-02T08:30:00Z'),
+        },
+        {
+          id: 'tx29',
+          investorId: '13',
+          propertyId: 'prop31',
+          type: 'dividend',
+          amount: '650',
+          fee: '0',
+          description: 'First dividend payment',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Al Rajhi Bank', account: '****9012' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '14',
+      name: 'Maria Santos',
+      firstName: 'Maria',
+      lastName: 'Santos',
+      email: 'maria.santos@cleaningservice.sa',
+      phone: '+966 55 345 6789',
+      salutation: 'Mrs',
+      gender: 'female',
+      dateOfBirth: new Date('1989-07-28'),
+      occupation: 'Cleaning Service Worker',
+      jobCategory: 'labor',
+      jobTitle: 'Cleaning Supervisor',
+      company: 'Premium Cleaning Services',
+      workExperience: 6,
+      city: 'Jeddah',
+      country: 'Saudi Arabia',
+      address: 'Al-Safa District, Jeddah',
+      nationality: 'Philippines',
+      profilePicture: 'https://images.unsplash.com/photo-1494790108755-2616b5b0c8d1?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '8500',
+      activeProperties: 1,
+      monthlyIncome: '2200',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-03-22T19:15:00Z'),
+      kycSubmittedAt: new Date('2024-03-28T15:45:00Z'),
+      aiRiskScore: 71,
+      investorTier: 'low',
+      preferredLanguage: 'en',
+      languagesSpoken: ['en', 'tl', 'ar'],
+      createdAt: new Date('2024-03-22'),
+      updatedAt: new Date('2024-04-05'),
+
+      portfolio: {
+        id: 'port14',
+        investorId: '14',
+        totalInvestment: '8500',
+        currentValue: '8650',
+        totalReturns: '150',
+        totalDividends: '420',
+        totalWithdrawals: '0',
+        unrealizedGains: '-270',
+        realizedGains: '420',
+        riskScore: 71,
+        performanceScore: 48,
+        lastUpdated: new Date('2024-04-03'),
+      },
+
+      investments: [
+        {
+          id: 'inv32',
+          investorId: '14',
+          propertyId: 'prop32',
+          investmentAmount: '8500',
+          ownershipPercentage: '1.2',
+          expectedReturn: '5.8',
+          currentValue: '8650',
+          totalReturns: '150',
+          totalDividends: '420',
+          status: 'active',
+          investmentDate: new Date('2024-04-05T13:20:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-04-05'),
+          updatedAt: new Date('2024-04-05'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx30',
+          investorId: '14',
+          propertyId: 'prop32',
+          type: 'investment',
+          amount: '8500',
+          fee: '85',
+          description: 'Small savings investment',
+          reference: 'INV-014-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'SAMBA Bank', account: '****0123' }),
+          processedAt: new Date('2024-04-05T13:20:00Z'),
+          createdAt: new Date('2024-04-05T12:00:00Z'),
+          updatedAt: new Date('2024-04-05T13:20:00Z'),
+        },
+        {
+          id: 'tx31',
+          investorId: '14',
+          propertyId: 'prop32',
+          type: 'dividend',
+          amount: '420',
+          fee: '0',
+          description: 'First dividend payment',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'SAMBA Bank', account: '****0123' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
+        }
+      ]
+    },
+
+    {
+      id: '15',
+      name: 'Omar Al-Kindi',
+      firstName: 'Omar',
+      lastName: 'Al-Kindi',
+      email: 'omar.kindi@delivery.sa',
+      phone: '+966 56 456 7890',
+      salutation: 'Mr',
+      gender: 'male',
+      dateOfBirth: new Date('1994-03-14'),
+      occupation: 'Delivery Driver',
+      jobCategory: 'labor',
+      jobTitle: 'Delivery Driver',
+      company: 'Quick Delivery Services',
+      workExperience: 4,
+      city: 'Dammam',
+      country: 'Saudi Arabia',
+      address: 'Al-Shatea District, Dammam',
+      nationality: 'Saudi Arabia',
+      profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      kycStatus: 'approved',
+      totalInvested: '12000',
+      activeProperties: 1,
+      monthlyIncome: '2500',
+      documentsUploaded: true,
+      applicationProgress: 100,
+      appDownloadedAt: new Date('2024-03-28T20:30:00Z'),
+      kycSubmittedAt: new Date('2024-04-03T14:15:00Z'),
+      aiRiskScore: 65,
+      investorTier: 'low',
+      preferredLanguage: 'ar',
+      languagesSpoken: ['ar', 'en'],
+      createdAt: new Date('2024-03-28'),
+      updatedAt: new Date('2024-04-08'),
+
+      portfolio: {
+        id: 'port15',
+        investorId: '15',
+        totalInvestment: '12000',
+        currentValue: '12180',
+        totalReturns: '180',
+        totalDividends: '580',
+        totalWithdrawals: '0',
+        unrealizedGains: '-400',
+        realizedGains: '580',
+        riskScore: 65,
+        performanceScore: 50,
+        lastUpdated: new Date('2024-04-06'),
+      },
+
+      investments: [
+        {
+          id: 'inv33',
+          investorId: '15',
+          propertyId: 'prop33',
+          investmentAmount: '12000',
+          ownershipPercentage: '1.5',
+          expectedReturn: '6.0',
+          currentValue: '12180',
+          totalReturns: '180',
+          totalDividends: '580',
+          status: 'active',
+          investmentDate: new Date('2024-04-08T10:45:00Z'),
+          exitDate: null,
+          createdAt: new Date('2024-04-08'),
+          updatedAt: new Date('2024-04-08'),
+        }
+      ],
+
+      transactions: [
+        {
+          id: 'tx32',
+          investorId: '15',
+          propertyId: 'prop33',
+          type: 'investment',
+          amount: '12000',
+          fee: '120',
+          description: 'Driver savings investment',
+          reference: 'INV-015-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Banque Saudi Fransi', account: '****1234' }),
+          processedAt: new Date('2024-04-08T10:45:00Z'),
+          createdAt: new Date('2024-04-08T09:30:00Z'),
+          updatedAt: new Date('2024-04-08T10:45:00Z'),
+        },
+        {
+          id: 'tx33',
+          investorId: '15',
+          propertyId: 'prop33',
+          type: 'dividend',
+          amount: '580',
+          fee: '0',
+          description: 'First dividend payment',
+          reference: 'DIV-Q1-2024',
+          status: 'completed',
+          paymentMethod: 'bank_transfer',
+          bankDetails: JSON.stringify({ bank: 'Banque Saudi Fransi', account: '****1234' }),
+          processedAt: new Date('2024-04-01T12:00:00Z'),
+          createdAt: new Date('2024-04-01T11:00:00Z'),
+          updatedAt: new Date('2024-04-01T12:00:00Z'),
         }
       ]
     }
@@ -463,18 +1975,27 @@ export default function Investors() {
     const isApproved = investor.kycStatus === 'approved'
     const matchesSearch = investor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          investor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (investor.occupation || '').toLowerCase().includes(searchTerm.toLowerCase())
+                         (investor.occupation || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (investor.jobTitle || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (investor.company || '').toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesJobCategory = jobCategoryFilter === "all" || investor.jobCategory === jobCategoryFilter
+    const matchesTier = investorTierFilter === "all" || investor.investorTier === investorTierFilter
+    const matchesLanguage = languageFilter === "all" || 
+                           (investor.languagesSpoken && investor.languagesSpoken.includes(languageFilter))
+    
     const riskScore = safeRiskScore(investor.aiRiskScore)
     const matchesRisk = riskFilter === "all" || 
                        (riskFilter === "low" && riskScore <= 30) ||
                        (riskFilter === "medium" && riskScore > 30 && riskScore <= 60) ||
                        (riskFilter === "high" && riskScore > 60)
-    return isApproved && matchesSearch && matchesRisk
+    
+    return isApproved && matchesSearch && matchesJobCategory && matchesTier && matchesLanguage && matchesRisk
   })
 
   const formatCurrency = (amount: string | null | undefined) => {
     const parsedAmount = safeParseNumber(amount, 0)
-    return `SAR ${parsedAmount.toLocaleString()}`
+    return `${parsedAmount.toLocaleString()}`
   }
 
   const formatPercentage = (value: string | null | undefined) => {
@@ -512,6 +2033,36 @@ export default function Investors() {
     return 'text-red-600'
   }
 
+  const getTierBadgeVariant = (tier: string | null | undefined) => {
+    switch (tier) {
+      case 'top': return "default" // Blue/primary
+      case 'medium': return "secondary" // Gray
+      case 'low': return "outline" // Outline
+      default: return "outline"
+    }
+  }
+
+  const getTierLabel = (tier: string | null | undefined) => {
+    switch (tier) {
+      case 'top': return "TOP INVESTOR"
+      case 'medium': return "MEDIUM INVESTOR"
+      case 'low': return "ENTRY INVESTOR"
+      default: return "INVESTOR"
+    }
+  }
+
+  const getJobCategoryLabel = (category: string | null | undefined) => {
+    switch (category) {
+      case 'executive': return "Executive"
+      case 'management': return "Management"
+      case 'professional': return "Professional"
+      case 'skilled_worker': return "Skilled Worker"
+      case 'entry_level': return "Entry Level"
+      case 'labor': return "Labor"
+      default: return "Unknown"
+    }
+  }
+
   const handleViewProfile = (investor: InvestorWithPortfolio) => {
     setSelectedInvestor(investor)
     setIsProfileModalOpen(true)
@@ -535,7 +2086,7 @@ export default function Investors() {
             </p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              {mockInvestors.length} active investors • {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.totalInvestment), 0).toLocaleString()} SAR total investment
+              {mockInvestors.length} active investors • {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.totalInvestment), 0).toLocaleString()} total investment • {Array.from(new Set(mockInvestors.flatMap(inv => inv.languagesSpoken || []))).length} languages
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -557,7 +2108,7 @@ export default function Investors() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                SAR {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.totalInvestment), 0).toLocaleString()}
+                {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.totalInvestment), 0).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">
                 Across all portfolios
@@ -574,7 +2125,7 @@ export default function Investors() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-primary">
-                SAR {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.currentValue), 0).toLocaleString()}
+                {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.currentValue), 0).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">
                 Live portfolio value
@@ -591,7 +2142,7 @@ export default function Investors() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                SAR {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.totalReturns), 0).toLocaleString()}
+                {mockInvestors.reduce((sum, inv) => sum + safeParseNumber(inv.portfolio.totalReturns), 0).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">
                 Total profit generated
@@ -621,32 +2172,91 @@ export default function Investors() {
         <Card className="glass-morphism">
           <CardHeader>
             <CardTitle>Search & Filter</CardTitle>
-            <CardDescription>Find investors by name, email, occupation, or risk profile</CardDescription>
+            <CardDescription>Find investors by name, job, tier, language, or risk profile</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
-              <div className="relative flex-1">
+            <div className="space-y-4">
+              <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by name, email, or occupation..."
+                  placeholder="Search by name, email, job title, or company..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
                   data-testid="input-search-investors"
                 />
               </div>
-              <Select value={riskFilter} onValueChange={setRiskFilter}>
-                <SelectTrigger className="w-48" data-testid="select-risk-filter">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by risk" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Risk Levels</SelectItem>
-                  <SelectItem value="low">Low Risk (1-30)</SelectItem>
-                  <SelectItem value="medium">Medium Risk (31-60)</SelectItem>
-                  <SelectItem value="high">High Risk (61-100)</SelectItem>
-                </SelectContent>
-              </Select>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2">
+                <Select value={jobCategoryFilter} onValueChange={setJobCategoryFilter}>
+                  <SelectTrigger className="w-full" data-testid="select-job-category-filter">
+                    <SelectValue placeholder="Job Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Job Categories</SelectItem>
+                    <SelectItem value="executive">Executives ({mockInvestors.filter(i => i.jobCategory === 'executive').length})</SelectItem>
+                    <SelectItem value="management">Management ({mockInvestors.filter(i => i.jobCategory === 'management').length})</SelectItem>
+                    <SelectItem value="professional">Professionals ({mockInvestors.filter(i => i.jobCategory === 'professional').length})</SelectItem>
+                    <SelectItem value="skilled_worker">Skilled Workers ({mockInvestors.filter(i => i.jobCategory === 'skilled_worker').length})</SelectItem>
+                    <SelectItem value="entry_level">Entry Level ({mockInvestors.filter(i => i.jobCategory === 'entry_level').length})</SelectItem>
+                    <SelectItem value="labor">Labor ({mockInvestors.filter(i => i.jobCategory === 'labor').length})</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={investorTierFilter} onValueChange={setInvestorTierFilter}>
+                  <SelectTrigger className="w-full" data-testid="select-tier-filter">
+                    <SelectValue placeholder="Investor Tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tiers</SelectItem>
+                    <SelectItem value="top">Top Investors ({mockInvestors.filter(i => i.investorTier === 'top').length})</SelectItem>
+                    <SelectItem value="medium">Medium Investors ({mockInvestors.filter(i => i.investorTier === 'medium').length})</SelectItem>
+                    <SelectItem value="low">Entry Investors ({mockInvestors.filter(i => i.investorTier === 'low').length})</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={languageFilter} onValueChange={setLanguageFilter}>
+                  <SelectTrigger className="w-full" data-testid="select-language-filter">
+                    <SelectValue placeholder="Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Languages</SelectItem>
+                    <SelectItem value="ar">Arabic ({mockInvestors.filter(i => i.languagesSpoken?.includes('ar')).length})</SelectItem>
+                    <SelectItem value="en">English ({mockInvestors.filter(i => i.languagesSpoken?.includes('en')).length})</SelectItem>
+                    <SelectItem value="fr">French ({mockInvestors.filter(i => i.languagesSpoken?.includes('fr')).length})</SelectItem>
+                    <SelectItem value="hi">Hindi ({mockInvestors.filter(i => i.languagesSpoken?.includes('hi')).length})</SelectItem>
+                    <SelectItem value="ur">Urdu ({mockInvestors.filter(i => i.languagesSpoken?.includes('ur')).length})</SelectItem>
+                    <SelectItem value="zh">Chinese ({mockInvestors.filter(i => i.languagesSpoken?.includes('zh')).length})</SelectItem>
+                    <SelectItem value="tl">Tagalog ({mockInvestors.filter(i => i.languagesSpoken?.includes('tl')).length})</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={riskFilter} onValueChange={setRiskFilter}>
+                  <SelectTrigger className="w-full" data-testid="select-risk-filter">
+                    <SelectValue placeholder="Risk Level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Risk Levels</SelectItem>
+                    <SelectItem value="low">Low Risk (1-30)</SelectItem>
+                    <SelectItem value="medium">Medium Risk (31-60)</SelectItem>
+                    <SelectItem value="high">High Risk (61-100)</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSearchTerm("")
+                    setJobCategoryFilter("all")
+                    setInvestorTierFilter("all")
+                    setLanguageFilter("all")
+                    setRiskFilter("all")
+                  }}
+                  data-testid="button-clear-filters"
+                >
+                  Clear All
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -679,9 +2289,9 @@ export default function Investors() {
                     
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-semibold">{investor.name}</h3>
-                        <Badge variant={getRiskBadgeVariant(investor.aiRiskScore)}>
-                          {getRiskLabel(investor.aiRiskScore)}
+                        <h3 className="font-semibold">{investor.salutation} {investor.name}</h3>
+                        <Badge variant={getTierBadgeVariant(investor.investorTier)}>
+                          {getTierLabel(investor.investorTier)}
                         </Badge>
                         {safePerformanceScore(investor.portfolio.performanceScore) >= 90 && (
                           <Badge variant="outline" className="text-green-600 border-green-600">
@@ -690,16 +2300,29 @@ export default function Investors() {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">{investor.email}</p>
+                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">
+                          {getJobCategoryLabel(investor.jobCategory)}
+                        </Badge>
+                        <span>{investor.jobTitle} @ {investor.company}</span>
+                        <span>•</span>
+                        <span>{investor.gender}, {investor.city}</span>
+                        <span>•</span>
+                        <span>{investor.languagesSpoken?.join(', ') || 'N/A'}</span>
+                      </div>
                       <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Building className="h-3 w-3" />
-                          {investor.occupation}
+                          <Building className="w-3 h-3" />
+                          {investor.activeProperties} properties
                         </span>
                         <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {investor.city}
+                          <Wallet className="w-3 h-3" />
+                          {formatCurrency(investor.monthlyIncome)} monthly
                         </span>
-                        <span>{investor.activeProperties} properties</span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {investor.workExperience || 0} years exp
+                        </span>
                       </div>
                     </div>
                   </div>
