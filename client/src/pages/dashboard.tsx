@@ -2,6 +2,8 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatCard } from "@/components/stat-card"
 import { DashboardChart } from "@/components/dashboard-chart"
+import { AiChatWidget } from "@/components/ai-chat-widget"
+import { AiInsightsPanel } from "@/components/ai-insights-panel"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { 
@@ -11,7 +13,10 @@ import {
   DollarSign, 
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  Brain,
+  Zap,
+  Target
 } from "lucide-react"
 import { Link } from "wouter"
 
@@ -115,6 +120,9 @@ export default function Dashboard() {
         />
       </div>
 
+      {/* AI Insights Panel */}
+      <AiInsightsPanel />
+
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DashboardChart
@@ -203,6 +211,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Chat Widget */}
+      <AiChatWidget />
     </div>
   </div>
   )

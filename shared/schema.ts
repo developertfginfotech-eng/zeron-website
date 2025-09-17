@@ -75,6 +75,25 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  message: text("message").notNull(),
+  sender: text("sender").notNull(), // "user" or "ai"
+  aiContext: text("ai_context"), // Context for AI responses
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const aiInsights = pgTable("ai_insights", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(), // "market", "customer", "property", "risk"
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  confidence: decimal("confidence", { precision: 3, scale: 2 }),
+  entityId: varchar("entity_id"), // Related property/customer ID
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -96,6 +115,16 @@ export const insertTransactionSchema = createInsertSchema(transactions).omit({
   createdAt: true,
 });
 
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAiInsightSchema = createInsertSchema(aiInsights).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -108,3 +137,7 @@ export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type KycDocument = typeof kycDocuments.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type AdminUser = typeof adminUsers.$inferSelect;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type AiInsight = typeof aiInsights.$inferSelect;
+export type InsertAiInsight = z.infer<typeof insertAiInsightSchema>;
