@@ -1,0 +1,155 @@
+Build a Real Estate Investment Platform (Demo Version)
+
+Scope:
+
+Backend Admin Panel (Web, React.js + Node.js)
+
+Mobile App (React Native for Android & iOS)
+
+No authentication for now (demo only).
+
+No external integrations (payment/KYC/banking). Use dummy data and mock flows.
+
+Multi-language support (Arabic RTL + English).
+
+Features – Mobile App (React Native)
+
+User Onboarding (dummy KYC flow)
+
+Upload required Saudi KYC documents:
+
+Saudi National ID / Iqama / Passport
+
+Selfie photo
+
+Proof of income
+
+Address proof (utility bill)
+
+Employment letter (dummy)
+
+Show document status (Pending / Approved / Rejected).
+
+Property Marketplace
+
+List properties with dummy data (images, maps, prices, ownership breakdown, yields).
+
+Search/filter by location, price, property type.
+
+Property detail page with gallery, projected yield, ownership % breakdown.
+
+Investment Flow (mock)
+
+Enter investment amount / units.
+
+Show calculated returns & digital receipt (dummy).
+
+Portfolio updated immediately with fake data.
+
+Dashboard & Portfolio
+
+Summary: Total Invested, Active Properties, Monthly Income (dummy charts).
+
+Graphs showing portfolio growth.
+
+List of owned properties with payout history (dummy data).
+
+Notifications (demo only)
+
+In-app alerts for: KYC Approved, Investment Confirmed, Monthly Income Added, New Property Listed.
+
+Document Vault
+
+Store and display uploaded KYC docs + investment contracts (dummy PDFs/images).
+
+Features – Admin Panel (React.js)
+
+Dashboard
+
+Graphs: Total Users, Total Properties, Total Investments, Pending KYCs.
+
+Tables with dummy recent transactions & new users.
+
+User & KYC Management
+
+List all users with KYC status.
+
+Review KYC submissions (dummy documents/images).
+
+Approve/Reject with notes.
+
+Property Management
+
+Create/Edit property listings with dummy fields (title deed, valuation, yield, ownership cap).
+
+Upload property images (dummy).
+
+Show property status (Live, Upcoming, Closed).
+
+Transactions (mock)
+
+View user investments & withdrawals with fake data.
+
+Reconcile & approve dummy requests.
+
+Document & Compliance Repository
+
+Upload/view dummy legal docs (valuation reports, contracts).
+
+Version tracking (simple demo).
+
+Reports & Analytics
+
+Generate portfolio summaries & income reports (dummy charts).
+
+Export to PDF/CSV (dummy).
+
+Push Notifications (mock)
+
+Compose/send fake alerts (New Property Added, Promotion).
+
+Admin Roles (demo)
+
+Basic role-based pages (KYC Officer, Property Manager).
+
+Dummy Data Requirements
+
+Populate with 30 sample users (Arabic + English names).
+
+Each user should have KYC docs (dummy images) uploaded.
+
+10 sample properties with images, price, location, projected yield.
+
+Transaction history (dummy investments, withdrawals).
+
+Dashboard graphs should render using this mock data.
+
+UI/UX Requirements
+
+Mobile App:
+
+Modern, clean design with bottom navigation.
+
+Arabic RTL + English toggle.
+
+Charts for portfolio.
+
+Admin Panel:
+
+Desktop-optimized, dark/light theme switch.
+
+Sidebar navigation (Users, Properties, Transactions, Reports, Notifications).
+
+Dashboard with charts (Chart.js or Recharts).
+
+Output Deliverables
+
+Mobile App (React Native) → fully functional demo with dummy flows & mock data.
+
+Admin Panel (React.js + Node.js backend) → dashboard + CRUD with mock data.
+
+No authentication or external integrations.
+
+All KYC + property data is dummy (with pictures).
+
+Both UIs should look impressive and professional.
