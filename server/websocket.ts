@@ -22,7 +22,10 @@ export class ChatWebSocketServer {
   private clients = new Map<string, ExtendedWebSocket>();
 
   constructor(server: any) {
-    this.wss = new WebSocketServer({ server });
+    this.wss = new WebSocketServer({ 
+      server,
+      path: '/ws' // Only handle WebSocket connections on /ws path
+    });
     
     this.wss.on('connection', (ws: ExtendedWebSocket, request: IncomingMessage) => {
       console.log('New WebSocket connection established');
