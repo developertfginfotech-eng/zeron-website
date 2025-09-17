@@ -1,145 +1,184 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { InvestorTable } from "@/components/investor-table"
-import { SmartTableView } from "@/components/smart-table-view"
-import { Customer360View } from "@/components/customer-360-view"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Filter, Download, Brain, Plus, ArrowLeft, Eye, Grid3X3, List } from "lucide-react"
-import { Investor } from "@shared/schema"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
+import { Search, Filter, Download, Plus, MoreHorizontal, Edit, Trash2, Shield, ShieldCheck, UserX, Settings } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { AdminUser } from "@shared/schema"
 
 export default function Users() {
-  // todo: remove mock functionality
   const [searchTerm, setSearchTerm] = useState("")
+  const [roleFilter, setRoleFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [viewMode, setViewMode] = useState<'classic' | 'smart'>('smart')
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  const mockInvestors: Investor[] = [
+  // Mock admin users data with all required fields
+  const mockAdminUsers: AdminUser[] = [
     {
       id: '1',
-      name: 'Ahmed Al-Rashid',
-      email: 'ahmed.rashid@example.com',
+      name: 'Sarah Al-Mahmoud',
+      email: 'sarah.mahmoud@zaron.com',
+      role: 'super_admin',
+      accessLevel: 'full',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b5b0c8d1?w=150&h=150&fit=crop&crop=face',
       phone: '+966 50 123 4567',
-      kycStatus: 'pending',
-      totalInvested: '150000',
-      activeProperties: 3,
-      monthlyIncome: '12500',
-      nationality: 'Saudi Arabia',
-      documentsUploaded: true,
-      createdAt: new Date('2024-01-15'),
+      department: 'Operations',
+      lastLogin: new Date('2024-01-20T10:30:00Z'),
+      status: 'active',
+      permissions: ['manage_users', 'manage_kyc', 'manage_properties', 'view_analytics', 'system_admin'],
+      createdAt: new Date('2023-06-15'),
+      updatedAt: new Date('2024-01-20'),
     },
     {
       id: '2',
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@example.com',
+      name: 'Ahmed Al-Rashid',
+      email: 'ahmed.rashid@zaron.com',
+      role: 'admin',
+      accessLevel: 'full',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       phone: '+966 55 987 6543',
-      kycStatus: 'approved',
-      totalInvested: '320000',
-      activeProperties: 5,
-      monthlyIncome: '28400',
-      nationality: 'United States',
-      documentsUploaded: true,
-      createdAt: new Date('2024-02-20'),
+      department: 'KYC Operations',
+      lastLogin: new Date('2024-01-19T14:22:00Z'),
+      status: 'active',
+      permissions: ['manage_kyc', 'view_users', 'manage_documents'],
+      createdAt: new Date('2023-08-10'),
+      updatedAt: new Date('2024-01-19'),
     },
     {
       id: '3',
-      name: 'Mohammad Al-Zahra',
-      email: 'mohammad.zahra@example.com',
+      name: 'Fatima Al-Qasimi',
+      email: 'fatima.qasimi@zaron.com',
+      role: 'manager',
+      accessLevel: 'limited',
+      avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face',
       phone: '+966 56 456 7890',
-      kycStatus: 'rejected',
-      totalInvested: '0',
-      activeProperties: 0,
-      monthlyIncome: '0',
-      nationality: 'Saudi Arabia',
-      documentsUploaded: false,
-      createdAt: new Date('2024-03-10'),
+      department: 'Customer Support',
+      lastLogin: new Date('2024-01-18T09:15:00Z'),
+      status: 'active',
+      permissions: ['view_kyc', 'manage_support_tickets'],
+      createdAt: new Date('2023-09-22'),
+      updatedAt: new Date('2024-01-18'),
     },
     {
       id: '4',
-      name: 'Fatima Al-Qasimi',
-      email: 'fatima.qasimi@example.com',
-      phone: '+966 54 789 0123',
-      kycStatus: 'pending',
-      totalInvested: '75000',
-      activeProperties: 2,
-      monthlyIncome: '6200',
-      nationality: 'UAE',
-      documentsUploaded: true,
-      createdAt: new Date('2024-01-25'),
+      name: 'Omar Hassan',
+      email: 'omar.hassan@zaron.com',
+      role: 'viewer',
+      accessLevel: 'read_only',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      phone: '+966 53 345 6789',
+      department: 'Analytics',
+      lastLogin: new Date('2024-01-17T16:45:00Z'),
+      status: 'active',
+      permissions: ['view_analytics', 'view_reports'],
+      createdAt: new Date('2023-11-05'),
+      updatedAt: new Date('2024-01-17'),
     },
     {
       id: '5',
-      name: 'Omar Hassan',
-      email: 'omar.hassan@example.com',
-      phone: '+966 53 345 6789',
-      kycStatus: 'approved',
-      totalInvested: '500000',
-      activeProperties: 8,
-      monthlyIncome: '42000',
-      nationality: 'Egypt',
-      documentsUploaded: true,
-      createdAt: new Date('2024-01-08'),
+      name: 'Layla Al-Zahra',
+      email: 'layla.zahra@zaron.com',
+      role: 'admin',
+      accessLevel: 'full',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+      phone: '+966 54 789 0123',
+      department: 'Compliance',
+      lastLogin: new Date('2024-01-15T08:30:00Z'),
+      status: 'suspended',
+      permissions: ['manage_compliance', 'view_kyc', 'manage_documents'],
+      createdAt: new Date('2023-07-30'),
+      updatedAt: new Date('2024-01-15'),
+    },
+    {
+      id: '6',
+      name: 'Khalid Al-Mutairi',
+      email: 'khalid.mutairi@zaron.com',
+      role: 'manager',
+      accessLevel: 'limited',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+      phone: '+966 52 234 5678',
+      department: 'Risk Management',
+      lastLogin: new Date('2024-01-19T11:20:00Z'),
+      status: 'active',
+      permissions: ['view_analytics', 'manage_risk_assessment'],
+      createdAt: new Date('2023-10-12'),
+      updatedAt: new Date('2024-01-19'),
     },
   ]
 
-  // Smart table data format with AI scores
-  const smartTableData = mockInvestors.map(investor => ({
-    id: investor.id,
-    name: investor.name,
-    email: investor.email,
-    status: investor.kycStatus === 'approved' ? 'active' : investor.kycStatus,
-    value: parseInt(investor.totalInvested || '0'),
-    aiScore: Math.floor(Math.random() * 40) + 60, // Mock AI score between 60-100
-    lastActivity: ['2 hours ago', '1 day ago', '3 days ago', '1 week ago'][Math.floor(Math.random() * 4)]
-  }))
-
-  const filteredInvestors = mockInvestors.filter(investor => {
-    const matchesSearch = investor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         investor.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || investor.kycStatus === statusFilter
-    return matchesSearch && matchesStatus
+  const filteredUsers = mockAdminUsers.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRole = roleFilter === "all" || user.role === roleFilter
+    const matchesStatus = statusFilter === "all" || user.status === statusFilter
+    return matchesSearch && matchesRole && matchesStatus
   })
 
-  const handleApproveKyc = (investorId: string) => {
-    console.log('Approved KYC for investor:', investorId)
-    // In real app, this would update the investor's KYC status
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case 'super_admin': return 'default'
+      case 'admin': return 'secondary'
+      case 'manager': return 'outline'
+      case 'viewer': return 'outline'
+      default: return 'outline'
+    }
   }
 
-  const handleRejectKyc = (investorId: string) => {
-    console.log('Rejected KYC for investor:', investorId)
-    // In real app, this would update the investor's KYC status
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'active': return 'default'
+      case 'inactive': return 'secondary'
+      case 'suspended': return 'destructive'
+      default: return 'outline'
+    }
+  }
+
+  const formatLastLogin = (date: Date | null) => {
+    if (!date) return 'Never'
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffMinutes = Math.floor(diffMs / (1000 * 60))
+    
+    if (diffDays > 0) return `${diffDays}d ago`
+    if (diffHours > 0) return `${diffHours}h ago`
+    if (diffMinutes > 0) return `${diffMinutes}m ago`
+    return 'Just now'
+  }
+
+  const handleCreateUser = () => {
+    console.log('Create new admin user')
+    setIsCreateModalOpen(false)
+  }
+
+  const handleEditUser = (user: AdminUser) => {
+    setSelectedUser(user)
+    setIsEditModalOpen(true)
+  }
+
+  const handleDeleteUser = (userId: string) => {
+    console.log('Delete user:', userId)
+    // In real app, this would delete the user
+  }
+
+  const handleToggleStatus = (userId: string) => {
+    console.log('Toggle user status:', userId)
+    // In real app, this would update the user status
   }
 
   const handleExport = () => {
-    console.log('Export users data triggered')
-    // In real app, this would export the data as CSV/Excel
-  }
-
-  // Handle 360 view
-  if (selectedUserId) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 modern-scrollbar">
-        <div className="p-6 space-y-6">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setSelectedUserId(null)}
-              className="hover-elevate"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Users
-            </Button>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground via-primary to-primary/70 bg-clip-text text-transparent">
-              Customer 360° View
-            </h1>
-          </div>
-          
-          <Customer360View customerId={selectedUserId} />
-        </div>
-      </div>
-    )
+    console.log('Export admin users data')
+    // In real app, this would export the data
   }
 
   return (
@@ -148,39 +187,24 @@ export default function Users() {
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground via-primary to-primary/70 bg-clip-text text-transparent animate-float" data-testid="text-users-title">
-              Users & KYC Management
+              Admin Panel Users
             </h1>
             <p className="text-lg text-muted-foreground/80">
-              AI-powered customer insights and KYC verification system
+              Manage admin users, roles, and access control permissions
             </p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              {mockInvestors.length} total users • {mockInvestors.filter(u => u.kycStatus === 'approved').length} active
+              {mockAdminUsers.length} total users • {mockAdminUsers.filter(u => u.status === 'active').length} active
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 mr-4">
-              <Button
-                variant={viewMode === 'smart' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('smart')}
-                className="neon-glow"
-              >
-                <Brain className="h-4 w-4 mr-2" />
-                Smart View
-              </Button>
-              <Button
-                variant={viewMode === 'classic' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('classic')}
-              >
-                <List className="h-4 w-4 mr-2" />
-                Classic
-              </Button>
-            </div>
-            <Button className="neon-glow hover:scale-105 transition-transform duration-300">
+            <Button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="neon-glow hover:scale-105 transition-transform duration-300"
+              data-testid="button-add-user"
+            >
               <Plus className="h-4 w-4 mr-2" />
-              Add New User
+              Add Admin User
             </Button>
             <Button onClick={handleExport} variant="outline" data-testid="button-export-users">
               <Download className="h-4 w-4 mr-2" />
@@ -189,68 +213,373 @@ export default function Users() {
           </div>
         </div>
 
-        {viewMode === 'smart' ? (
-          <SmartTableView
-            title="Customer Database"
-            description="Complete customer overview with AI-powered insights and 360-degree profiles"
-            data={smartTableData}
-            type="users"
-            columns={['user', 'email', 'status', 'totalInvested', 'aiScore', 'actions']}
-          />
-        ) : (
-          <>
-            <Card className="glass-morphism">
-              <CardHeader>
-                <CardTitle>Search & Filter</CardTitle>
-                <CardDescription>Find users by name, email, or KYC status</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search by name or email..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9"
-                      data-testid="input-search-users"
-                    />
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="glass-morphism" data-testid="card-total-users">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Users
+              </CardTitle>
+              <Shield className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {mockAdminUsers.length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Admin panel access
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-morphism" data-testid="card-active-users">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Active Users
+              </CardTitle>
+              <ShieldCheck className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {mockAdminUsers.filter(u => u.status === 'active').length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Currently active
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-morphism" data-testid="card-super-admins">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Super Admins
+              </CardTitle>
+              <Settings className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">
+                {mockAdminUsers.filter(u => u.role === 'super_admin').length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Full system access
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-morphism" data-testid="card-suspended-users">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Suspended
+              </CardTitle>
+              <UserX className="h-4 w-4 text-destructive" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-destructive">
+                {mockAdminUsers.filter(u => u.status === 'suspended').length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Access revoked
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search and Filter */}
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Search & Filter</CardTitle>
+            <CardDescription>Find admin users by name, email, role, or status</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                  data-testid="input-search-users"
+                />
+              </div>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-48" data-testid="select-role-filter">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  <SelectItem value="super_admin">Super Admin</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-48" data-testid="select-status-filter">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Users Table */}
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>
+              Admin Users ({filteredUsers.length} users)
+            </CardTitle>
+            <CardDescription>
+              Manage administrative access and permissions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {filteredUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover-elevate"
+                  data-testid={`user-row-${user.id}`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                      <AvatarFallback>
+                        {user.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-semibold">{user.name}</h3>
+                        <Badge variant={getRoleBadgeVariant(user.role)}>
+                          {user.role.replace('_', ' ').toUpperCase()}
+                        </Badge>
+                        <Badge variant={getStatusBadgeVariant(user.status)}>
+                          {user.status.toUpperCase()}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                        <span>{user.department}</span>
+                        <span>•</span>
+                        <span>Last login: {formatLastLogin(user.lastLogin)}</span>
+                        <span>•</span>
+                        <span>Access: {user.accessLevel.replace('_', ' ')}</span>
+                      </div>
+                    </div>
                   </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-48" data-testid="select-status-filter">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Filter by status" />
+
+                  <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap gap-1 max-w-xs">
+                      {user.permissions?.slice(0, 2).map((permission) => (
+                        <Badge key={permission} variant="outline" className="text-xs">
+                          {permission.replace('_', ' ')}
+                        </Badge>
+                      ))}
+                      {user.permissions && user.permissions.length > 2 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{user.permissions.length - 2}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          data-testid={`button-actions-${user.id}`}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleEditUser(user)}
+                          data-testid={`button-edit-${user.id}`}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit User
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleToggleStatus(user.id)}
+                          data-testid={`button-toggle-status-${user.id}`}
+                        >
+                          {user.status === 'active' ? <UserX className="h-4 w-4 mr-2" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
+                          {user.status === 'active' ? 'Suspend User' : 'Activate User'}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="text-destructive"
+                          data-testid={`button-delete-${user.id}`}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {filteredUsers.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground mb-4">No users found matching your criteria</p>
+                <Button variant="outline" onClick={() => {
+                  setSearchTerm("")
+                  setRoleFilter("all")
+                  setStatusFilter("all")
+                }} data-testid="button-clear-filters">
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Create User Modal */}
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Add New Admin User</DialogTitle>
+              <DialogDescription>
+                Create a new admin user with specific role and permissions.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" placeholder="John Doe" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="john@zaron.com" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
+                      <SelectItem value="super_admin">Super Admin</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="viewer">Viewer</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="department">Department</Label>
+                  <Input id="department" placeholder="Operations" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input id="phone" placeholder="+966 50 123 4567" />
+              </div>
+              <div className="space-y-2">
+                <Label>Permissions</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {['manage_users', 'manage_kyc', 'manage_properties', 'view_analytics', 'system_admin'].map((permission) => (
+                    <div key={permission} className="flex items-center space-x-2">
+                      <Switch />
+                      <Label className="text-sm">{permission.replace('_', ' ')}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateUser}>Create User</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-            <Card className="glass-morphism">
-              <CardHeader>
-                <CardTitle>
-                  User List ({filteredInvestors.length} users)
-                </CardTitle>
-                <CardDescription>
-                  Review user information and manage KYC verification status
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <InvestorTable
-                  investors={filteredInvestors}
-                  onApproveKyc={handleApproveKyc}
-                  onRejectKyc={handleRejectKyc}
-                />
-              </CardContent>
-            </Card>
-          </>
-        )}
+        {/* Edit User Modal */}
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Edit Admin User</DialogTitle>
+              <DialogDescription>
+                Update user information, role, and permissions.
+              </DialogDescription>
+            </DialogHeader>
+            {selectedUser && (
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-name">Full Name</Label>
+                    <Input id="edit-name" defaultValue={selectedUser.name} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-email">Email</Label>
+                    <Input id="edit-email" type="email" defaultValue={selectedUser.email} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-role">Role</Label>
+                    <Select defaultValue={selectedUser.role}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="super_admin">Super Admin</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                        <SelectItem value="viewer">Viewer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-department">Department</Label>
+                    <Input id="edit-department" defaultValue={selectedUser.department || ''} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-phone">Phone Number</Label>
+                  <Input id="edit-phone" defaultValue={selectedUser.phone || ''} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select defaultValue={selectedUser.status}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="suspended">Suspended</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

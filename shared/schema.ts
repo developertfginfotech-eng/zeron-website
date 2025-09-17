@@ -13,9 +13,16 @@ export const adminUsers = pgTable("admin_users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  role: text("role").notNull().default("admin"),
+  role: text("role").notNull().default("admin"), // "super_admin", "admin", "manager", "viewer"
+  accessLevel: text("access_level").notNull().default("full"), // "full", "limited", "read_only"
   avatar: text("avatar"),
+  phone: text("phone"),
+  department: text("department"),
+  lastLogin: timestamp("last_login"),
+  status: text("status").notNull().default("active"), // "active", "inactive", "suspended"
+  permissions: text("permissions").array().default(sql`ARRAY[]::text[]`), // array of permission strings
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const properties = pgTable("properties", {
@@ -37,13 +44,30 @@ export const investors = pgTable("investors", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone"),
-  kycStatus: text("kyc_status").notNull().default("pending"),
+  kycStatus: text("kyc_status").notNull().default("pending"), // "pending", "approved", "rejected", "under_review"
   totalInvested: decimal("total_invested", { precision: 12, scale: 2 }).default("0"),
   activeProperties: integer("active_properties").default(0),
   monthlyIncome: decimal("monthly_income", { precision: 10, scale: 2 }).default("0"),
   nationality: text("nationality"),
   documentsUploaded: boolean("documents_uploaded").default(false),
+  // Additional KYC fields
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  salutation: text("salutation"), // "Mr", "Mrs", "Ms", "Dr"
+  gender: text("gender"), // "male", "female", "other"
+  dateOfBirth: timestamp("date_of_birth"),
+  occupation: text("occupation"),
+  city: text("city"),
+  country: text("country"),
+  address: text("address"),
+  profilePicture: text("profile_picture"),
+  applicationProgress: integer("application_progress").default(0), // 0-100 percentage
+  appDownloadedAt: timestamp("app_downloaded_at"),
+  kycSubmittedAt: timestamp("kyc_submitted_at"),
+  aiRiskScore: integer("ai_risk_score"), // 1-100 AI calculated risk score
+  preferredLanguage: text("preferred_language").default("en"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const transactions = pgTable("transactions", {
@@ -59,11 +83,16 @@ export const transactions = pgTable("transactions", {
 export const kycDocuments = pgTable("kyc_documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   investorId: varchar("investor_id").references(() => investors.id),
-  documentType: text("document_type").notNull(),
+  documentType: text("document_type").notNull(), // "national_id", "passport", "iqama", "selfie", "proof_of_income", "address_proof", "employment_letter", "bank_statement"
   documentUrl: text("document_url").notNull(),
-  status: text("status").notNull().default("pending"),
+  status: text("status").notNull().default("pending"), // "pending", "approved", "rejected", "under_review", "resubmit_required"
   reviewNotes: text("review_notes"),
+  reviewedBy: varchar("reviewed_by").references(() => adminUsers.id),
+  isAuthentic: boolean("is_authentic"), // AI/Third-party authentication result
+  confidenceScore: integer("confidence_score"), // 1-100 confidence in document authenticity
+  extractedData: text("extracted_data"), // JSON string of extracted document data
   uploadedAt: timestamp("uploaded_at").defaultNow(),
+  reviewedAt: timestamp("reviewed_at"),
 });
 
 export const notifications = pgTable("notifications", {
@@ -108,6 +137,19 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
 export const insertInvestorSchema = createInsertSchema(investors).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertKycDocumentSchema = createInsertSchema(kycDocuments).omit({
+  id: true,
+  uploadedAt: true,
+  reviewedAt: true,
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
@@ -132,9 +174,11 @@ export type Property = typeof properties.$inferSelect;
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
 export type Investor = typeof investors.$inferSelect;
 export type InsertInvestor = z.infer<typeof insertInvestorSchema>;
+export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type KycDocument = typeof kycDocuments.$inferSelect;
+export type InsertKycDocument = z.infer<typeof insertKycDocumentSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type ChatMessage = typeof chatMessages.$inferSelect;
