@@ -8,8 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Filter, Eye, TrendingUp, TrendingDown, DollarSign, Building, Wallet, ArrowUpRight, ArrowDownRight, Calendar, MapPin, Phone, Mail, User, FileText, CreditCard, Banknote, PieChart } from "lucide-react"
-import { Investor, Investment, Transaction, PortfolioSummary } from "@shared/schema"
+import { Search, Filter, Eye, TrendingUp, TrendingDown, Building, Wallet, ArrowUpRight, ArrowDownRight, Calendar, MapPin, Phone, Mail, User, FileText, CreditCard, Banknote, PieChart, Shield, CheckCircle, XCircle, Clock, AlertTriangle, Download, ExternalLink } from "lucide-react"
+import { Investor, Investment, Transaction, PortfolioSummary, KycDocument } from "@shared/schema"
 
 // Safe helper functions for nullable values
 const safeParseNumber = (value: string | number | null | undefined, defaultValue: number = 0): number => {
@@ -22,10 +22,6 @@ const safeParseString = (value: string | null | undefined, defaultValue: string 
   return value ?? defaultValue
 }
 
-const safeRiskScore = (score: number | null | undefined): number => {
-  return score ?? 50 // Default risk score
-}
-
 const safePerformanceScore = (score: number | null | undefined): number => {
   return score ?? 50 // Default performance score
 }
@@ -34,11 +30,11 @@ interface InvestorWithPortfolio extends Investor {
   investments: Investment[]
   transactions: Transaction[]
   portfolio: PortfolioSummary
+  kycDocuments?: KycDocument[]
 }
 
 export default function Investors() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [riskFilter, setRiskFilter] = useState("all")
   const [jobCategoryFilter, setJobCategoryFilter] = useState("all")
   const [investorTierFilter, setInvestorTierFilter] = useState("all")
   const [languageFilter, setLanguageFilter] = useState("all")
@@ -233,6 +229,158 @@ export default function Investors() {
           processedAt: new Date('2024-03-15T14:20:00Z'),
           createdAt: new Date('2024-03-15T13:10:00Z'),
           updatedAt: new Date('2024-03-15T14:20:00Z'),
+        }
+      ],
+
+      // KYC Documents - Executive level comprehensive documentation
+      kycDocuments: [
+        {
+          id: 'kyc1',
+          investorId: '1',
+          documentType: 'national_id',
+          documentUrl: 'https://docs.example.com/kyc/ahmed-mansouri-national-id.pdf',
+          status: 'approved',
+          reviewNotes: 'High-quality scan, all security features verified. Document issued by Ministry of Interior.',
+          reviewedBy: 'admin1',
+          isAuthentic: true,
+          confidenceScore: 98,
+          extractedData: JSON.stringify({
+            idNumber: '1234567890',
+            fullName: 'Ahmed bin Abdullah Al-Mansouri',
+            dateOfBirth: '1975-03-15',
+            placeOfBirth: 'Riyadh',
+            nationality: 'Saudi Arabia',
+            issueDate: '2020-01-15',
+            expiryDate: '2030-01-15'
+          }),
+          uploadedAt: new Date('2024-01-08T14:30:00Z'),
+          reviewedAt: new Date('2024-01-09T10:15:00Z'),
+        },
+        {
+          id: 'kyc2',
+          investorId: '1',
+          documentType: 'passport',
+          documentUrl: 'https://docs.example.com/kyc/ahmed-mansouri-passport.pdf',
+          status: 'approved',
+          reviewNotes: 'Saudi passport with multiple travel stamps. All security features authentic.',
+          reviewedBy: 'admin1',
+          isAuthentic: true,
+          confidenceScore: 97,
+          extractedData: JSON.stringify({
+            passportNumber: 'A12345678',
+            fullName: 'Ahmed Abdullah Al-Mansouri',
+            nationality: 'Saudi Arabia',
+            dateOfBirth: '1975-03-15',
+            placeOfBirth: 'Riyadh',
+            issueDate: '2022-05-20',
+            expiryDate: '2032-05-20'
+          }),
+          uploadedAt: new Date('2024-01-08T14:45:00Z'),
+          reviewedAt: new Date('2024-01-09T10:30:00Z'),
+        },
+        {
+          id: 'kyc3',
+          investorId: '1',
+          documentType: 'selfie',
+          documentUrl: 'https://docs.example.com/kyc/ahmed-mansouri-selfie.jpg',
+          status: 'approved',
+          reviewNotes: 'Clear facial biometric match with official documents. Liveness detection passed.',
+          reviewedBy: 'admin1',
+          isAuthentic: true,
+          confidenceScore: 99,
+          extractedData: JSON.stringify({
+            biometricMatch: 'verified',
+            livenessDetection: 'passed',
+            faceMatchConfidence: 99.2,
+            qualityScore: 95
+          }),
+          uploadedAt: new Date('2024-01-08T15:00:00Z'),
+          reviewedAt: new Date('2024-01-09T11:00:00Z'),
+        },
+        {
+          id: 'kyc4',
+          investorId: '1',
+          documentType: 'employment_letter',
+          documentUrl: 'https://docs.example.com/kyc/ahmed-mansouri-employment.pdf',
+          status: 'approved',
+          reviewNotes: 'Official Saudi Aramco letterhead with HR seal. Position and salary confirmed.',
+          reviewedBy: 'admin2',
+          isAuthentic: true,
+          confidenceScore: 96,
+          extractedData: JSON.stringify({
+            company: 'Saudi Aramco',
+            position: 'Chief Technology Officer',
+            employmentType: 'permanent',
+            monthlySalary: '85000',
+            currency: 'SAR',
+            startDate: '2019-01-15',
+            hrContact: '+966-13-872-0000'
+          }),
+          uploadedAt: new Date('2024-01-08T15:30:00Z'),
+          reviewedAt: new Date('2024-01-09T14:20:00Z'),
+        },
+        {
+          id: 'kyc5',
+          investorId: '1',
+          documentType: 'bank_statement',
+          documentUrl: 'https://docs.example.com/kyc/ahmed-mansouri-bank-statement.pdf',
+          status: 'approved',
+          reviewNotes: 'Al Rajhi Bank statement showing consistent high income and substantial savings.',
+          reviewedBy: 'admin2',
+          isAuthentic: true,
+          confidenceScore: 95,
+          extractedData: JSON.stringify({
+            bank: 'Al Rajhi Bank',
+            accountType: 'current',
+            averageBalance: '2450000',
+            currency: 'SAR',
+            statementPeriod: '2023-10 to 2024-01',
+            regularIncome: true,
+            transactionVolume: 'high'
+          }),
+          uploadedAt: new Date('2024-01-09T09:00:00Z'),
+          reviewedAt: new Date('2024-01-09T16:45:00Z'),
+        },
+        {
+          id: 'kyc6',
+          investorId: '1',
+          documentType: 'address_proof',
+          documentUrl: 'https://docs.example.com/kyc/ahmed-mansouri-utility-bill.pdf',
+          status: 'approved',
+          reviewNotes: 'Saudi Electricity Company bill matching address on official documents.',
+          reviewedBy: 'admin1',
+          isAuthentic: true,
+          confidenceScore: 94,
+          extractedData: JSON.stringify({
+            address: 'King Fahd District, Riyadh',
+            utilityProvider: 'Saudi Electricity Company',
+            billDate: '2024-01-05',
+            accountHolder: 'Ahmed Al-Mansouri',
+            serviceAddress: 'King Fahd District, Riyadh 12271'
+          }),
+          uploadedAt: new Date('2024-01-09T10:15:00Z'),
+          reviewedAt: new Date('2024-01-10T09:30:00Z'),
+        },
+        {
+          id: 'kyc7',
+          investorId: '1',
+          documentType: 'proof_of_income',
+          documentUrl: 'https://docs.example.com/kyc/ahmed-mansouri-tax-certificate.pdf',
+          status: 'approved',
+          reviewNotes: 'ZATCA tax certificate confirming declared income and tax compliance.',
+          reviewedBy: 'admin2',
+          isAuthentic: true,
+          confidenceScore: 97,
+          extractedData: JSON.stringify({
+            taxAuthority: 'ZATCA',
+            taxYear: '2023',
+            declaredIncome: '1020000',
+            currency: 'SAR',
+            taxStatus: 'compliant',
+            certificateNumber: 'TAX-2023-891234'
+          }),
+          uploadedAt: new Date('2024-01-09T11:30:00Z'),
+          reviewedAt: new Date('2024-01-10T13:15:00Z'),
         }
       ]
     },
@@ -1984,13 +2132,7 @@ export default function Investors() {
     const matchesLanguage = languageFilter === "all" || 
                            (investor.languagesSpoken && investor.languagesSpoken.includes(languageFilter))
     
-    const riskScore = safeRiskScore(investor.aiRiskScore)
-    const matchesRisk = riskFilter === "all" || 
-                       (riskFilter === "low" && riskScore <= 30) ||
-                       (riskFilter === "medium" && riskScore > 30 && riskScore <= 60) ||
-                       (riskFilter === "high" && riskScore > 60)
-    
-    return isApproved && matchesSearch && matchesJobCategory && matchesTier && matchesLanguage && matchesRisk
+    return isApproved && matchesSearch && matchesJobCategory && matchesTier && matchesLanguage
   })
 
   const formatCurrency = (amount: string | null | undefined) => {
@@ -2012,19 +2154,6 @@ export default function Investors() {
     }).format(date)
   }
 
-  const getRiskBadgeVariant = (riskScore: number | null | undefined) => {
-    const score = safeRiskScore(riskScore)
-    if (score <= 30) return 'default'
-    if (score <= 60) return 'secondary'
-    return 'destructive'
-  }
-
-  const getRiskLabel = (riskScore: number | null | undefined) => {
-    const score = safeRiskScore(riskScore)
-    if (score <= 30) return 'Low Risk'
-    if (score <= 60) return 'Medium Risk'
-    return 'High Risk'
-  }
 
   const getPerformanceColor = (score: number | null | undefined) => {
     const safeScore = safePerformanceScore(score)
@@ -2104,7 +2233,7 @@ export default function Investors() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total Investment
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-green-600" />
+              <Wallet className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -2172,7 +2301,7 @@ export default function Investors() {
         <Card className="glass-morphism">
           <CardHeader>
             <CardTitle>Search & Filter</CardTitle>
-            <CardDescription>Find investors by name, job, tier, language, or risk profile</CardDescription>
+            <CardDescription>Find investors by name, job category, tier, or language</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -2231,18 +2360,6 @@ export default function Investors() {
                   </SelectContent>
                 </Select>
                 
-                <Select value={riskFilter} onValueChange={setRiskFilter}>
-                  <SelectTrigger className="w-full" data-testid="select-risk-filter">
-                    <SelectValue placeholder="Risk Level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Risk Levels</SelectItem>
-                    <SelectItem value="low">Low Risk (1-30)</SelectItem>
-                    <SelectItem value="medium">Medium Risk (31-60)</SelectItem>
-                    <SelectItem value="high">High Risk (61-100)</SelectItem>
-                  </SelectContent>
-                </Select>
-                
                 <Button 
                   variant="outline" 
                   onClick={() => {
@@ -2250,7 +2367,6 @@ export default function Investors() {
                     setJobCategoryFilter("all")
                     setInvestorTierFilter("all")
                     setLanguageFilter("all")
-                    setRiskFilter("all")
                   }}
                   data-testid="button-clear-filters"
                 >
@@ -2374,7 +2490,9 @@ export default function Investors() {
                 <p className="text-muted-foreground mb-4">No investors found matching your criteria</p>
                 <Button variant="outline" onClick={() => {
                   setSearchTerm("")
-                  setRiskFilter("all")
+                  setJobCategoryFilter("all")
+                  setInvestorTierFilter("all")
+                  setLanguageFilter("all")
                 }} data-testid="button-clear-filters">
                   Clear Filters
                 </Button>
@@ -2410,8 +2528,8 @@ export default function Investors() {
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-2">
                       <h2 className="text-3xl font-bold">{selectedInvestor.salutation} {selectedInvestor.name}</h2>
-                      <Badge variant={getRiskBadgeVariant(selectedInvestor.aiRiskScore)}>
-                        {getRiskLabel(selectedInvestor.aiRiskScore)} ({selectedInvestor.aiRiskScore}/100)
+                      <Badge variant={getTierBadgeVariant(selectedInvestor.investorTier)}>
+                        {getTierLabel(selectedInvestor.investorTier)}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -2449,11 +2567,12 @@ export default function Investors() {
                 </div>
 
                 <Tabs defaultValue="financial" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
+                  <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="financial">Financial Overview</TabsTrigger>
                     <TabsTrigger value="investments">Investments</TabsTrigger>
                     <TabsTrigger value="transactions">Transactions</TabsTrigger>
                     <TabsTrigger value="personal">Personal Info</TabsTrigger>
+                    <TabsTrigger value="kyc-documents">KYC Documents</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="financial" className="space-y-4">
@@ -2490,7 +2609,7 @@ export default function Investors() {
                       <Card>
                         <CardHeader className="pb-3">
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <DollarSign className="h-5 w-5 text-blue-600" />
+                            <Banknote className="h-5 w-5 text-blue-600" />
                             Dividend & Withdrawals
                           </CardTitle>
                         </CardHeader>
@@ -2532,13 +2651,6 @@ export default function Investors() {
                               </span>
                             </div>
                             <Progress value={safePerformanceScore(selectedInvestor.portfolio.performanceScore)} className="h-2" />
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Risk Score:</span>
-                              <span className="font-bold">{safeRiskScore(selectedInvestor.aiRiskScore)}/100</span>
-                            </div>
-                            <Progress value={safeRiskScore(selectedInvestor.aiRiskScore)} className="h-2" />
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Active Properties:</span>
@@ -2757,6 +2869,273 @@ export default function Investors() {
                           </div>
                         </CardContent>
                       </Card>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="kyc-documents" className="space-y-4">
+                    <div className="space-y-6">
+                      {/* KYC Summary Stats */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <Card>
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <Shield className="h-5 w-5 text-green-600" />
+                              <div>
+                                <p className="text-2xl font-bold text-green-600">{selectedInvestor.kycDocuments?.filter(doc => doc.status === 'approved').length || 0}</p>
+                                <p className="text-sm text-muted-foreground">Approved Documents</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-5 w-5 text-orange-600" />
+                              <div>
+                                <p className="text-2xl font-bold text-orange-600">{selectedInvestor.kycDocuments?.filter(doc => doc.status === 'under_review').length || 0}</p>
+                                <p className="text-sm text-muted-foreground">Under Review</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="h-5 w-5 text-blue-600" />
+                              <div>
+                                <p className="text-2xl font-bold text-blue-600">
+                                  {selectedInvestor.kycDocuments?.length ? 
+                                    Math.round(selectedInvestor.kycDocuments.reduce((acc, doc) => acc + (doc.confidenceScore || 0), 0) / selectedInvestor.kycDocuments.length) 
+                                    : 0}%
+                                </p>
+                                <p className="text-sm text-muted-foreground">Avg AI Confidence</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-5 w-5 text-purple-600" />
+                              <div>
+                                <p className="text-2xl font-bold text-purple-600">{selectedInvestor.kycDocuments?.length || 0}</p>
+                                <p className="text-sm text-muted-foreground">Total Documents</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Document Cards */}
+                      <div className="space-y-4">
+                        {selectedInvestor.kycDocuments?.map((document) => {
+                          const getStatusIcon = (status: string) => {
+                            switch (status) {
+                              case 'approved':
+                                return <CheckCircle className="h-5 w-5 text-green-600" />
+                              case 'rejected':
+                                return <XCircle className="h-5 w-5 text-red-600" />
+                              case 'under_review':
+                                return <Clock className="h-5 w-5 text-orange-600" />
+                              case 'pending':
+                                return <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                              default:
+                                return <FileText className="h-5 w-5 text-gray-600" />
+                            }
+                          }
+
+                          const getStatusVariant = (status: string) => {
+                            switch (status) {
+                              case 'approved':
+                                return 'default' as const
+                              case 'rejected':
+                                return 'destructive' as const
+                              case 'under_review':
+                                return 'secondary' as const
+                              case 'pending':
+                                return 'outline' as const
+                              default:
+                                return 'outline' as const
+                            }
+                          }
+
+                          const getDocumentDisplayName = (type: string) => {
+                            const names = {
+                              'national_id': 'National ID',
+                              'passport': 'Passport',
+                              'iqama': 'Iqama',
+                              'selfie': 'Selfie Verification',
+                              'proof_of_income': 'Proof of Income',
+                              'address_proof': 'Address Proof',
+                              'employment_letter': 'Employment Letter',
+                              'bank_statement': 'Bank Statement'
+                            }
+                            return names[type as keyof typeof names] || type.replace('_', ' ')
+                          }
+
+                          return (
+                            <Card key={document.id} className="hover-elevate">
+                              <CardContent className="p-6">
+                                <div className="flex items-start gap-6">
+                                  {/* Document Icon and Basic Info */}
+                                  <div className="flex items-center gap-3">
+                                    {getStatusIcon(document.status)}
+                                    <div>
+                                      <h4 className="text-lg font-semibold">{getDocumentDisplayName(document.documentType)}</h4>
+                                      <p className="text-sm text-muted-foreground">
+                                        Uploaded: {formatDate(document.uploadedAt)}
+                                      </p>
+                                      {document.reviewedAt && (
+                                        <p className="text-sm text-muted-foreground">
+                                          Reviewed: {formatDate(document.reviewedAt)}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="flex-1 space-y-4">
+                                    {/* Status and AI Verification */}
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <Badge variant={getStatusVariant(document.status)} data-testid={`badge-document-status-${document.id}`}>
+                                          {document.status.toUpperCase().replace('_', ' ')}
+                                        </Badge>
+                                        {document.isAuthentic !== null && (
+                                          <Badge variant={document.isAuthentic ? 'default' : 'destructive'}>
+                                            {document.isAuthentic ? 'AUTHENTIC' : 'NOT AUTHENTIC'}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-4">
+                                        <Button variant="outline" size="sm" data-testid={`button-view-document-${document.id}`}>
+                                          <Eye className="h-4 w-4 mr-2" />
+                                          View Document
+                                        </Button>
+                                        <Button variant="outline" size="sm" data-testid={`button-download-document-${document.id}`}>
+                                          <Download className="h-4 w-4 mr-2" />
+                                          Download
+                                        </Button>
+                                      </div>
+                                    </div>
+
+                                    {/* AI Confidence Score */}
+                                    {document.confidenceScore && (
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-sm font-medium text-muted-foreground">AI Confidence Score</span>
+                                          <span className={`text-sm font-bold ${
+                                            document.confidenceScore >= 90 ? 'text-green-600' : 
+                                            document.confidenceScore >= 70 ? 'text-orange-600' : 'text-red-600'
+                                          }`}>
+                                            {document.confidenceScore}%
+                                          </span>
+                                        </div>
+                                        <Progress 
+                                          value={document.confidenceScore} 
+                                          className={`h-2 ${
+                                            document.confidenceScore >= 90 ? '[&>div]:bg-green-600' : 
+                                            document.confidenceScore >= 70 ? '[&>div]:bg-orange-600' : '[&>div]:bg-red-600'
+                                          }`} 
+                                        />
+                                      </div>
+                                    )}
+
+                                    {/* Review Notes */}
+                                    {document.reviewNotes && (
+                                      <div className="bg-muted/50 p-3 rounded-md">
+                                        <h5 className="text-sm font-medium mb-1">Review Notes</h5>
+                                        <p className="text-sm text-muted-foreground">{document.reviewNotes}</p>
+                                        {document.reviewedBy && (
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            Reviewed by: {document.reviewedBy}
+                                          </p>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {/* Extracted Data */}
+                                    {document.extractedData && (
+                                      <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-md">
+                                        <h5 className="text-sm font-medium mb-2 flex items-center gap-2">
+                                          <PieChart className="h-4 w-4" />
+                                          Extracted Information
+                                        </h5>
+                                        <div className="grid grid-cols-2 gap-2 text-xs">
+                                          {Object.entries(JSON.parse(document.extractedData)).map(([key, value]) => (
+                                            <div key={key} className="flex justify-between">
+                                              <span className="text-muted-foreground capitalize">
+                                                {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                              </span>
+                                              <span className="font-medium text-right">
+                                                {typeof value === 'string' ? value : JSON.stringify(value)}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )
+                        })}
+
+                        {/* No Documents Message */}
+                        {(!selectedInvestor.kycDocuments || selectedInvestor.kycDocuments.length === 0) && (
+                          <Card>
+                            <CardContent className="p-8 text-center">
+                              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                              <h3 className="text-lg font-medium mb-2">No KYC Documents</h3>
+                              <p className="text-muted-foreground">
+                                This investor has not uploaded any KYC documents yet.
+                              </p>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+
+                      {/* KYC Completion Summary */}
+                      {selectedInvestor.kycDocuments && selectedInvestor.kycDocuments.length > 0 && (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <Shield className="h-5 w-5" />
+                              KYC Verification Summary
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                <span className="text-sm font-medium text-muted-foreground">Overall Status</span>
+                                <p className="font-medium text-green-600">Fully Verified</p>
+                              </div>
+                              <div>
+                                <span className="text-sm font-medium text-muted-foreground">Verification Date</span>
+                                <p className="font-medium">{formatDate(selectedInvestor.kycSubmittedAt)}</p>
+                              </div>
+                              <div>
+                                <span className="text-sm font-medium text-muted-foreground">Investor Tier</span>
+                                <p className={`font-medium ${
+                                  selectedInvestor.investorTier === 'top' ? 'text-green-600' : 
+                                  selectedInvestor.investorTier === 'medium' ? 'text-orange-600' : 'text-blue-600'
+                                }`}>
+                                  {getTierLabel(selectedInvestor.investorTier)}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-md">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle className="h-5 w-5 text-green-600" />
+                                <span className="font-medium text-green-800 dark:text-green-200">
+                                  All KYC requirements satisfied. Investor approved for investment activities.
+                                </span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
                     </div>
                   </TabsContent>
                 </Tabs>
