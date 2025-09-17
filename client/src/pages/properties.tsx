@@ -20,7 +20,7 @@ export default function Properties() {
   const [showForm, setShowForm] = useState(false)
   const [editingProperty, setEditingProperty] = useState<Property | null>(null)
 
-  const mockProperties: Property[] = [
+  const [properties, setProperties] = useState<Property[]>([
     {
       id: '1',
       title: 'Luxury Apartment Complex',
@@ -32,7 +32,19 @@ export default function Properties() {
       ownershipCap: 75,
       status: 'live',
       images: [apartmentImg],
-      createdAt: new Date(),
+      // Investment tracking data
+      totalInvestment: '1875000', // 75% of price invested
+      investorCount: 43,
+      currentOwnership: '75.0', // percentage owned
+      monthlyRevenue: '18750',
+      totalRevenue: '562500', // 30 months of revenue
+      occupancyRate: '92.5',
+      performance: 'excellent',
+      lastDividendDate: new Date('2024-01-15'),
+      deactivationReason: null,
+      deactivatedAt: null,
+      deactivatedBy: null,
+      createdAt: new Date('2023-06-15'),
     },
     {
       id: '2',
@@ -45,7 +57,19 @@ export default function Properties() {
       ownershipCap: 60,
       status: 'upcoming',
       images: [officeImg],
-      createdAt: new Date(),
+      // Investment tracking data
+      totalInvestment: '0', // upcoming property, no investments yet
+      investorCount: 0,
+      currentOwnership: '0',
+      monthlyRevenue: '0',
+      totalRevenue: '0',
+      occupancyRate: '0',
+      performance: 'stable',
+      lastDividendDate: null,
+      deactivationReason: null,
+      deactivatedAt: null,
+      deactivatedBy: null,
+      createdAt: new Date('2023-09-10'),
     },
     {
       id: '3',
@@ -58,7 +82,19 @@ export default function Properties() {
       ownershipCap: 40,
       status: 'upcoming',
       images: [villaImg],
-      createdAt: new Date(),
+      // Investment tracking data
+      totalInvestment: '0', // upcoming property, no investments yet
+      investorCount: 0,
+      currentOwnership: '0',
+      monthlyRevenue: '0',
+      totalRevenue: '0',
+      occupancyRate: '0',
+      performance: 'stable',
+      lastDividendDate: null,
+      deactivationReason: null,
+      deactivatedAt: null,
+      deactivatedBy: null,
+      createdAt: new Date('2023-11-20'),
     },
     {
       id: '4',
@@ -71,11 +107,23 @@ export default function Properties() {
       ownershipCap: 80,
       status: 'live',
       images: [retailImg],
-      createdAt: new Date(),
+      // Investment tracking data
+      totalInvestment: '9600000', // 80% of price invested
+      investorCount: 67,
+      currentOwnership: '80.0',
+      monthlyRevenue: '84000',
+      totalRevenue: '1680000', // 20 months of revenue
+      occupancyRate: '88.0',
+      performance: 'good',
+      lastDividendDate: new Date('2024-01-31'),
+      deactivationReason: null,
+      deactivatedAt: null,
+      deactivatedBy: null,
+      createdAt: new Date('2023-07-22'),
     },
-  ]
+  ])
 
-  const filteredProperties = mockProperties.filter(property => {
+  const filteredProperties = properties.filter(property => {
     const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          property.location.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === "all" || property.status === statusFilter
@@ -185,13 +233,13 @@ export default function Properties() {
           </h2>
           <div className="flex gap-2">
             <Badge variant="outline">
-              {mockProperties.filter(p => p.status === 'live').length} Live
+              {properties.filter(p => p.status === 'live').length} Live
             </Badge>
             <Badge variant="outline">
-              {mockProperties.filter(p => p.status === 'upcoming').length} Upcoming
+              {properties.filter(p => p.status === 'upcoming').length} Upcoming
             </Badge>
             <Badge variant="outline">
-              {mockProperties.filter(p => p.status === 'closed').length} Closed
+              {properties.filter(p => p.status === 'closed').length} Closed
             </Badge>
           </div>
         </div>

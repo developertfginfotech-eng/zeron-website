@@ -36,6 +36,18 @@ export const properties = pgTable("properties", {
   ownershipCap: integer("ownership_cap").default(100),
   status: text("status").notNull().default("upcoming"),
   images: text("images").array(),
+  // Investment tracking fields
+  totalInvestment: decimal("total_investment", { precision: 12, scale: 2 }).default("0"),
+  investorCount: integer("investor_count").default(0),
+  currentOwnership: decimal("current_ownership", { precision: 5, scale: 2 }).default("0"), // percentage owned
+  monthlyRevenue: decimal("monthly_revenue", { precision: 10, scale: 2 }).default("0"),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default("0"),
+  occupancyRate: decimal("occupancy_rate", { precision: 5, scale: 2 }).default("0"), // percentage
+  performance: text("performance").default("stable"), // "excellent", "good", "stable", "declining"
+  lastDividendDate: timestamp("last_dividend_date"),
+  deactivationReason: text("deactivation_reason"), // reason if property is deactivated
+  deactivatedAt: timestamp("deactivated_at"),
+  deactivatedBy: varchar("deactivated_by"), // admin who deactivated
   createdAt: timestamp("created_at").defaultNow(),
 });
 
