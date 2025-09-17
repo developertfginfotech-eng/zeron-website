@@ -1,20 +1,28 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MapPin, TrendingUp, Users, Edit, Trash2 } from "lucide-react"
+import { MapPin, TrendingUp, Users, Edit, Trash2, DollarSign, BarChart3, Activity, Shield } from "lucide-react"
 import { Property } from "@shared/schema"
 
 interface PropertyCardProps {
   property: Property
   onEdit?: (id: string) => void
   onDelete?: (id: string) => void
+  onDeactivate?: (id: string) => void
 }
 
-export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) {
+export function PropertyCard({ property, onEdit, onDelete, onDeactivate }: PropertyCardProps) {
   const statusColors = {
     live: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     upcoming: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
     closed: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+  }
+
+  const performanceColors = {
+    excellent: "text-emerald-600",
+    good: "text-green-600",
+    stable: "text-blue-600",
+    declining: "text-orange-600"
   }
 
   const handleEdit = () => {
@@ -26,6 +34,17 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
     console.log('Delete property triggered:', property.id)
     onDelete?.(property.id)
   }
+
+  const handleDeactivate = () => {
+    console.log('Deactivate property triggered:', property.id)
+    onDeactivate?.(property.id)
+  }
+
+  // Determine if property can be deleted (only non-live properties without investments)
+  const canDelete = property.status !== 'live' && Number(property.totalInvestment || 0) === 0
+  
+  // Determine if property should show deactivate option (live properties with investments)
+  const shouldShowDeactivate = property.status === 'live' && Number(property.totalInvestment || 0) > 0
 
   return (
     <Card className="enhanced-card animate-scale-up group overflow-hidden" data-testid={`card-property-${property.id}`}>
@@ -60,7 +79,7 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         <div className="flex items-center text-sm text-muted-foreground">
           <MapPin className="h-4 w-4 mr-1" />
           <span data-testid={`text-location-${property.id}`}>{property.location}</span>
@@ -81,6 +100,51 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
           SAR {Number(property.price).toLocaleString()}
         </div>
 
+        {/* Investment Metrics */}
+        {property.status === 'live' && (
+          <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center">
+                <DollarSign className="h-4 w-4 mr-1 text-green-600" />
+                <span className="text-muted-foreground">Investment</span>
+              </div>
+              <span className="font-semibold" data-testid={`text-investment-${property.id}`}>
+                SAR {Number(property.totalInvestment || 0).toLocaleString()}
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center">
+                <Users className="h-4 w-4 mr-1 text-blue-600" />
+                <span className="text-muted-foreground">Investors</span>
+              </div>
+              <span className="font-semibold" data-testid={`text-investors-${property.id}`}>
+                {property.investorCount || 0}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center">
+                <BarChart3 className="h-4 w-4 mr-1 text-purple-600" />
+                <span className="text-muted-foreground">Occupancy</span>
+              </div>
+              <span className="font-semibold" data-testid={`text-occupancy-${property.id}`}>
+                {property.occupancyRate || 0}%
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center">
+                <Activity className="h-4 w-4 mr-1" />
+                <span className="text-muted-foreground">Performance</span>
+              </div>
+              <span className={`font-semibold capitalize ${performanceColors[property.performance as keyof typeof performanceColors] || 'text-muted-foreground'}`} data-testid={`text-performance-${property.id}`}>
+                {property.performance || 'stable'}
+              </span>
+            </div>
+          </div>
+        )}
+
         {property.description && (
           <p className="text-sm text-muted-foreground line-clamp-2" data-testid={`text-description-${property.id}`}>
             {property.description}
@@ -99,16 +163,41 @@ export function PropertyCard({ property, onEdit, onDelete }: PropertyCardProps) 
           <Edit className="h-4 w-4 mr-1" />
           Edit
         </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleDelete}
-          data-testid={`button-delete-${property.id}`}
-          className="flex-1"
-        >
-          <Trash2 className="h-4 w-4 mr-1" />
-          Delete
-        </Button>
+        
+        {canDelete ? (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDelete}
+            data-testid={`button-delete-${property.id}`}
+            className="flex-1 text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
+        ) : shouldShowDeactivate ? (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDeactivate}
+            data-testid={`button-deactivate-${property.id}`}
+            className="flex-1 text-orange-600 hover:text-orange-700"
+          >
+            <Shield className="h-4 w-4 mr-1" />
+            Deactivate
+          </Button>
+        ) : (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            disabled
+            className="flex-1 opacity-50"
+            title={property.status === 'live' ? 'Cannot delete live property with investments' : 'Property has active investments'}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            {property.status === 'live' ? 'Active' : 'Protected'}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )

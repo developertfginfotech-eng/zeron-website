@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Search, Filter, Plus, ArrowLeft } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
+import { Search, Filter, Plus, ArrowLeft, Shield, AlertTriangle } from "lucide-react"
 import { Property } from "@shared/schema"
 import apartmentImg from '@assets/generated_images/luxury_apartment_building_exterior_e11af77f.png'
 import officeImg from '@assets/generated_images/commercial_office_building_f8c8d53a.png'
@@ -14,11 +18,16 @@ import villaImg from '@assets/generated_images/luxury_villa_property_b02d7e37.pn
 import retailImg from '@assets/generated_images/retail_shopping_complex_10ee6fbf.png'
 
 export default function Properties() {
-  // todo: remove mock functionality
+  const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [showForm, setShowForm] = useState(false)
   const [editingProperty, setEditingProperty] = useState<Property | null>(null)
+  const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] = useState(false)
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
+  const [authPassword, setAuthPassword] = useState("")
+  const [deactivationReason, setDeactivationReason] = useState("")
+  const [deactivationComment, setDeactivationComment] = useState("")
 
   const [properties, setProperties] = useState<Property[]>([
     {
@@ -136,16 +145,105 @@ export default function Properties() {
   }
 
   const handleEditProperty = (id: string) => {
-    const property = mockProperties.find(p => p.id === id)
+    const property = properties.find(p => p.id === id)
     if (property) {
       setEditingProperty(property)
       setShowForm(true)
     }
   }
 
+  const DUMMY_PASSWORD = "1234"
+
+  const deactivationReasons = [
+    { value: "maintenance_required", label: "Maintenance Required" },
+    { value: "market_conditions", label: "Unfavorable Market Conditions" },
+    { value: "regulatory_issues", label: "Regulatory Issues" },
+    { value: "investor_request", label: "Investor Request" },
+    { value: "performance_issues", label: "Performance Issues" },
+    { value: "strategic_decision", label: "Strategic Business Decision" },
+    { value: "other", label: "Other" }
+  ]
+
   const handleDeleteProperty = (id: string) => {
-    console.log('Delete property triggered:', id)
+    const property = properties.find(p => p.id === id)
+    if (!property) return
+
+    // Only allow deletion of non-live properties without investments
+    if (property.status === 'live' || Number(property.totalInvestment || 0) > 0) {
+      toast({
+        title: "Cannot Delete Property",
+        description: "Live properties with investments cannot be deleted. Use deactivate instead.",
+        variant: "destructive"
+      })
+      return
+    }
+
     // In real app, this would delete the property
+    setProperties(prev => prev.filter(p => p.id !== id))
+    toast({
+      title: "Property Deleted",
+      description: "Property has been successfully deleted.",
+    })
+  }
+
+  const handleDeactivateProperty = (id: string) => {
+    setSelectedPropertyId(id)
+    setIsDeactivateDialogOpen(true)
+  }
+
+  const handleConfirmDeactivation = () => {
+    if (authPassword !== DUMMY_PASSWORD) {
+      toast({
+        title: "Invalid Password",
+        description: "Please enter the correct 4-digit authentication code.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!deactivationReason) {
+      toast({
+        title: "Reason Required",
+        description: "Please select a reason for deactivation.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!selectedPropertyId) return
+
+    // Update property status to closed
+    setProperties(prev => prev.map(property => 
+      property.id === selectedPropertyId 
+        ? {
+            ...property,
+            status: 'closed',
+            deactivationReason,
+            deactivatedAt: new Date(),
+            deactivatedBy: 'admin-current' // In real app, this would be the current admin
+          }
+        : property
+    ))
+
+    // Reset form and close dialog
+    setIsDeactivateDialogOpen(false)
+    setSelectedPropertyId(null)
+    setAuthPassword("")
+    setDeactivationReason("")
+    setDeactivationComment("")
+
+    toast({
+      title: "Property Deactivated",
+      description: "Property has been successfully deactivated and marked as closed.",
+    })
+  }
+
+  const handleCancelDeactivation = () => {
+    setIsDeactivateDialogOpen(false)
+    setSelectedPropertyId(null)
+    setAuthPassword("")
+    setDeactivationReason("")
+    setDeactivationComment("")
   }
 
   const handleFormSubmit = (data: any) => {
@@ -252,6 +350,7 @@ export default function Properties() {
             property={property}
             onEdit={handleEditProperty}
             onDelete={handleDeleteProperty}
+            onDeactivate={handleDeactivateProperty}
           />
         ))}
       </div>
@@ -269,6 +368,90 @@ export default function Properties() {
           </CardContent>
         </Card>
       )}
+
+      {/* Deactivation Dialog */}
+      <Dialog open={isDeactivateDialogOpen} onOpenChange={setIsDeactivateDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-orange-600" />
+              Deactivate Property
+            </DialogTitle>
+            <DialogDescription>
+              This will deactivate the property and mark it as closed. This action requires authentication and a reason.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-orange-50 dark:bg-orange-950/30 p-3 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-4 w-4 text-orange-600" />
+                <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Warning</span>
+              </div>
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                This property has active investments. Deactivating will mark it as closed but preserve investor data and history.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="auth-password">4-Digit Authentication Code</Label>
+              <Input
+                id="auth-password"
+                type="password"
+                placeholder="Enter 4-digit code"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                maxLength={4}
+                className="text-center text-lg tracking-widest"
+                data-testid="input-deactivation-password"
+              />
+              <p className="text-xs text-muted-foreground">
+                Demo code: 1234
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Deactivation Reason</Label>
+              <Select value={deactivationReason} onValueChange={setDeactivationReason}>
+                <SelectTrigger data-testid="select-deactivation-reason">
+                  <SelectValue placeholder="Select reason for deactivation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {deactivationReasons.map((reason) => (
+                    <SelectItem key={reason.value} value={reason.value}>
+                      {reason.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deactivation-comment">Additional Comments (Optional)</Label>
+              <Textarea
+                id="deactivation-comment"
+                placeholder="Provide additional details about the deactivation..."
+                value={deactivationComment}
+                onChange={(e) => setDeactivationComment(e.target.value)}
+                rows={3}
+                data-testid="textarea-deactivation-comment"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelDeactivation}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmDeactivation}
+              disabled={authPassword !== DUMMY_PASSWORD || !deactivationReason}
+              variant="destructive"
+              data-testid="button-confirm-deactivation"
+            >
+              Deactivate Property
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
