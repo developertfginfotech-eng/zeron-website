@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { usePullToRefresh } from "@/hooks/usePullToRefresh"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -93,16 +94,28 @@ const availableProperties = saudiProperties.slice(0, 3)
 
 export default function MobileDashboard() {
   const { t } = useTranslation()
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const [showFloatingActions, setShowFloatingActions] = useState(false)
   const [scrollY, setScrollY] = useState(0)
   
-  // Pull-to-refresh simulation
+  // Real gesture-based pull-to-refresh
   const handleRefresh = async () => {
-    setIsRefreshing(true)
+    // Simulate API refresh with realistic delay
     await new Promise(resolve => setTimeout(resolve, 1500))
-    setIsRefreshing(false)
+    console.log('Dashboard refreshed!')
   }
+  
+  const { 
+    pullToRefreshProps, 
+    indicatorProps, 
+    isPulling, 
+    isRefreshing,
+    isOverThreshold 
+  } = usePullToRefresh({ 
+    onRefresh: handleRefresh,
+    threshold: 80,
+    resistance: 2.5,
+    enabled: true
+  })
   
   // Scroll listener for floating elements
   useEffect(() => {
@@ -117,13 +130,21 @@ export default function MobileDashboard() {
   
   return (
     <div className="relative">
-      {/* Pull-to-refresh indicator */}
-      {isRefreshing && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary text-white px-4 py-2 rounded-full shadow-lg animate-bounce">
-          <RefreshCw className="h-4 w-4 animate-spin inline mr-2" />
-          Refreshing...
+      {/* Real gesture-based pull-to-refresh indicator */}
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50" {...indicatorProps}>
+        <div className={`
+          px-4 py-2 rounded-full shadow-lg
+          ${isRefreshing ? 'bg-primary text-white animate-bounce' : 
+            isOverThreshold ? 'bg-green-500 text-white' : 
+            'bg-gray-200 text-gray-600'}
+          transition-colors duration-200
+        `}>
+          <RefreshCw className={`h-4 w-4 inline mr-2 ${isRefreshing ? 'animate-spin' : isPulling ? 'animate-pulse' : ''}`} />
+          {isRefreshing ? 'Refreshing...' : 
+           isOverThreshold ? 'Release to refresh' : 
+           isPulling ? 'Pull to refresh' : ''}
         </div>
-      )}
+      </div>
       
       {/* Floating scroll-to-top button */}
       {showFloatingActions && (
@@ -148,7 +169,7 @@ export default function MobileDashboard() {
         </Link>
       )}
     
-      <div className="space-y-6 pb-20 mobile-enhanced bg-gradient-to-br from-background via-muted/10 to-primary/5 min-h-screen">
+      <div className="space-y-6 pb-20 mobile-enhanced bg-gradient-to-br from-background via-muted/10 to-primary/5 min-h-screen" {...pullToRefreshProps}>
         {/* Outstanding Premium Welcome Header with Particle Background */}
         <div className="bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 rounded-3xl text-white relative overflow-hidden mobile-scale-in glass-card shadow-2xl border border-white/20 backdrop-blur-xl interactive-bounce" data-testid="header-welcome">
           {/* Floating Particle Background */}

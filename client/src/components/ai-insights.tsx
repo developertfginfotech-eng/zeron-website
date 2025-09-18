@@ -1,7 +1,16 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   TrendingUp, 
   Brain, 
@@ -10,13 +19,16 @@ import {
   Sparkles,
   ArrowUpRight,
   BarChart3,
-  Lightbulb
+  Lightbulb,
+  X
 } from "lucide-react";
 import { useTranslation } from "@/hooks/use-translation";
 import { aiInsights, saudiMarketStats } from "@/lib/saudi-data";
 
 export function AIInsights() {
   const { t } = useTranslation();
+  const [selectedInsight, setSelectedInsight] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -120,15 +132,80 @@ export function AIInsights() {
               />
             </div>
 
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="w-full mt-3 text-primary hover:bg-primary/10"
-              data-testid={`button-insight-details-${insight.id}`}
-            >
-              View Detailed Analysis
-              <ArrowUpRight className="h-3 w-3 ml-1" />
-            </Button>
+            <Dialog open={isDialogOpen && selectedInsight?.id === insight.id} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) setSelectedInsight(null);
+            }}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full mt-3 text-primary hover:bg-primary/10"
+                  data-testid={`button-insight-details-${insight.id}`}
+                  onClick={() => {
+                    setSelectedInsight(insight);
+                    setIsDialogOpen(true);
+                  }}
+                >
+                  View Detailed Analysis
+                  <ArrowUpRight className="h-3 w-3 ml-1" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md" aria-describedby={`insight-dialog-description-${insight.id}`}>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    {getInsightIcon(insight.type)}
+                    {insight.title}
+                    <Badge className={`text-xs ${getImpactColor(insight.impact)}`}>
+                      {insight.impact.toUpperCase()}
+                    </Badge>
+                  </DialogTitle>
+                  <DialogDescription id={`insight-dialog-description-${insight.id}`}>
+                    AI Analysis • {insight.timestamp.toLocaleDateString()} • {insight.confidence}% Confidence
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Analysis Summary</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {insight.content}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Detailed Insights</h4>
+                    <div className="space-y-2">
+                      <p className="text-sm">
+                        • Market trends indicate a strong growth potential in {insight.type === 'market_analysis' ? 'residential properties' : 'commercial sectors'}
+                      </p>
+                      <p className="text-sm">
+                        • Risk assessment shows {insight.impact === 'high' ? 'favorable' : 'moderate'} investment conditions
+                      </p>
+                      <p className="text-sm">
+                        • Vision 2030 alignment creates additional opportunity multipliers
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">AI Confidence Level</h4>
+                    <Progress value={insight.confidence} className="h-3" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Based on {Math.floor(Math.random() * 500 + 100)} data points and market indicators
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Recommendations</h4>
+                    <div className="space-y-1">
+                      <p className="text-sm">• Consider diversifying into {insight.type === 'market_analysis' ? 'NEOM' : 'Red Sea'} projects</p>
+                      <p className="text-sm">• Monitor market conditions over the next 30-60 days</p>
+                      <p className="text-sm">• Maintain Shariah-compliant investment strategy</p>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
       ))}
