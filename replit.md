@@ -1,6 +1,6 @@
 # Overview
 
-Zaron is a real estate investment platform designed for the Saudi Arabian market, featuring both an admin web panel and mobile application. The platform facilitates property investment management, KYC verification processes, and portfolio tracking. Built as a demo version, it uses mock data flows without external payment or banking integrations, supporting both Arabic (RTL) and English languages.
+Zaron is a real estate investment platform designed for the Saudi Arabian market, featuring both an admin web panel and mobile application. The platform facilitates property investment management, KYC verification processes, and portfolio tracking. Built as a demo version, it uses mock data flows without external payment or banking integrations. The mobile app now features comprehensive multi-language support with English (default), Arabic (RTL), and Hindi languages, along with enhanced interactivity and modern mobile UI/UX.
 
 # User Preferences
 
@@ -42,7 +42,9 @@ Preferred communication style: Simple, everyday language.
 - **Transaction Processing**: Investment flows, payouts, and withdrawal handling
 - **AI Integration**: Chat widget, insights panel, and smart analytics
 - **Admin Dashboard**: Comprehensive analytics, user management, and system settings
-- **Multi-language Support**: RTL Arabic and English language switching
+- **Multi-language Support**: Full internationalization with English (default), Arabic (RTL), and Hindi
+- **Mobile App Features**: Interactive dashboard, properties display, portfolio tracking, and language switching
+- **Mobile Interactivity**: Touch-friendly animations, hover effects, and responsive design optimized for mobile devices
 
 ## Development Patterns
 - **Mock Data Strategy**: Comprehensive mock data throughout for demo functionality
