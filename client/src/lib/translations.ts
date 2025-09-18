@@ -3,8 +3,9 @@ export type TranslationKey = keyof typeof translations.en
 export const translations = {
   en: {
     // Header & Navigation
-    welcome_back: "Welcome back,",
+    welcome_back: "Welcome back,", 
     track_investments: "Track your real estate investments",
+    total_portfolio_value: "Total Portfolio Value",
     
     // Navigation
     home: "Home",
@@ -67,6 +68,7 @@ export const translations = {
     // Header & Navigation  
     welcome_back: "مرحباً بعودتك،",
     track_investments: "تتبع استثماراتك العقارية",
+    total_portfolio_value: "إجمالي قيمة المحفظة",
     
     // Navigation
     home: "الرئيسية",
@@ -129,6 +131,7 @@ export const translations = {
     // Header & Navigation
     welcome_back: "वापसी पर स्वागत है,",
     track_investments: "अपने रियल एस्टेट निवेश को ट्रैक करें",
+    total_portfolio_value: "कुल पोर्टफोलियो मूल्य",
     
     // Navigation
     home: "होम",
