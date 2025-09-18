@@ -471,3 +471,292 @@
     inset: -1px;
   }
 }
+
+/* RTL Support */
+.rtl {
+  direction: rtl;
+}
+
+.ltr {
+  direction: ltr;
+}
+
+/* RTL-specific adjustments */
+.rtl .text-left {
+  text-align: right;
+}
+
+.rtl .text-right {
+  text-align: left;
+}
+
+.rtl .ml-auto {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.rtl .mr-auto {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.rtl .flex-row-reverse {
+  flex-direction: row;
+}
+
+.rtl .rounded-l-lg {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.rtl .rounded-r-lg {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+/* Mobile Interactive Animations */
+@keyframes mobile-bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes mobile-scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes mobile-fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobile-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes mobile-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+  }
+}
+
+/* Mobile Animation Classes */
+.mobile-bounce {
+  animation: mobile-bounce 1s ease-in-out;
+}
+
+.mobile-scale-in {
+  animation: mobile-scale-in 0.3s ease-out;
+}
+
+.mobile-fade-in-up {
+  animation: mobile-fade-in-up 0.5s ease-out;
+}
+
+.mobile-slide-in {
+  animation: mobile-slide-in 0.4s ease-out;
+}
+
+.mobile-pulse-glow {
+  animation: mobile-pulse-glow 2s infinite;
+}
+
+/* Mobile Interactive States */
+.mobile-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.mobile-card:active {
+  transform: scale(0.98) translateZ(0);
+  transition: all 0.1s ease-out;
+}
+
+.mobile-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.mobile-button:active {
+  transform: scale(0.95) translateZ(0);
+  transition: all 0.1s ease-out;
+}
+
+/* Enhanced Mobile Navigation */
+.mobile-nav-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: hsl(var(--primary));
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.mobile-nav-item.active::before {
+  width: 80%;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.95);
+}
+
+/* Enhanced Property Cards */
+.property-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.property-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.property-card:hover::before {
+  left: 100%;
+}
+
+.property-card:active {
+  transform: scale(0.98);
+}
+
+/* Staggered Animation Delays */
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+}
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 768px) {
+  .mobile-enhanced {
+    padding: 1rem;
+  }
+  
+  .mobile-grid {
+    gap: 0.75rem;
+  }
+  
+  .mobile-text {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .mobile-button-large {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-height: 3rem;
+  }
+}
+
+/* Touch-friendly Interactive Areas */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glass Morphism Effect for Mobile */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* RTL language-specific text direction for specific elements */
+.rtl .language-text {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl .number-text {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Currency display always LTR */
+.currency {
+  direction: ltr;
+  display: inline-block;
+}
+
+.rtl .currency {
+  direction: ltr;
+}
+
+/* Mobile specific RTL adjustments */
+@media (max-width: 768px) {
+  .rtl .mobile-card {
+    text-align: right;
+  }
+  
+  .rtl .mobile-flex {
+    flex-direction: row-reverse;
+  }
+  
+  .rtl .mobile-grid {
+    direction: rtl;
+  }
+}

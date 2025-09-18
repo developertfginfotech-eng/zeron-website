@@ -1,12 +1,16 @@
 import { ReactNode } from "react"
 import { MobileNavigation } from "./mobile-navigation"
 import { ThemeToggle } from "./theme-toggle"
+import { LanguageSwitcher } from "./language-switcher"
+import { useTranslation } from "@/hooks/use-translation"
 
 interface MobileLayoutProps {
   children: ReactNode
 }
 
 export function MobileLayout({ children }: MobileLayoutProps) {
+  const { t } = useTranslation()
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
@@ -18,7 +22,10 @@ export function MobileLayout({ children }: MobileLayoutProps) {
               Zaron
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

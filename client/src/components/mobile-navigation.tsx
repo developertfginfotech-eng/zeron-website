@@ -1,29 +1,30 @@
 import { Link, useLocation } from "wouter"
 import { Home, Building2, TrendingUp, User } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "@/hooks/use-translation"
 
 const navigationItems = [
   {
     href: "/mobile",
-    label: "Home",
+    labelKey: "home" as const,
     icon: Home,
     testId: "nav-mobile-home"
   },
   {
     href: "/mobile/properties",
-    label: "Properties",
+    labelKey: "properties" as const,
     icon: Building2,
     testId: "nav-mobile-properties"
   },
   {
     href: "/mobile/portfolio",
-    label: "Portfolio",
+    labelKey: "portfolio" as const,
     icon: TrendingUp,
     testId: "nav-mobile-portfolio"
   },
   {
     href: "/mobile/profile",
-    label: "Profile",
+    labelKey: "profile" as const,
     icon: User,
     testId: "nav-mobile-profile"
   }
@@ -31,6 +32,7 @@ const navigationItems = [
 
 export function MobileNavigation() {
   const [location] = useLocation()
+  const { t } = useTranslation()
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
@@ -43,7 +45,7 @@ export function MobileNavigation() {
             <Link key={item.href} href={item.href}>
               <button
                 className={cn(
-                  "flex flex-col items-center gap-1 p-2 rounded-lg transition-colors min-w-[60px]",
+                  "flex flex-col items-center gap-1 p-2 rounded-lg transition-colors min-w-[60px] hover-elevate",
                   isActive 
                     ? "text-primary bg-primary/10" 
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -52,7 +54,7 @@ export function MobileNavigation() {
               >
                 <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
                 <span className={cn("text-xs font-medium", isActive && "text-primary")}>
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
               </button>
             </Link>

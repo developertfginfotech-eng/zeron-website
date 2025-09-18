@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { LanguageProvider } from "@/components/language-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -69,7 +70,8 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="zaron-theme">
-        <TooltipProvider>
+        <LanguageProvider defaultLanguage="en" storageKey="zaron-language">
+          <TooltipProvider>
           {isMobile ? (
             // Mobile Layout for Investors
             <MobileLayout>
@@ -114,7 +116,8 @@ export default function App() {
             </SidebarProvider>
           )}
           <Toaster />
-        </TooltipProvider>
+          </TooltipProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
