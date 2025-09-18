@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,8 +6,11 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
-import { User, Phone, Mail, MapPin, FileText, Shield, Camera, Edit2, CheckCircle, AlertCircle, Clock } from "lucide-react"
+import { User, Phone, Mail, MapPin, FileText, Shield, Camera, Edit2, CheckCircle, AlertCircle, Clock, Upload } from "lucide-react"
 
 const mockInvestor = {
   id: "inv_001",
@@ -49,8 +52,28 @@ const mockInvestor = {
 
 export default function MobileProfile() {
   const { toast } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState(mockInvestor)
+  
+  // Modal states
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false)
+  const [showNotificationDialog, setShowNotificationDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  
+  // Form states
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  })
+  
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailNotifications: true,
+    smsNotifications: false,
+    pushNotifications: true,
+    marketingEmails: false
+  })
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -84,6 +107,72 @@ export default function MobileProfile() {
     toast({
       title: "Profile Updated",
       description: "Your profile information has been saved successfully.",
+    })
+  }
+
+  const handlePasswordChange = () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Password Mismatch",
+        description: "New password and confirmation password don't match.",
+      })
+      return
+    }
+    
+    if (passwordForm.newPassword.length < 8) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Password",
+        description: "Password must be at least 8 characters long.",
+      })
+      return
+    }
+
+    // In real app, this would call backend
+    setShowPasswordDialog(false)
+    setPasswordForm({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: ""
+    })
+    toast({
+      title: "Password Changed",
+      description: "Your password has been updated successfully.",
+    })
+  }
+
+  const handleNotificationSave = () => {
+    // In real app, this would save to backend
+    setShowNotificationDialog(false)
+    toast({
+      title: "Settings Saved",
+      description: "Your notification preferences have been updated.",
+    })
+  }
+
+  const handleFileUpload = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      // In real app, this would upload to backend
+      toast({
+        title: "Document Uploaded",
+        description: `${file.name} has been uploaded successfully.`,
+      })
+    }
+  }
+
+  const handleDeleteAccount = () => {
+    // In real app, this would call backend
+    setShowDeleteDialog(false)
+    toast({
+      variant: "destructive",
+      title: "Account Deletion Requested",
+      description: "Your account deletion request has been submitted.",
     })
   }
 
@@ -286,10 +375,25 @@ export default function MobileProfile() {
           
           <Separator />
           
-          <Button variant="outline" className="w-full" data-testid="button-upload-document">
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={handleFileUpload}
+            data-testid="button-upload-document"
+          >
             <FileText className="h-4 w-4 mr-2" />
             Upload New Document
           </Button>
+          
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+            onChange={handleFileChange}
+            className="hidden"
+            data-testid="input-file-upload"
+          />
         </CardContent>
       </Card>
 
@@ -300,20 +404,184 @@ export default function MobileProfile() {
           <CardDescription>Manage your account preferences</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Button variant="outline" className="w-full justify-start" data-testid="button-change-password">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start" 
+            onClick={() => setShowPasswordDialog(true)}
+            data-testid="button-change-password"
+          >
             <Shield className="h-4 w-4 mr-2" />
             Change Password
           </Button>
-          <Button variant="outline" className="w-full justify-start" data-testid="button-notification-settings">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start" 
+            onClick={() => setShowNotificationDialog(true)}
+            data-testid="button-notification-settings"
+          >
             <Mail className="h-4 w-4 mr-2" />
             Notification Settings
           </Button>
-          <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700" data-testid="button-delete-account">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-red-600 hover:text-red-700" 
+            onClick={() => setShowDeleteDialog(true)}
+            data-testid="button-delete-account"
+          >
             <AlertCircle className="h-4 w-4 mr-2" />
             Delete Account
           </Button>
         </CardContent>
       </Card>
+
+      {/* Password Change Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new one.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="current-password">Current Password</Label>
+              <Input
+                id="current-password"
+                type="password"
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                data-testid="input-current-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                data-testid="input-new-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                data-testid="input-confirm-password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handlePasswordChange} data-testid="button-save-password">
+              Change Password
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Notification Settings Dialog */}
+      <Dialog open={showNotificationDialog} onOpenChange={setShowNotificationDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Notification Settings</DialogTitle>
+            <DialogDescription>
+              Choose how you want to receive notifications.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Email Notifications</Label>
+                <p className="text-sm text-muted-foreground">Receive important updates via email</p>
+              </div>
+              <Switch
+                checked={notificationSettings.emailNotifications}
+                onCheckedChange={(checked) => 
+                  setNotificationSettings({...notificationSettings, emailNotifications: checked})
+                }
+                data-testid="switch-email-notifications"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>SMS Notifications</Label>
+                <p className="text-sm text-muted-foreground">Get alerts via text message</p>
+              </div>
+              <Switch
+                checked={notificationSettings.smsNotifications}
+                onCheckedChange={(checked) => 
+                  setNotificationSettings({...notificationSettings, smsNotifications: checked})
+                }
+                data-testid="switch-sms-notifications"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Push Notifications</Label>
+                <p className="text-sm text-muted-foreground">Browser push notifications</p>
+              </div>
+              <Switch
+                checked={notificationSettings.pushNotifications}
+                onCheckedChange={(checked) => 
+                  setNotificationSettings({...notificationSettings, pushNotifications: checked})
+                }
+                data-testid="switch-push-notifications"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Marketing Emails</Label>
+                <p className="text-sm text-muted-foreground">Receive promotional content</p>
+              </div>
+              <Switch
+                checked={notificationSettings.marketingEmails}
+                onCheckedChange={(checked) => 
+                  setNotificationSettings({...notificationSettings, marketingEmails: checked})
+                }
+                data-testid="switch-marketing-emails"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNotificationDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleNotificationSave} data-testid="button-save-notifications">
+              Save Settings
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Account Confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete your account? This action cannot be undone. 
+              All your investments and data will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteAccount}
+              className="bg-red-600 hover:bg-red-700"
+              data-testid="button-confirm-delete"
+            >
+              Delete Account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
