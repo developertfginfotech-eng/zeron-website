@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { usePullToRefresh } from "@/hooks/usePullToRefresh"
+import { BottomSheet } from "@/components/ui/bottom-sheet"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -96,6 +97,9 @@ export default function MobileDashboard() {
   const { t } = useTranslation()
   const [showFloatingActions, setShowFloatingActions] = useState(false)
   const [scrollY, setScrollY] = useState(0)
+  const [selectedProperty, setSelectedProperty] = useState<any>(null)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
+  const [isFabMenuOpen, setIsFabMenuOpen] = useState(false)
   
   // Real gesture-based pull-to-refresh
   const handleRefresh = async () => {
@@ -117,15 +121,38 @@ export default function MobileDashboard() {
     enabled: true
   })
   
-  // Scroll listener for floating elements
+  // Performance optimized scroll listener for floating elements and parallax
   useEffect(() => {
+    let animationId: number
+    let lastScrollY = 0
+    
     const handleScroll = () => {
-      setScrollY(window.scrollY)
-      setShowFloatingActions(window.scrollY > 200)
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
+      
+      animationId = requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY
+        
+        if (Math.abs(currentScrollY - lastScrollY) > 2) {
+          setScrollY(currentScrollY)
+          setShowFloatingActions(currentScrollY > 200)
+          
+          // Update CSS custom property for parallax effect
+          document.documentElement.style.setProperty('--scroll-y', currentScrollY.toString())
+          
+          lastScrollY = currentScrollY
+        }
+      })
     }
     
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
+    }
   }, [])
   
   return (
@@ -146,30 +173,73 @@ export default function MobileDashboard() {
         </div>
       </div>
       
-      {/* Floating scroll-to-top button */}
+      {/* Enhanced floating scroll-to-top button with glassmorphism */}
       {showFloatingActions && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-24 right-4 z-40 w-12 h-12 bg-primary text-white rounded-full shadow-xl mobile-pulse-glow hover:scale-110 transition-all duration-300 flex items-center justify-center"
+          className="fixed bottom-24 right-4 z-40 w-14 h-14 glass-card haptic-feedback advanced-glow text-primary rounded-full shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center float-gentle morph-premium"
           data-testid="button-scroll-top"
+          aria-label="Scroll to top"
         >
-          <ChevronUp className="h-5 w-5" />
+          <ChevronUp className="h-6 w-6" />
         </button>
       )}
       
-      {/* Floating AI Assistant Button */}
+      {/* Enhanced Expanding FAB Menu */}
       {showFloatingActions && (
-        <Link href="/mobile/ai-advisor">
+        <div className="fixed bottom-40 right-4 z-40">
+          {/* Main FAB Button */}
           <button
-            className="fixed bottom-40 right-4 z-40 w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full shadow-xl mobile-pulse-glow hover:scale-110 transition-all duration-300 flex items-center justify-center"
-            data-testid="button-floating-ai"
+            onClick={() => setIsFabMenuOpen(!isFabMenuOpen)}
+            className={`w-16 h-16 glass-card haptic-feedback bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-500 flex items-center justify-center float-dynamic advanced-glow ${
+              isFabMenuOpen ? 'fab-menu-open' : 'fab-menu-closed'
+            }`}
+            data-testid="button-floating-menu"
+            aria-label="Quick Actions Menu"
           >
-            <Brain className="h-6 w-6" />
+            <Brain className={`h-7 w-7 transition-transform duration-300 ${
+              isFabMenuOpen ? 'rotate-180' : ''
+            }`} />
           </button>
-        </Link>
+          
+          {/* Expanding Menu Items */}
+          {isFabMenuOpen && (
+            <div className="absolute bottom-20 right-0 space-y-4">
+              <Link href="/mobile/ai-advisor">
+                <button
+                  className="w-12 h-12 glass-card haptic-feedback bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center fab-item"
+                  data-testid="fab-item-ai-advisor"
+                  aria-label="AI Investment Advisor"
+                >
+                  <Brain className="h-5 w-5" />
+                </button>
+              </Link>
+              
+              <Link href="/mobile/chat">
+                <button
+                  className="w-12 h-12 glass-card haptic-feedback bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center fab-item"
+                  data-testid="fab-item-chat"
+                  aria-label="Live Chat Support"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                </button>
+              </Link>
+              
+              <Link href="/mobile/properties">
+                <button
+                  className="w-12 h-12 glass-card haptic-feedback bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-full shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center fab-item"
+                  data-testid="fab-item-properties"
+                  aria-label="Browse Properties"
+                >
+                  <Building className="h-5 w-5" />
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
       )}
     
-      <div className="space-y-6 pb-20 mobile-enhanced bg-gradient-to-br from-background via-muted/10 to-primary/5 min-h-screen" {...pullToRefreshProps}>
+      <div className="space-y-8 pb-20 mobile-enhanced bg-gradient-to-br from-background via-muted/10 to-primary/5 min-h-screen parallax-slow saudi-pattern" {...pullToRefreshProps}>
         {/* Outstanding Premium Welcome Header with Particle Background */}
         <div className="bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 rounded-3xl text-white relative overflow-hidden mobile-scale-in glass-card shadow-2xl border border-white/20 backdrop-blur-xl interactive-bounce" data-testid="header-welcome">
           {/* Floating Particle Background */}
@@ -208,9 +278,9 @@ export default function MobileDashboard() {
           <div className="absolute top-1/4 left-1/3 w-6 h-6 bg-white/20 rounded-full animate-ping" />
         </div>
 
-        {/* Enhanced Portfolio Overview Cards */}
+        {/* Enhanced Portfolio Overview Cards with Staggered Animations */}
         <div className="grid grid-cols-2 gap-4 mobile-grid">
-          <Card className="enhanced-card mobile-fade-in-up mobile-interactive border-0 shadow-xl interactive-bounce glow-effect" data-testid="card-total-value">
+          <Card className="glass-card stagger-animation stagger-delay-100 mobile-interactive haptic-feedback morph-premium chart-interactive" data-testid="card-total-value">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center shadow-lg wave-animation hover:scale-110 transition-all" data-testid="icon-total-value">
@@ -230,7 +300,7 @@ export default function MobileDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="enhanced-card mobile-fade-in-up mobile-interactive animate-delay-100 border-0 shadow-xl interactive-bounce glow-effect" data-testid="card-total-return">
+          <Card className="glass-card stagger-animation stagger-delay-200 mobile-interactive haptic-feedback morph-premium chart-interactive" data-testid="card-total-return">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-lg wave-animation hover:scale-110 transition-all animate-delay-200" data-testid="icon-total-return">
@@ -246,8 +316,8 @@ export default function MobileDashboard() {
           </Card>
         </div>
 
-        {/* Premium Saudi Market Overview */}
-        <Card className="enhanced-card mobile-fade-in-up animate-delay-200 border-0 shadow-xl bg-gradient-to-br from-white via-white to-primary/5 interactive-bounce glow-effect">
+        {/* Premium Saudi Market Overview with Glassmorphism */}
+        <Card className="glass-card stagger-animation stagger-delay-300 haptic-feedback morph-premium vision-2030-accent">
           <CardContent className="p-6">
             <div className="flex items-center gap-4 mb-5">
               <div className="w-12 h-12 bg-gradient-to-br from-green-100 via-green-200 to-green-300 rounded-xl flex items-center justify-center shadow-lg animate-pulse-slow wave-animation glow-effect">
@@ -477,7 +547,15 @@ export default function MobileDashboard() {
           <CardContent>
             <div className="space-y-5">
               {availableProperties.map((property, index) => (
-                <div key={property.id} className={`border rounded-2xl p-6 space-y-5 mobile-interactive property-card bg-gradient-to-r from-white to-muted/20 shadow-lg hover:shadow-xl transition-all mobile-fade-in-up animate-delay-${(index + 1) * 100}`} data-testid={`property-card-${property.id}`}>
+                <div 
+                  key={property.id} 
+                  className="glass-card stagger-animation haptic-feedback morph-premium p-6 space-y-5 mobile-interactive property-card cursor-pointer" 
+                  onClick={() => {
+                    setSelectedProperty(property)
+                    setIsBottomSheetOpen(true)
+                  }}
+                  data-testid={`property-card-${property.id}`}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="font-bold text-lg mb-2" data-testid={`text-property-name-${property.id}`}>{property.name}</h3>
@@ -531,6 +609,83 @@ export default function MobileDashboard() {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Bottom Sheet for Property Details */}
+        <BottomSheet
+          isOpen={isBottomSheetOpen}
+          onClose={() => {
+            setIsBottomSheetOpen(false)
+            setSelectedProperty(null)
+          }}
+          title={selectedProperty ? `${selectedProperty.name} Details` : "Property Details"}
+          height="full"
+        >
+          {selectedProperty && (
+            <div className="space-y-6">
+              {/* Property Header */}
+              <div className="glass-overlay p-4 rounded-xl">
+                <h3 className="text-xl font-bold mb-2">{selectedProperty.name}</h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">{selectedProperty.location}</p>
+                </div>
+                <p className="text-sm leading-relaxed">{selectedProperty.description}</p>
+              </div>
+              
+              {/* Key Metrics */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="glass-card p-4 text-center">
+                  <p className="text-xs text-muted-foreground font-medium mb-2">Min Investment</p>
+                  <p className="text-lg font-bold text-primary">SAR {selectedProperty.minInvestment.toLocaleString()}</p>
+                </div>
+                <div className="glass-card p-4 text-center">
+                  <p className="text-xs text-muted-foreground font-medium mb-2">Expected Return</p>
+                  <p className="text-lg font-bold text-green-600">{selectedProperty.expectedReturn}%</p>
+                </div>
+              </div>
+              
+              {/* Investment Progress */}
+              <div className="glass-overlay p-4 rounded-xl">
+                <div className="flex justify-between text-sm mb-3">
+                  <span className="font-medium">Funding Progress</span>
+                  <span className="font-bold text-primary">
+                    {Math.round((selectedProperty.soldUnits / selectedProperty.totalUnits) * 100)}% Complete
+                  </span>
+                </div>
+                <Progress 
+                  value={(selectedProperty.soldUnits / selectedProperty.totalUnits) * 100} 
+                  className="h-3 mb-2"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {selectedProperty.soldUnits} of {selectedProperty.totalUnits} units sold
+                </p>
+              </div>
+              
+              {/* Investment Action */}
+              <Button 
+                className="w-full haptic-feedback morph-premium advanced-glow" 
+                size="lg"
+                data-testid="button-invest-property"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Invest in This Property
+              </Button>
+              
+              {/* Vision 2030 Badge */}
+              {selectedProperty.vision2030 && (
+                <div className="glass-overlay p-3 rounded-xl flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <Target className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-green-700">Vision 2030 Project</p>
+                    <p className="text-xs text-muted-foreground">Part of Saudi Arabia's transformative vision</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </BottomSheet>
       </div>
     </div>
   )
