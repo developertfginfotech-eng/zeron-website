@@ -9,8 +9,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslation } from "@/hooks/use-translation"
+import luxuryApartmentImg from '@assets/generated_images/luxury_apartment_building_exterior_e11af77f.png'
+import luxuryVillaImg from '@assets/generated_images/luxury_villa_property_b02d7e37.png'
+import commercialOfficeImg from '@assets/generated_images/commercial_office_building_f8c8d53a.png'
+import retailComplexImg from '@assets/generated_images/retail_shopping_complex_10ee6fbf.png'
 import { 
   Search, 
   MapPin, 
@@ -34,7 +39,24 @@ import {
   Bookmark,
   Crown,
   Globe,
-  Zap
+  Zap,
+  ImageIcon,
+  Clock,
+  Home,
+  FileText,
+  Calculator,
+  PieChart,
+  TrendingDown,
+  Percent,
+  Layers,
+  ArrowRight,
+  MapPinIcon,
+  Info,
+  CheckCircle2,
+  AlertTriangle,
+  CircleDollarSign,
+  Award,
+  Activity
 } from "lucide-react"
 
 interface Property {
@@ -51,7 +73,7 @@ interface Property {
   description: string
   descriptionAr: string
   descriptionHi: string
-  image: string
+  images: string[]
   minInvestment: number
   targetAmount: number
   raisedAmount: number
@@ -69,6 +91,44 @@ interface Property {
   category: "residential" | "commercial" | "mixed" | "hospitality" | "industrial"
   amenities: string[]
   developmentStage: "planning" | "construction" | "near_completion" | "ready"
+  financialMetrics: {
+    irr: number // Internal Rate of Return
+    noi: number // Net Operating Income
+    capRate: number // Capitalization Rate
+    cashOnCash: number // Cash-on-Cash Return
+    totalCostOfProject: number
+    loanToValue: number // LTV ratio
+    debtServiceCoverage: number // DSCR
+    breakEvenOccupancy: number
+  }
+  investmentHighlights: string[]
+  risks: string[]
+  marketAnalysis: {
+    averageRent: number
+    marketGrowth: number
+    competitorAnalysis: string
+    demographic: string
+  }
+  legalStructure: {
+    ownership: string
+    managementFees: number
+    exitStrategy: string
+    taxation: string
+  }
+  timeline: {
+    phase: string
+    milestones: Array<{
+      name: string
+      date: string
+      status: "completed" | "pending" | "in_progress"
+    }>
+  }
+  developer: {
+    name: string
+    experience: string
+    reputation: number
+    previousProjects: number
+  }
 }
 
 const saudiProperties: Property[] = [
@@ -86,7 +146,7 @@ const saudiProperties: Property[] = [
     description: "Revolutionary linear city with mirror-clad walls stretching 170km through mountains and desert",
     descriptionAr: "مدينة خطية ثورية بجدران مكسوة بالمرايا تمتد 170 كم عبر الجبال والصحراء",
     descriptionHi: "पहाड़ों और रेगिस्तान के माध्यम से 170 किमी तक फैली दर्पण-क्लैड दीवारों के साथ क्रांतिकारी रैखिक शहर",
-    image: "/api/placeholder/400/300",
+    images: [luxuryApartmentImg, luxuryVillaImg, commercialOfficeImg],
     minInvestment: 100000,
     targetAmount: 8500000,
     raisedAmount: 5950000,
@@ -103,7 +163,57 @@ const saudiProperties: Property[] = [
     riskLevel: "medium",
     category: "residential",
     amenities: ["AI Integration", "Renewable Energy", "Climate Control", "Hyperloop", "Vertical Farming"],
-    developmentStage: "construction"
+    developmentStage: "construction",
+    financialMetrics: {
+      irr: 21.4,
+      noi: 1530000,
+      capRate: 6.8,
+      cashOnCash: 14.2,
+      totalCostOfProject: 8500000,
+      loanToValue: 65,
+      debtServiceCoverage: 1.85,
+      breakEvenOccupancy: 72
+    },
+    investmentHighlights: [
+      "Part of Saudi Arabia's NEOM mega-project",
+      "Zero-emission linear city with cutting-edge technology",
+      "Government-backed with sovereign guarantee",
+      "Direct access to planned hyperloop network",
+      "AI-powered building management systems"
+    ],
+    risks: [
+      "Construction timeline dependent on technology development",
+      "Regulatory changes in new economic zone",
+      "Market acceptance of linear city concept",
+      "Weather conditions affecting construction"
+    ],
+    marketAnalysis: {
+      averageRent: 18000,
+      marketGrowth: 15.8,
+      competitorAnalysis: "No direct competitors in futuristic smart city segment",
+      demographic: "High-income tech professionals and international executives"
+    },
+    legalStructure: {
+      ownership: "Freehold with 99-year renewable lease",
+      managementFees: 2.5,
+      exitStrategy: "Secondary market trading after 5 years",
+      taxation: "10% capital gains tax exemption for first 10 years"
+    },
+    timeline: {
+      phase: "Phase 2 - Infrastructure Development",
+      milestones: [
+        { name: "Foundation & Utilities", date: "2024-12-31", status: "completed" },
+        { name: "Structural Framework", date: "2026-06-30", status: "in_progress" },
+        { name: "Interior Systems", date: "2028-12-31", status: "pending" },
+        { name: "Project Completion", date: "2030-12-31", status: "pending" }
+      ]
+    },
+    developer: {
+      name: "NEOM Company",
+      experience: "Backed by Saudi Public Investment Fund",
+      reputation: 95,
+      previousProjects: 12
+    }
   },
   {
     id: "2",
@@ -119,7 +229,7 @@ const saudiProperties: Property[] = [
     description: "Ultra-luxury regenerative tourism destination with world-class marina and pristine coral reefs",
     descriptionAr: "وجهة سياحية متجددة فائقة الفخامة مع مارينا عالمية المستوى وشعاب مرجانية نقية",
     descriptionHi: "विश्व स्तरीय मरीना और प्राचीन कोरल रीफ के साथ अल्ट्रा-लक्जरी पुनर्योजी पर्यटन गंतव्य",
-    image: "/api/placeholder/400/300",
+    images: [luxuryApartmentImg, luxuryVillaImg, commercialOfficeImg],
     minInvestment: 200000,
     targetAmount: 12200000,
     raisedAmount: 9150000,
@@ -136,7 +246,57 @@ const saudiProperties: Property[] = [
     riskLevel: "low",
     category: "hospitality",
     amenities: ["Private Beach", "Coral Restoration", "Solar Power", "Desalination", "Yacht Club"],
-    developmentStage: "construction"
+    developmentStage: "construction",
+    financialMetrics: {
+      irr: 25.8,
+      noi: 2740000,
+      capRate: 8.2,
+      cashOnCash: 18.6,
+      totalCostOfProject: 12200000,
+      loanToValue: 70,
+      debtServiceCoverage: 2.1,
+      breakEvenOccupancy: 68
+    },
+    investmentHighlights: [
+      "Ultra-luxury tourism destination with pristine coral reefs",
+      "First regenerative tourism project in Middle East",
+      "Partnership with global luxury hotel brands",
+      "Exclusive beach access and marina facilities",
+      "Carbon-negative resort operations"
+    ],
+    risks: [
+      "Seasonal tourism fluctuations",
+      "Environmental regulations compliance",
+      "Competition from established luxury destinations",
+      "Currency exchange rate variations"
+    ],
+    marketAnalysis: {
+      averageRent: 25000,
+      marketGrowth: 22.4,
+      competitorAnalysis: "Premium positioning above Maldives and Seychelles",
+      demographic: "Ultra-high-net-worth individuals and luxury travelers"
+    },
+    legalStructure: {
+      ownership: "99-year leasehold with renewal option",
+      managementFees: 3.0,
+      exitStrategy: "REIT conversion planned in year 7",
+      taxation: "Tourism investment incentives apply"
+    },
+    timeline: {
+      phase: "Phase 3 - Resort Construction",
+      milestones: [
+        { name: "Environmental Assessment", date: "2024-03-31", status: "completed" },
+        { name: "Marina Development", date: "2025-09-30", status: "in_progress" },
+        { name: "Resort Buildings", date: "2027-12-31", status: "pending" },
+        { name: "Grand Opening", date: "2030-06-30", status: "pending" }
+      ]
+    },
+    developer: {
+      name: "Red Sea Global",
+      experience: "15+ years in luxury tourism development",
+      reputation: 92,
+      previousProjects: 8
+    }
   },
   {
     id: "3",
@@ -152,7 +312,7 @@ const saudiProperties: Property[] = [
     description: "World's largest entertainment, sports, and arts destination spanning 334 square kilometers",
     descriptionAr: "أكبر وجهة ترفيهية ورياضية وفنية في العالم تمتد على 334 كيلومتر مربع",
     descriptionHi: "334 वर्ग किलोमीटर में फैला दुनिया का सबसे बड़ा मनोरंजन, खेल और कला गंतव्य",
-    image: "/api/placeholder/400/300",
+    images: [luxuryApartmentImg, luxuryVillaImg, commercialOfficeImg],
     minInvestment: 75000,
     targetAmount: 6800000,
     raisedAmount: 4760000,
@@ -169,7 +329,57 @@ const saudiProperties: Property[] = [
     riskLevel: "medium",
     category: "commercial",
     amenities: ["Theme Parks", "Sports Venues", "Gaming Arena", "Cultural Center", "Racing Circuit"],
-    developmentStage: "construction"
+    developmentStage: "construction",
+    financialMetrics: {
+      irr: 19.2,
+      noi: 1156000,
+      capRate: 7.4,
+      cashOnCash: 12.8,
+      totalCostOfProject: 6800000,
+      loanToValue: 60,
+      debtServiceCoverage: 1.95,
+      breakEvenOccupancy: 75
+    },
+    investmentHighlights: [
+      "World's largest entertainment destination",
+      "Government commitment of $8 billion investment",
+      "Partnership with Six Flags and other global brands",
+      "Year-round entertainment programming",
+      "Integration with Riyadh metro system"
+    ],
+    risks: [
+      "Dependence on tourism and entertainment spending",
+      "Competition from Dubai and other regional hubs",
+      "Economic cycles affecting discretionary spending",
+      "Operational complexity of mixed-use development"
+    ],
+    marketAnalysis: {
+      averageRent: 15000,
+      marketGrowth: 18.5,
+      competitorAnalysis: "First-mover advantage in Saudi entertainment market",
+      demographic: "Families, young professionals, and tourists from GCC region"
+    },
+    legalStructure: {
+      ownership: "Freehold with commercial license",
+      managementFees: 2.8,
+      exitStrategy: "IPO consideration after stabilization",
+      taxation: "Entertainment sector incentives available"
+    },
+    timeline: {
+      phase: "Phase 1 - Core Infrastructure",
+      milestones: [
+        { name: "Site Preparation", date: "2024-06-30", status: "completed" },
+        { name: "Theme Park Construction", date: "2026-12-31", status: "in_progress" },
+        { name: "Sports Facilities", date: "2028-06-30", status: "pending" },
+        { name: "Full Operations", date: "2030-12-31", status: "pending" }
+      ]
+    },
+    developer: {
+      name: "Qiddiya Investment Company",
+      experience: "Joint venture with international entertainment leaders",
+      reputation: 88,
+      previousProjects: 6
+    }
   },
   {
     id: "4",
@@ -185,7 +395,7 @@ const saudiProperties: Property[] = [
     description: "Modern financial district with smart buildings and integrated business ecosystem",
     descriptionAr: "حي مالي حديث مع مباني ذكية ونظام بيئي متكامل للأعمال",
     descriptionHi: "स्मार्ट बिल्डिंगों और एकीकृत व्यापार पारिस्थितिकी तंत्र के साथ आधुनिक वित्तीय जिला",
-    image: "/api/placeholder/400/300",
+    images: [luxuryApartmentImg, luxuryVillaImg, commercialOfficeImg],
     minInvestment: 50000,
     targetAmount: 4200000,
     raisedAmount: 2940000,
@@ -202,7 +412,57 @@ const saudiProperties: Property[] = [
     riskLevel: "low",
     category: "commercial",
     amenities: ["Smart Offices", "Conference Centers", "Banking Hub", "Retail Plaza", "Transport Hub"],
-    developmentStage: "planning"
+    developmentStage: "planning",
+    financialMetrics: {
+      irr: 16.8,
+      noi: 596000,
+      capRate: 6.2,
+      cashOnCash: 10.4,
+      totalCostOfProject: 4200000,
+      loanToValue: 75,
+      debtServiceCoverage: 1.75,
+      breakEvenOccupancy: 78
+    },
+    investmentHighlights: [
+      "Strategic location in King Abdullah Economic City",
+      "Pre-leasing agreements with major banks",
+      "Government tenant anchor agreements",
+      "Direct access to King Abdulaziz Port",
+      "Tax incentives for KAEC investors"
+    ],
+    risks: [
+      "Economic city development timeline",
+      "Corporate relocation decisions",
+      "Competition from Riyadh financial district",
+      "Regulatory changes in economic zones"
+    ],
+    marketAnalysis: {
+      averageRent: 12000,
+      marketGrowth: 12.3,
+      competitorAnalysis: "Limited supply in specialized economic city",
+      demographic: "Financial services, logistics, and international trade companies"
+    },
+    legalStructure: {
+      ownership: "Freehold within economic zone",
+      managementFees: 2.2,
+      exitStrategy: "Corporate sale or REIT inclusion",
+      taxation: "KAEC special economic zone benefits"
+    },
+    timeline: {
+      phase: "Phase 0 - Planning & Approvals",
+      milestones: [
+        { name: "Master Planning", date: "2025-03-31", status: "in_progress" },
+        { name: "Construction Start", date: "2025-09-30", status: "pending" },
+        { name: "Core & Shell", date: "2027-06-30", status: "pending" },
+        { name: "Tenant Fit-out", date: "2028-12-31", status: "pending" }
+      ]
+    },
+    developer: {
+      name: "KAEC Development Company",
+      experience: "20+ years in economic city development",
+      reputation: 90,
+      previousProjects: 15
+    }
   },
   {
     id: "5",
@@ -218,7 +478,7 @@ const saudiProperties: Property[] = [
     description: "Wellness-focused ultra-luxury destination with pristine beaches and world-class spas",
     descriptionAr: "وجهة فائقة الفخامة تركز على الصحة مع شواطئ نقية ومنتجعات صحية عالمية المستوى",
     descriptionHi: "प्राचीन समुद्र तटों और विश्व स्तरीय स्पा के साथ कल्याण-केंद्रित अल्ट्रा-लक्जरी गंतव्य",
-    image: "/api/placeholder/400/300",
+    images: [luxuryApartmentImg, luxuryVillaImg, commercialOfficeImg],
     minInvestment: 150000,
     targetAmount: 9500000,
     raisedAmount: 6650000,
@@ -235,7 +495,57 @@ const saudiProperties: Property[] = [
     riskLevel: "medium",
     category: "hospitality",
     amenities: ["Wellness Centers", "Private Villas", "Art Galleries", "Organic Farms", "Healing Gardens"],
-    developmentStage: "construction"
+    developmentStage: "construction",
+    financialMetrics: {
+      irr: 23.6,
+      noi: 1881000,
+      capRate: 7.8,
+      cashOnCash: 16.4,
+      totalCostOfProject: 9500000,
+      loanToValue: 68,
+      debtServiceCoverage: 2.0,
+      breakEvenOccupancy: 70
+    },
+    investmentHighlights: [
+      "First wellness-focused mega-resort in Saudi Arabia",
+      "Partnership with leading wellness brands",
+      "Exclusive access to pristine coastline",
+      "Cultural arts and wellness programming",
+      "Sustainable architecture and operations"
+    ],
+    risks: [
+      "Wellness tourism market development",
+      "Seasonal demand variations",
+      "High operational complexity",
+      "Competition from established wellness destinations"
+    ],
+    marketAnalysis: {
+      averageRent: 22000,
+      marketGrowth: 20.7,
+      competitorAnalysis: "Unique positioning in growing wellness tourism segment",
+      demographic: "Wellness enthusiasts, art collectors, and luxury travelers"
+    },
+    legalStructure: {
+      ownership: "99-year leasehold with freehold conversion option",
+      managementFees: 3.2,
+      exitStrategy: "Hospitality REIT or strategic acquisition",
+      taxation: "Tourism development incentives apply"
+    },
+    timeline: {
+      phase: "Phase 2 - Resort Development",
+      milestones: [
+        { name: "Coastal Infrastructure", date: "2024-09-30", status: "completed" },
+        { name: "Wellness Facilities", date: "2026-12-31", status: "in_progress" },
+        { name: "Villa Construction", date: "2028-09-30", status: "pending" },
+        { name: "Resort Opening", date: "2030-06-30", status: "pending" }
+      ]
+    },
+    developer: {
+      name: "Amaala Development",
+      experience: "Backed by PIF with international wellness expertise",
+      reputation: 91,
+      previousProjects: 4
+    }
   }
 ]
 
@@ -254,11 +564,13 @@ export default function MobileProperties() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [isInvestDialogOpen, setIsInvestDialogOpen] = useState(false)
+  const [isPropertyDetailsOpen, setIsPropertyDetailsOpen] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [investmentAmount, setInvestmentAmount] = useState("")
   const [favorites, setFavorites] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState<"newest" | "price_low" | "price_high" | "roi_high" | "popularity">("newest")
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   
   // Filter states
   const [filters, setFilters] = useState({
@@ -283,6 +595,12 @@ export default function MobileProperties() {
   const handleInvestClick = (property: Property) => {
     setSelectedProperty(property)
     setIsInvestDialogOpen(true)
+  }
+
+  const handleViewDetails = (property: Property) => {
+    setSelectedProperty(property)
+    setCurrentImageIndex(0)
+    setIsPropertyDetailsOpen(true)
   }
 
   const handleInvestmentSubmit = () => {
@@ -508,10 +826,22 @@ export default function MobileProperties() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Card className="overflow-hidden shadow-2xl border-0 bg-gradient-to-br from-card via-card/95 to-card/80 backdrop-blur-sm hover:shadow-3xl transition-all duration-500 group">
-                  {/* Property Image */}
+                  {/* Property Image Gallery */}
                   <div className="relative h-64 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20" />
+                    <img 
+                      src={property.images[0]} 
+                      alt={getPropertyTitle(property)}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    
+                    {/* Image Count Badge */}
+                    {property.images.length > 1 && (
+                      <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-xs flex items-center gap-1 backdrop-blur-xl border border-white/20">
+                        <ImageIcon className="w-3 h-3" />
+                        <span>{property.images.length} photos</span>
+                      </div>
+                    )}
                     
                     {/* Top Badges */}
                     <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
@@ -694,6 +1024,7 @@ export default function MobileProperties() {
                         variant="outline" 
                         size="icon"
                         className="h-12 w-12 border-2 hover:bg-primary/10"
+                        onClick={() => handleViewDetails(property)}
                         data-testid={`button-view-details-${property.id}`}
                       >
                         <Eye className="h-4 w-4" />
@@ -799,6 +1130,376 @@ export default function MobileProperties() {
                 data-testid="button-confirm-investment"
               >
                 Submit Investment
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Property Details Dialog */}
+        <Dialog open={isPropertyDetailsOpen} onOpenChange={setIsPropertyDetailsOpen}>
+          <DialogContent className="sm:max-w-lg bg-card/95 backdrop-blur-xl border-border/50 max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl flex items-center gap-2">
+                <Home className="w-5 h-5" />
+                {selectedProperty && getPropertyTitle(selectedProperty)}
+              </DialogTitle>
+              <DialogDescription>
+                Comprehensive Investment Analysis
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedProperty && (
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="financials">Financials</TabsTrigger>
+                  <TabsTrigger value="analysis">Analysis</TabsTrigger>
+                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="space-y-4 mt-4">
+                  {/* Image Gallery */}
+                  <div className="space-y-3">
+                    <div className="relative h-48 rounded-lg overflow-hidden">
+                      <img 
+                        src={selectedProperty.images[currentImageIndex]} 
+                        alt={getPropertyTitle(selectedProperty)}
+                        className="w-full h-full object-cover"
+                      />
+                      {selectedProperty.images.length > 1 && (
+                        <>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white hover:bg-black/70"
+                            onClick={() => setCurrentImageIndex(prev => 
+                              prev === 0 ? selectedProperty.images.length - 1 : prev - 1
+                            )}
+                          >
+                            <ChevronDown className="w-4 h-4 rotate-90" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white hover:bg-black/70"
+                            onClick={() => setCurrentImageIndex(prev => 
+                              prev === selectedProperty.images.length - 1 ? 0 : prev + 1
+                            )}
+                          >
+                            <ChevronDown className="w-4 h-4 -rotate-90" />
+                          </Button>
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                            {selectedProperty.images.map((_, index) => (
+                              <div
+                                key={index}
+                                className={`w-2 h-2 rounded-full ${
+                                  index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Basic Information */}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Location</p>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-primary" />
+                          <span className="font-medium">{getPropertyLocation(selectedProperty)}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Property Type</p>
+                        <span className="font-medium capitalize">{selectedProperty.category}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Description</p>
+                      <p className="text-sm leading-relaxed">{getPropertyDescription(selectedProperty)}</p>
+                    </div>
+
+                    {/* Investment Highlights */}
+                    <div className="space-y-3">
+                      <h4 className="font-semibold flex items-center gap-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        Investment Highlights
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedProperty.investmentHighlights.map((highlight, index) => (
+                          <div key={index} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{highlight}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Key Amenities */}
+                    <div className="space-y-3">
+                      <h4 className="font-semibold">Key Features & Amenities</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProperty.amenities.map((amenity) => (
+                          <Badge key={amenity} variant="secondary" className="text-xs">
+                            {amenity}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="financials" className="space-y-4 mt-4">
+                  {/* Financial Overview */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="p-4">
+                      <div className="text-center">
+                        <CircleDollarSign className="w-6 h-6 text-primary mx-auto mb-2" />
+                        <p className="text-2xl font-bold text-primary">{selectedProperty.roi}%</p>
+                        <p className="text-xs text-muted-foreground">Expected ROI</p>
+                      </div>
+                    </Card>
+                    <Card className="p-4">
+                      <div className="text-center">
+                        <TrendingUp className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                        <p className="text-2xl font-bold text-green-600">{selectedProperty.financialMetrics.irr}%</p>
+                        <p className="text-xs text-muted-foreground">IRR</p>
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Detailed Financial Metrics */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Calculator className="w-4 h-4" />
+                      Financial Metrics
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Net Operating Income (NOI)</span>
+                        <span className="font-medium">{selectedProperty.financialMetrics.noi.toLocaleString()} SAR</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Cap Rate</span>
+                        <span className="font-medium">{selectedProperty.financialMetrics.capRate}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Cash-on-Cash Return</span>
+                        <span className="font-medium">{selectedProperty.financialMetrics.cashOnCash}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Loan-to-Value (LTV)</span>
+                        <span className="font-medium">{selectedProperty.financialMetrics.loanToValue}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Debt Service Coverage</span>
+                        <span className="font-medium">{selectedProperty.financialMetrics.debtServiceCoverage}x</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Break-even Occupancy</span>
+                        <span className="font-medium">{selectedProperty.financialMetrics.breakEvenOccupancy}%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Investment Structure */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Investment Structure
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Ownership Type</span>
+                        <span className="font-medium text-right flex-1 ml-2">{selectedProperty.legalStructure.ownership}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Management Fees</span>
+                        <span className="font-medium">{selectedProperty.legalStructure.managementFees}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Exit Strategy</span>
+                        <span className="font-medium text-right flex-1 ml-2">{selectedProperty.legalStructure.exitStrategy}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Taxation</span>
+                        <span className="font-medium text-right flex-1 ml-2">{selectedProperty.legalStructure.taxation}</span>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="analysis" className="space-y-4 mt-4">
+                  {/* Market Analysis */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4" />
+                      Market Analysis
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Average Rent</span>
+                        <span className="font-medium">{selectedProperty.marketAnalysis.averageRent.toLocaleString()} SAR</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Market Growth</span>
+                        <span className="font-medium text-green-600">+{selectedProperty.marketAnalysis.marketGrowth}%</span>
+                      </div>
+                      <div className="space-y-2">
+                        <span className="text-sm text-muted-foreground">Target Demographic</span>
+                        <p className="text-sm">{selectedProperty.marketAnalysis.demographic}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <span className="text-sm text-muted-foreground">Competitive Analysis</span>
+                        <p className="text-sm">{selectedProperty.marketAnalysis.competitorAnalysis}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Risk Assessment */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                      Risk Assessment
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedProperty.risks.map((risk, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">{risk}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Developer Information */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Award className="w-4 h-4" />
+                      Developer Information
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Developer</span>
+                        <span className="font-medium">{selectedProperty.developer.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Experience</span>
+                        <span className="font-medium text-right flex-1 ml-2">{selectedProperty.developer.experience}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Reputation Score</span>
+                        <span className="font-medium">{selectedProperty.developer.reputation}/100</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Previous Projects</span>
+                        <span className="font-medium">{selectedProperty.developer.previousProjects}</span>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="timeline" className="space-y-4 mt-4">
+                  {/* Project Timeline */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Project Timeline
+                    </h4>
+                    <p className="text-sm text-muted-foreground">Current Phase: {selectedProperty.timeline.phase}</p>
+                    
+                    <div className="space-y-4">
+                      {selectedProperty.timeline.milestones.map((milestone, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <div className={`w-4 h-4 rounded-full border-2 ${
+                            milestone.status === 'completed' 
+                              ? 'bg-green-500 border-green-500' 
+                              : milestone.status === 'in_progress'
+                              ? 'bg-blue-500 border-blue-500'
+                              : 'border-muted-foreground'
+                          }`} />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">{milestone.name}</span>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(milestone.date).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <Badge 
+                              variant={
+                                milestone.status === 'completed' 
+                                  ? 'default' 
+                                  : milestone.status === 'in_progress'
+                                  ? 'secondary'
+                                  : 'outline'
+                              }
+                              className="text-xs mt-1"
+                            >
+                              {milestone.status.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Project Information */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Info className="w-4 h-4" />
+                      Project Details
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Development Stage</span>
+                        <Badge variant="outline" className="capitalize">{selectedProperty.developmentStage.replace('_', ' ')}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Expected Completion</span>
+                        <span className="font-medium">{selectedProperty.completionDate}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Total Units</span>
+                        <span className="font-medium">{selectedProperty.totalUnits.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Available Units</span>
+                        <span className="font-medium">{selectedProperty.availableUnits.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Project Size</span>
+                        <span className="font-medium">{selectedProperty.size.toLocaleString()} sqm</span>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            )}
+
+            <DialogFooter className="gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsPropertyDetailsOpen(false)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+              <Button 
+                onClick={() => {
+                  setIsPropertyDetailsOpen(false)
+                  if (selectedProperty) {
+                    handleInvestClick(selectedProperty)
+                  }
+                }}
+                className="flex-1 bg-gradient-to-r from-primary to-primary/90"
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Invest Now
               </Button>
             </DialogFooter>
           </DialogContent>

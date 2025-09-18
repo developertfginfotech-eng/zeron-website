@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslation } from "@/hooks/use-translation"
 import { 
@@ -226,6 +228,10 @@ export default function MobilePortfolio() {
   const [sortBy, setSortBy] = useState("performance")
   const [filterBy, setFilterBy] = useState("all")
   const [showDetails, setShowDetails] = useState<string | null>(null)
+  const [isWithdrawalDialogOpen, setIsWithdrawalDialogOpen] = useState(false)
+  const [selectedInvestment, setSelectedInvestment] = useState<Investment | null>(null)
+  const [withdrawalAmount, setWithdrawalAmount] = useState("")
+  const [withdrawalReason, setWithdrawalReason] = useState("")
 
   const timeframes = [
     { id: "daily", label: "Daily", value: portfolioStats.portfolioGrowth.daily },
@@ -287,6 +293,55 @@ export default function MobilePortfolio() {
       title: "Portfolio Shared",
       description: "Portfolio link copied to clipboard.",
     })
+  }
+
+  const handleWithdrawalRequest = (investment: Investment) => {
+    setSelectedInvestment(investment)
+    setWithdrawalAmount("")
+    setWithdrawalReason("")
+    setIsWithdrawalDialogOpen(true)
+  }
+
+  const submitWithdrawalRequest = () => {
+    const amount = parseFloat(withdrawalAmount)
+    if (!amount || amount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid withdrawal amount.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!selectedInvestment) return
+
+    if (amount > selectedInvestment.currentValue) {
+      toast({
+        title: "Amount Too High",
+        description: `Maximum withdrawal amount is ${selectedInvestment.currentValue.toLocaleString()} SAR`,
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!withdrawalReason.trim()) {
+      toast({
+        title: "Reason Required",
+        description: "Please provide a reason for your withdrawal request.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    toast({
+      title: "Withdrawal Request Submitted",
+      description: `Your withdrawal request for ${amount.toLocaleString()} SAR has been submitted for review.`,
+    })
+
+    setIsWithdrawalDialogOpen(false)
+    setSelectedInvestment(null)
+    setWithdrawalAmount("")
+    setWithdrawalReason("")
   }
 
   return (
@@ -671,19 +726,29 @@ export default function MobilePortfolio() {
                             )}
 
                             {/* Action Buttons */}
-                            <div className="flex gap-3">
+                            <div className="grid grid-cols-3 gap-2">
                               <Button 
                                 variant="outline"
-                                className="flex-1"
+                                size="sm"
                                 onClick={() => setShowDetails(showDetails === investment.id ? null : investment.id)}
                                 data-testid={`button-view-details-${investment.id}`}
                               >
-                                <Eye className="w-4 h-4 mr-2" />
-                                View Details
+                                <Eye className="w-4 h-4 mr-1" />
+                                Details
                               </Button>
                               <Button 
                                 variant="outline"
-                                size="icon"
+                                size="sm"
+                                onClick={() => handleWithdrawalRequest(investment)}
+                                className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                                data-testid={`button-withdraw-${investment.id}`}
+                              >
+                                <ArrowDownRight className="w-4 h-4 mr-1" />
+                                Withdraw
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                size="sm"
                                 data-testid={`button-share-investment-${investment.id}`}
                               >
                                 <Share2 className="w-4 h-4" />
@@ -798,6 +863,130 @@ export default function MobilePortfolio() {
           </Tabs>
         </motion.div>
       </div>
+
+      {/* Withdrawal Request Dialog */}
+      <Dialog open={isWithdrawalDialogOpen} onOpenChange={setIsWithdrawalDialogOpen}>
+        <DialogContent className="mx-4 max-w-md bg-gradient-to-br from-card to-card/95 backdrop-blur-xl border-2 border-border/50">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <ArrowDownRight className="w-6 h-6 text-orange-600" />
+              Withdrawal Request
+            </DialogTitle>
+            <DialogDescription>
+              Request to withdraw funds from{" "}
+              <span className="font-semibold text-foreground">
+                {selectedInvestment?.propertyName}
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 pt-4">
+            {/* Investment Summary */}
+            {selectedInvestment && (
+              <div className="p-4 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl border border-border/30">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Your Investment</p>
+                    <p className="font-bold text-base">{selectedInvestment.investedAmount.toLocaleString()} SAR</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Current Value</p>
+                    <p className="font-bold text-base text-primary">{selectedInvestment.currentValue.toLocaleString()} SAR</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Total Return</p>
+                    <p className="font-bold text-base text-green-600">+{selectedInvestment.returnAmount.toLocaleString()} SAR</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Available</p>
+                    <p className="font-bold text-base text-blue-600">{selectedInvestment.currentValue.toLocaleString()} SAR</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Withdrawal Amount */}
+            <div className="space-y-2">
+              <label htmlFor="withdrawal-amount" className="text-sm font-medium">
+                Withdrawal Amount (SAR)
+              </label>
+              <div className="relative">
+                <Input
+                  id="withdrawal-amount"
+                  type="number"
+                  placeholder="Enter amount"
+                  value={withdrawalAmount}
+                  onChange={(e) => setWithdrawalAmount(e.target.value)}
+                  className="pl-10 bg-background/50 backdrop-blur-sm"
+                  data-testid="input-withdrawal-amount"
+                />
+                <Banknote className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              </div>
+              {selectedInvestment && withdrawalAmount && parseFloat(withdrawalAmount) > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Percentage: {((parseFloat(withdrawalAmount) / selectedInvestment.currentValue) * 100).toFixed(1)}% of your investment
+                </p>
+              )}
+            </div>
+
+            {/* Withdrawal Reason */}
+            <div className="space-y-2">
+              <label htmlFor="withdrawal-reason" className="text-sm font-medium">
+                Reason for Withdrawal
+              </label>
+              <Select value={withdrawalReason} onValueChange={setWithdrawalReason}>
+                <SelectTrigger className="bg-background/50 backdrop-blur-sm" data-testid="select-withdrawal-reason">
+                  <SelectValue placeholder="Select a reason" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Personal Emergency">Personal Emergency</SelectItem>
+                  <SelectItem value="Liquidity Needs">Immediate Liquidity Needs</SelectItem>
+                  <SelectItem value="Market Concerns">Market Concerns</SelectItem>
+                  <SelectItem value="Portfolio Rebalancing">Portfolio Rebalancing</SelectItem>
+                  <SelectItem value="Investment Diversification">Investment Diversification</SelectItem>
+                  <SelectItem value="Financial Planning">Financial Planning Adjustment</SelectItem>
+                  <SelectItem value="Other Investment">Other Investment Opportunity</SelectItem>
+                  <SelectItem value="Partial Exit">Partial Exit Strategy</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Important Note */}
+            <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-orange-800">Important Information</p>
+                  <p className="text-xs text-orange-700">
+                    • Withdrawal requests are subject to review and approval
+                    <br />
+                    • Processing time: 3-5 business days
+                    <br />
+                    • Early withdrawal may affect future investment opportunities
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-3 pt-6">
+            <Button
+              variant="outline"
+              onClick={() => setIsWithdrawalDialogOpen(false)}
+              data-testid="button-cancel-withdrawal"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={submitWithdrawalRequest}
+              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
+              data-testid="button-submit-withdrawal"
+            >
+              Submit Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

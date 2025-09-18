@@ -222,20 +222,6 @@ export default function MobileDashboard() {
       path: "/mobile/portfolio", 
       gradient: "from-emerald-500 via-green-600 to-teal-500",
       description: "Track your investments"
-    },
-    { 
-      icon: Brain, 
-      label: t("ai_advisor"), 
-      path: "/mobile/ai-advisor", 
-      gradient: "from-purple-500 via-violet-600 to-pink-500",
-      description: "Smart investment insights"
-    },
-    { 
-      icon: MessageSquare, 
-      label: t("chat"), 
-      path: "/mobile/chat", 
-      gradient: "from-orange-500 via-amber-600 to-red-500",
-      description: "Connect with experts"
     }
   ]
 
@@ -599,31 +585,6 @@ export default function MobileDashboard() {
         </motion.div>
 
         {/* AI Insights CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
-        >
-          <Link href="/mobile/ai-advisor">
-            <Card className="cursor-pointer shadow-xl border-0 overflow-hidden bg-gradient-to-br from-purple-50 via-violet-50 to-pink-50 hover:shadow-2xl transition-all duration-300 group">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-pink-500/10" />
-              <CardContent className="p-8 relative z-10">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 via-violet-600 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
-                    <Brain className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-xl font-bold mb-2">{t("ai_advisor")}</h4>
-                    <p className="text-muted-foreground">
-                      Get personalized Saudi Vision 2030 investment recommendations powered by AI
-                    </p>
-                  </div>
-                  <ArrowUpRight className="w-6 h-6 text-purple-600 group-hover:transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        </motion.div>
       </div>
     </div>
   )

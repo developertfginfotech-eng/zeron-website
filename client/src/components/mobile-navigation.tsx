@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link, useLocation } from "wouter"
-import { Home, Building2, TrendingUp, User, MessageSquare, Bot } from "lucide-react"
+import { Home, Building2, TrendingUp, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/hooks/use-translation"
 
@@ -18,16 +18,10 @@ const navigationItems = [
     testId: "nav-mobile-properties"
   },
   {
-    href: "/mobile/chat",
-    labelKey: "chat" as const,
-    icon: MessageSquare,
-    testId: "nav-mobile-chat"
-  },
-  {
-    href: "/mobile/ai-advisor",
-    labelKey: "ai_advisor" as const,
-    icon: Bot,
-    testId: "nav-mobile-ai-advisor"
+    href: "/mobile/portfolio",
+    labelKey: "portfolio" as const,
+    icon: TrendingUp,
+    testId: "nav-mobile-portfolio"
   },
   {
     href: "/mobile/profile",
