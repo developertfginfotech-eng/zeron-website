@@ -159,7 +159,7 @@ const mockInvestments: Investment[] = [
 ]
 
 export default function MobileDashboard() {
-  const { t, language, isRTL } = useTranslation()
+  const { t, language } = useTranslation()
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
@@ -180,9 +180,9 @@ export default function MobileDashboard() {
 
   const getGreeting = () => {
     const hour = currentTime.getHours()
-    if (hour < 12) return t("Good Morning")
-    if (hour < 17) return t("Good Afternoon") 
-    return t("Good Evening")
+    if (hour < 12) return "Good Morning"
+    if (hour < 17) return "Good Afternoon" 
+    return "Good Evening"
   }
 
   const getGreetingIcon = () => {
@@ -203,39 +203,39 @@ export default function MobileDashboard() {
   const averageROI = mockInvestments.reduce((sum, inv) => sum + inv.roi, 0) / mockInvestments.length
 
   const timeframes = [
-    { id: "daily", label: t("Daily"), value: `+${marketData.dailyChange}%`, icon: TrendingUp },
-    { id: "monthly", label: t("Monthly"), value: `+${marketData.monthlyGrowth}%`, icon: BarChart3 },
-    { id: "yearly", label: t("Yearly"), value: `+${marketData.yearlyReturn}%`, icon: Star }
+    { id: "daily", label: "Daily", value: `+${marketData.dailyChange}%`, icon: TrendingUp },
+    { id: "monthly", label: "Monthly", value: `+${marketData.monthlyGrowth}%`, icon: BarChart3 },
+    { id: "yearly", label: "Yearly", value: `+${marketData.yearlyReturn}%`, icon: Star }
   ]
 
   const quickActions = [
     { 
       icon: Building, 
-      label: t("Properties"), 
+      label: t("properties"), 
       path: "/mobile/properties", 
       gradient: "from-blue-500 via-blue-600 to-cyan-500",
-      description: t("Explore Vision 2030 projects")
+      description: "Explore Vision 2030 projects"
     },
     { 
       icon: BarChart3, 
-      label: t("Portfolio"), 
+      label: t("portfolio"), 
       path: "/mobile/portfolio", 
       gradient: "from-emerald-500 via-green-600 to-teal-500",
-      description: t("Track your investments")
+      description: "Track your investments"
     },
     { 
       icon: Brain, 
-      label: t("AI Advisor"), 
+      label: t("ai_advisor"), 
       path: "/mobile/ai-advisor", 
       gradient: "from-purple-500 via-violet-600 to-pink-500",
-      description: t("Smart investment insights")
+      description: "Smart investment insights"
     },
     { 
       icon: MessageSquare, 
-      label: t("Chat"), 
+      label: t("chat"), 
       path: "/mobile/chat", 
       gradient: "from-orange-500 via-amber-600 to-red-500",
-      description: t("Connect with experts")
+      description: "Connect with experts"
     }
   ]
 
@@ -289,7 +289,7 @@ export default function MobileDashboard() {
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold">{getGreeting()}</h1>
-                    <p className="text-white/80 text-lg">{t("Investor")}</p>
+                    <p className="text-white/80 text-lg">Investor</p>
                   </div>
                 </div>
                 
@@ -305,9 +305,9 @@ export default function MobileDashboard() {
 
               <div className="space-y-4">
                 <div className="text-center">
-                  <p className="text-white/70 text-sm uppercase tracking-widest">{t("Total Portfolio Value")}</p>
+                  <p className="text-white/70 text-sm uppercase tracking-widest">{t("total_portfolio_value")}</p>
                   <div className="text-4xl font-bold mt-2">
-                    {(totalInvested + totalReturn).toLocaleString()} {t("SAR")}
+                    {(totalInvested + totalReturn).toLocaleString()} SAR
                   </div>
                 </div>
 
@@ -349,7 +349,7 @@ export default function MobileDashboard() {
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-emerald-700">{t("Total Return")}</p>
+                  <p className="text-sm font-medium text-emerald-700">{t("total_return")}</p>
                   <p className="text-2xl font-bold text-emerald-800">+{totalReturn.toLocaleString()}</p>
                 </div>
               </div>
@@ -367,13 +367,13 @@ export default function MobileDashboard() {
                   <BarChart3 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-blue-700">{t("Avg ROI")}</p>
+                  <p className="text-sm font-medium text-blue-700">Avg ROI</p>
                   <p className="text-2xl font-bold text-blue-800">{averageROI.toFixed(1)}%</p>
                 </div>
               </div>
               <Badge className="bg-blue-500/10 text-blue-700 border-blue-300">
                 <Target className="w-3 h-3 mr-1" />
-                {mockInvestments.length} {t("Properties")}
+                {mockInvestments.length} {t("properties")}
               </Badge>
             </CardContent>
           </Card>
@@ -389,7 +389,7 @@ export default function MobileDashboard() {
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-primary" />
-                {t("Market Performance")}
+                Market Performance
               </h3>
               
               <div className="grid grid-cols-3 gap-3 mb-4">
@@ -413,11 +413,11 @@ export default function MobileDashboard() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-xl">
-                  <p className="text-sm text-muted-foreground">{t("Active Projects")}</p>
+                  <p className="text-sm text-muted-foreground">Active Projects</p>
                   <p className="text-xl font-bold text-primary">{marketData.activeProjects}</p>
                 </div>
                 <div className="bg-gradient-to-r from-green-500/10 to-green-500/5 p-4 rounded-xl">
-                  <p className="text-sm text-muted-foreground">{t("Vision 2030")}</p>
+                  <p className="text-sm text-muted-foreground">Vision 2030</p>
                   <p className="text-xl font-bold text-green-600">{marketData.vision2030Progress}%</p>
                 </div>
               </div>
@@ -434,7 +434,7 @@ export default function MobileDashboard() {
         >
           <h3 className="text-xl font-bold flex items-center gap-2">
             <Zap className="w-6 h-6 text-primary" />
-            {t("Quick Actions")}
+            Quick Actions
           </h3>
           
           <div className="grid grid-cols-2 gap-4">
@@ -471,11 +471,11 @@ export default function MobileDashboard() {
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold flex items-center gap-2">
               <Crown className="w-6 h-6 text-primary" />
-              {t("Featured Properties")}
+              Featured Properties
             </h3>
             <Link href="/mobile/properties">
               <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10" data-testid="button-view-all-properties">
-                {t("View All")}
+                View All
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
@@ -510,20 +510,20 @@ export default function MobileDashboard() {
                         <div className="flex gap-2 flex-wrap">
                           {property.vision2030 && (
                             <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-                              {t("Vision 2030")}
+                              Vision 2030
                             </Badge>
                           )}
                           {property.shariahCompliant && (
                             <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs">
                               <Shield className="w-3 h-3 mr-1" />
-                              {t("Halal")}
+                              Halal
                             </Badge>
                           )}
                         </div>
                         
                         <div className="flex items-center justify-between">
                           <div className="text-lg font-bold text-primary">
-                            {property.price.toLocaleString()} {t("SAR")}
+                            {property.price.toLocaleString()} SAR
                           </div>
                           <div className="flex items-center gap-1 bg-emerald-50 px-3 py-1 rounded-full">
                             <TrendingUp className="w-3 h-3 text-emerald-600" />
@@ -549,11 +549,11 @@ export default function MobileDashboard() {
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold flex items-center gap-2">
               <Star className="w-6 h-6 text-primary" />
-              {t("Your Investments")}
+              Your Investments
             </h3>
             <Link href="/mobile/portfolio">
               <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10" data-testid="button-view-portfolio">
-                {t("View Portfolio")}
+                View Portfolio
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
@@ -573,7 +573,7 @@ export default function MobileDashboard() {
                       <div className="flex-1">
                         <h4 className="font-semibold text-base mb-1">{investment.propertyTitle}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {t("Invested")}: {investment.amount.toLocaleString()} {t("SAR")}
+                          Invested: {investment.amount.toLocaleString()} SAR
                         </p>
                       </div>
                       <div className="text-right">
@@ -587,7 +587,7 @@ export default function MobileDashboard() {
                               : 'bg-blue-500/10 text-blue-600 border-blue-500/20'
                           }`}
                         >
-                          {t(investment.performance)}
+                          {investment.performance === 'excellent' ? 'Excellent' : investment.performance === 'good' ? 'Good' : 'Stable'}
                         </Badge>
                       </div>
                     </div>
@@ -613,9 +613,9 @@ export default function MobileDashboard() {
                     <Brain className="w-8 h-8 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-xl font-bold mb-2">{t("AI Investment Advisor")}</h4>
+                    <h4 className="text-xl font-bold mb-2">{t("ai_advisor")}</h4>
                     <p className="text-muted-foreground">
-                      {t("Get personalized Saudi Vision 2030 investment recommendations powered by AI")}
+                      Get personalized Saudi Vision 2030 investment recommendations powered by AI
                     </p>
                   </div>
                   <ArrowUpRight className="w-6 h-6 text-purple-600 group-hover:transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
