@@ -1,691 +1,629 @@
 import { useState, useEffect } from "react"
-import { usePullToRefresh } from "@/hooks/usePullToRefresh"
-import { BottomSheet } from "@/components/ui/bottom-sheet"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
+import { useQuery } from "@tanstack/react-query"
+import { motion, AnimatePresence } from "framer-motion"
+import { Link } from "wouter"
 import { 
   TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
   Building, 
-  Eye, 
-  Plus, 
-  Star, 
+  DollarSign, 
+  BarChart3, 
   MapPin, 
-  ArrowRight,
-  MessageSquare,
-  Brain,
+  Star,
+  Calendar,
+  Bell,
   Sparkles,
+  Crown,
+  Users,
   Shield,
+  Zap,
+  ChevronRight,
+  Eye,
+  Heart,
+  Share,
   Globe,
   Target,
-  Bot,
-  RefreshCw,
-  Zap,
-  ChevronUp
+  MessageSquare,
+  Brain,
+  ArrowUpRight,
+  Sunrise,
+  Moon,
+  Sun,
+  ChevronUp,
+  RefreshCw
 } from "lucide-react"
-import { Link } from "wouter"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/hooks/use-translation"
-import { MobileChat } from "@/components/mobile-chat"
-import { AIInsights } from "@/components/ai-insights"
-import { saudiProperties, saudiMarketStats } from "@/lib/saudi-data"
-import apartmentImg from "@assets/generated_images/luxury_apartment_building_exterior_e11af77f.png"
-import officeImg from "@assets/generated_images/commercial_office_building_f8c8d53a.png"
-import retailImg from "@assets/generated_images/retail_shopping_complex_10ee6fbf.png"
-import villaImg from "@assets/generated_images/luxury_villa_property_b02d7e37.png"
 
-// Enhanced Saudi investor data
-const mockInvestor = {
-  id: "inv_001",
-  name: "Ahmed Al-Rashid",
-  nameAr: "أحمد الراشد",
-  nameHi: "अहमद अल-राशिद",
-  totalInvestment: 1250000,
-  currentValue: 1582000,
-  totalReturn: 332000,
-  returnPercentage: 26.6,
-  activeInvestments: 5,
-  aiScore: 92,
-  vision2030Aligned: true,
-  shariahCompliant: true,
-  portfolio: [
-    {
-      id: "1",
-      name: "neom_the_line_residential",
-      location: "neom",
-      invested: 500000,
-      currentValue: 634000,
-      returnAmount: 134000,
-      returnPercentage: 26.8,
-      performance: "excellent",
-      vision2030: true,
-      shariah: true
-    },
-    {
-      id: "2", 
-      name: "red_sea_global_marina",
-      location: "red_sea",
-      invested: 400000,
-      currentValue: 498000,
-      returnAmount: 98000,
-      returnPercentage: 24.5,
-      performance: "excellent",
-      vision2030: true,
-      shariah: true
-    },
-    {
-      id: "3",
-      name: "riyadh_financial_district",
-      location: "riyadh",
-      invested: 350000,
-      currentValue: 450000,
-      returnAmount: 100000,
-      returnPercentage: 28.6,
-      performance: "excellent",
-      vision2030: true,
-      shariah: true
-    }
-  ]
+interface Property {
+  id: string
+  title: string
+  titleAr: string
+  titleHi: string
+  location: string
+  locationAr: string
+  locationHi: string
+  price: number
+  roi: number
+  image: string
+  type: string
+  shariahCompliant: boolean
+  vision2030: boolean
+  featured: boolean
 }
 
-// Use Saudi properties from saudi-data.ts
-const availableProperties = saudiProperties.slice(0, 3)
+interface Investment {
+  id: string
+  propertyTitle: string
+  amount: number
+  roi: number
+  status: string
+  performance: "excellent" | "good" | "stable"
+}
+
+interface MarketData {
+  totalValue: number
+  dailyChange: number
+  monthlyGrowth: number
+  yearlyReturn: number
+  activeProjects: number
+  vision2030Progress: number
+}
+
+const saudiProperties: Property[] = [
+  {
+    id: "1",
+    title: "NEOM The Line Residences",
+    titleAr: "مساكن ذا لاين نيوم", 
+    titleHi: "नियोम द लाइन निवास",
+    location: "NEOM, Tabuk Province",
+    locationAr: "نيوم، منطقة تبوك",
+    locationHi: "नियोम, तबूक प्रांत",
+    price: 4850000,
+    roi: 18.5,
+    image: "/api/placeholder/400/300",
+    type: "Futuristic Residential",
+    shariahCompliant: true,
+    vision2030: true,
+    featured: true
+  },
+  {
+    id: "2", 
+    title: "Red Sea Global Resort",
+    titleAr: "منتجع البحر الأحمر العالمي",
+    titleHi: "रेड सी ग्लोबल रिज़ॉर्ट",
+    location: "Red Sea Project",
+    locationAr: "مشروع البحر الأحمر",
+    locationHi: "रेड सी प्रोजेक्ट",
+    price: 6200000,
+    roi: 22.3,
+    image: "/api/placeholder/400/300",
+    type: "Luxury Resort",
+    shariahCompliant: true,
+    vision2030: true,
+    featured: true
+  },
+  {
+    id: "3",
+    title: "Qiddiya Entertainment City",
+    titleAr: "مدينة القدية الترفيهية",
+    titleHi: "किद्दिया मनोरंजन शहर",
+    location: "Riyadh, Central Region",
+    locationAr: "الرياض، المنطقة الوسطى",
+    locationHi: "रियाध, मध्य क्षेत्र",
+    price: 3950000,
+    roi: 16.8,
+    image: "/api/placeholder/400/300",
+    type: "Entertainment Complex",
+    shariahCompliant: true,
+    vision2030: true,
+    featured: false
+  }
+]
+
+const marketData: MarketData = {
+  totalValue: 2450000,
+  dailyChange: 2.4,
+  monthlyGrowth: 12.7,
+  yearlyReturn: 89.4,
+  activeProjects: 156,
+  vision2030Progress: 67
+}
+
+const mockInvestments: Investment[] = [
+  {
+    id: "1",
+    propertyTitle: "NEOM The Line Residences",
+    amount: 750000,
+    roi: 18.5,
+    status: "Active",
+    performance: "excellent"
+  },
+  {
+    id: "2",
+    propertyTitle: "Qiddiya Entertainment City",
+    amount: 580000,
+    roi: 16.8,
+    status: "Active", 
+    performance: "excellent"
+  },
+  {
+    id: "3",
+    propertyTitle: "Red Sea Global Resort",
+    amount: 420000,
+    roi: 22.3,
+    status: "Active",
+    performance: "excellent"
+  }
+]
 
 export default function MobileDashboard() {
-  const { t } = useTranslation()
-  const [showFloatingActions, setShowFloatingActions] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
-  const [selectedProperty, setSelectedProperty] = useState<any>(null)
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
-  const [isFabMenuOpen, setIsFabMenuOpen] = useState(false)
-  
-  // Real gesture-based pull-to-refresh
-  const handleRefresh = async () => {
-    // Simulate API refresh with realistic delay
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    console.log('Dashboard refreshed!')
-  }
-  
-  const { 
-    pullToRefreshProps, 
-    indicatorProps, 
-    isPulling, 
-    isRefreshing,
-    isOverThreshold 
-  } = usePullToRefresh({ 
-    onRefresh: handleRefresh,
-    threshold: 80,
-    resistance: 2.5,
-    enabled: true
-  })
-  
-  // Performance optimized scroll listener for floating elements and parallax
+  const { t, language, isRTL } = useTranslation()
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showScrollTop, setShowScrollTop] = useState(false)
+  const [selectedTimeframe, setSelectedTimeframe] = useState("monthly")
+
   useEffect(() => {
-    let animationId: number
-    let lastScrollY = 0
-    
-    const handleScroll = () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId)
-      }
-      
-      animationId = requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY
-        
-        if (Math.abs(currentScrollY - lastScrollY) > 2) {
-          setScrollY(currentScrollY)
-          setShowFloatingActions(currentScrollY > 200)
-          
-          // Update CSS custom property for parallax effect
-          document.documentElement.style.setProperty('--scroll-y', currentScrollY.toString())
-          
-          lastScrollY = currentScrollY
-        }
-      })
-    }
-    
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      if (animationId) {
-        cancelAnimationFrame(animationId)
-      }
-    }
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
   }, [])
-  
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const getGreeting = () => {
+    const hour = currentTime.getHours()
+    if (hour < 12) return t("Good Morning")
+    if (hour < 17) return t("Good Afternoon") 
+    return t("Good Evening")
+  }
+
+  const getGreetingIcon = () => {
+    const hour = currentTime.getHours()
+    if (hour < 12) return Sunrise
+    if (hour < 17) return Sun
+    return Moon
+  }
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    setIsRefreshing(false)
+  }
+
+  const totalInvested = mockInvestments.reduce((sum, inv) => sum + inv.amount, 0)
+  const totalReturn = mockInvestments.reduce((sum, inv) => sum + (inv.amount * inv.roi / 100), 0)
+  const averageROI = mockInvestments.reduce((sum, inv) => sum + inv.roi, 0) / mockInvestments.length
+
+  const timeframes = [
+    { id: "daily", label: t("Daily"), value: `+${marketData.dailyChange}%`, icon: TrendingUp },
+    { id: "monthly", label: t("Monthly"), value: `+${marketData.monthlyGrowth}%`, icon: BarChart3 },
+    { id: "yearly", label: t("Yearly"), value: `+${marketData.yearlyReturn}%`, icon: Star }
+  ]
+
+  const quickActions = [
+    { 
+      icon: Building, 
+      label: t("Properties"), 
+      path: "/mobile/properties", 
+      gradient: "from-blue-500 via-blue-600 to-cyan-500",
+      description: t("Explore Vision 2030 projects")
+    },
+    { 
+      icon: BarChart3, 
+      label: t("Portfolio"), 
+      path: "/mobile/portfolio", 
+      gradient: "from-emerald-500 via-green-600 to-teal-500",
+      description: t("Track your investments")
+    },
+    { 
+      icon: Brain, 
+      label: t("AI Advisor"), 
+      path: "/mobile/ai-advisor", 
+      gradient: "from-purple-500 via-violet-600 to-pink-500",
+      description: t("Smart investment insights")
+    },
+    { 
+      icon: MessageSquare, 
+      label: t("Chat"), 
+      path: "/mobile/chat", 
+      gradient: "from-orange-500 via-amber-600 to-red-500",
+      description: t("Connect with experts")
+    }
+  ]
+
+  const GreetingIcon = getGreetingIcon()
+
   return (
-    <div className="relative">
-      {/* Real gesture-based pull-to-refresh indicator */}
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50" {...indicatorProps}>
-        <div className={`
-          px-4 py-2 rounded-full shadow-lg
-          ${isRefreshing ? 'bg-primary text-white animate-bounce' : 
-            isOverThreshold ? 'bg-green-500 text-white' : 
-            'bg-gray-200 text-gray-600'}
-          transition-colors duration-200
-        `}>
-          <RefreshCw className={`h-4 w-4 inline mr-2 ${isRefreshing ? 'animate-spin' : isPulling ? 'animate-pulse' : ''}`} />
-          {isRefreshing ? 'Refreshing...' : 
-           isOverThreshold ? 'Release to refresh' : 
-           isPulling ? 'Pull to refresh' : ''}
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-10 left-4 w-72 h-72 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl animate-pulse opacity-60" />
+        <div className="absolute bottom-20 right-8 w-96 h-96 bg-gradient-to-tl from-secondary/15 to-transparent rounded-full blur-3xl animate-pulse opacity-40" />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-accent/10 to-transparent rounded-full blur-2xl animate-pulse opacity-30" />
       </div>
-      
-      {/* Enhanced floating scroll-to-top button with glassmorphism */}
-      {showFloatingActions && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-24 right-4 z-40 w-14 h-14 glass-card haptic-feedback advanced-glow text-primary rounded-full shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center float-gentle morph-premium"
-          data-testid="button-scroll-top"
-          aria-label="Scroll to top"
-        >
-          <ChevronUp className="h-6 w-6" />
-        </button>
-      )}
-      
-      {/* Enhanced Expanding FAB Menu */}
-      {showFloatingActions && (
-        <div className="fixed bottom-40 right-4 z-40">
-          {/* Main FAB Button */}
-          <button
-            onClick={() => setIsFabMenuOpen(!isFabMenuOpen)}
-            className={`w-16 h-16 glass-card haptic-feedback bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-500 flex items-center justify-center float-dynamic advanced-glow ${
-              isFabMenuOpen ? 'fab-menu-open' : 'fab-menu-closed'
-            }`}
-            data-testid="button-floating-menu"
-            aria-label="Quick Actions Menu"
+
+      {/* Floating Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-gradient-to-r from-primary to-primary/80 text-white rounded-full shadow-2xl backdrop-blur-xl border border-white/20 flex items-center justify-center hover:scale-110 transition-all duration-300"
+            data-testid="button-scroll-top"
           >
-            <Brain className={`h-7 w-7 transition-transform duration-300 ${
-              isFabMenuOpen ? 'rotate-180' : ''
-            }`} />
-          </button>
-          
-          {/* Expanding Menu Items */}
-          {isFabMenuOpen && (
-            <div className="absolute bottom-20 right-0 space-y-4">
-              <Link href="/mobile/ai-advisor">
-                <button
-                  className="w-12 h-12 glass-card haptic-feedback bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center fab-item"
-                  data-testid="fab-item-ai-advisor"
-                  aria-label="AI Investment Advisor"
-                >
-                  <Brain className="h-5 w-5" />
-                </button>
-              </Link>
-              
-              <Link href="/mobile/chat">
-                <button
-                  className="w-12 h-12 glass-card haptic-feedback bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center fab-item"
-                  data-testid="fab-item-chat"
-                  aria-label="Live Chat Support"
-                >
-                  <MessageSquare className="h-5 w-5" />
-                </button>
-              </Link>
-              
-              <Link href="/mobile/properties">
-                <button
-                  className="w-12 h-12 glass-card haptic-feedback bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-full shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center fab-item"
-                  data-testid="fab-item-properties"
-                  aria-label="Browse Properties"
-                >
-                  <Building className="h-5 w-5" />
-                </button>
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-    
-      <div className="space-y-8 pb-20 mobile-enhanced bg-gradient-to-br from-background via-muted/10 to-primary/5 min-h-screen parallax-slow saudi-pattern" {...pullToRefreshProps}>
-        {/* Outstanding Premium Welcome Header with Particle Background */}
-        <div className="bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 rounded-3xl text-white relative overflow-hidden mobile-scale-in glass-card shadow-2xl border border-white/20 backdrop-blur-xl interactive-bounce" data-testid="header-welcome">
-          {/* Floating Particle Background */}
-          <div className="particle-bg">
-            <div className="particle"></div>
-            <div className="particle"></div>
-            <div className="particle"></div>
-            <div className="particle"></div>
-            <div className="particle"></div>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 backdrop-blur-sm" />
-          {/* Dynamic gradient overlay */}
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20 animate-pulse" />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold mb-1" data-testid="text-welcome-message">{t('welcome_back')}</h1>
-                <p className="text-xl font-semibold" data-testid="text-investor-name">{mockInvestor.name}</p>
-                <p className="text-primary-foreground/80 mt-1 text-sm" data-testid="text-track-investments">{t('track_investments')}</p>
-              </div>
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg animate-float glow-effect wave-animation" data-testid="icon-portfolio-value">
-                <DollarSign className="h-8 w-8 text-white" />
-              </div>
-            </div>
-            <div className="bg-white/15 rounded-xl p-4 backdrop-blur-xl border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 mobile-interactive" data-testid="card-portfolio-value">
-              <p className="text-xs text-primary-foreground/70 uppercase tracking-wide">{t('total_portfolio_value')}</p>
-              <p className="text-2xl font-bold" data-testid="text-portfolio-value">SAR {mockInvestor.currentValue.toLocaleString()}</p>
-            </div>
-          </div>
-          <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse-slow" />
-          <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/10 rounded-full blur-lg animate-float" />
-          <div className="absolute top-1/2 right-1/4 w-12 h-12 bg-white/10 rounded-full blur-md animate-pulse" />
-          <div className="absolute top-1/4 left-1/3 w-6 h-6 bg-white/20 rounded-full animate-ping" />
-        </div>
+            <ChevronUp className="w-6 h-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-        {/* Enhanced Portfolio Overview Cards with Staggered Animations */}
-        <div className="grid grid-cols-2 gap-4 mobile-grid">
-          <Card className="glass-card stagger-animation stagger-delay-100 mobile-interactive haptic-feedback morph-premium chart-interactive" data-testid="card-total-value">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center shadow-lg wave-animation hover:scale-110 transition-all" data-testid="icon-total-value">
-                  <DollarSign className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-muted-foreground">{t('total_value')}</p>
-                  <p className="text-2xl font-bold" data-testid="text-total-value">SAR {mockInvestor.currentValue.toLocaleString()}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-gradient-to-r from-green-50 to-green-100 px-3 py-1 rounded-full border border-green-200 shadow-sm" data-testid="badge-return-percentage">
-                  <TrendingUp className="h-3 w-3 text-green-600" />
-                  <p className="text-xs font-semibold text-green-600">+{mockInvestor.returnPercentage}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card stagger-animation stagger-delay-200 mobile-interactive haptic-feedback morph-premium chart-interactive" data-testid="card-total-return">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-lg wave-animation hover:scale-110 transition-all animate-delay-200" data-testid="icon-total-return">
-                  <TrendingUp className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-muted-foreground">{t('total_return')}</p>
-                  <p className="text-2xl font-bold text-green-600" data-testid="text-total-return">+SAR {mockInvestor.totalReturn.toLocaleString()}</p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground bg-gradient-to-r from-muted/50 to-muted/30 px-3 py-1 rounded-full inline-block border border-muted/30" data-testid="text-since-inception">{t('since_inception')}</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Premium Saudi Market Overview with Glassmorphism */}
-        <Card className="glass-card stagger-animation stagger-delay-300 haptic-feedback morph-premium vision-2030-accent">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-5">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-100 via-green-200 to-green-300 rounded-xl flex items-center justify-center shadow-lg animate-pulse-slow wave-animation glow-effect">
-                <Globe className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">{t('saudi_market')}</h3>
-                <p className="text-sm text-muted-foreground">Live Market Analytics with AI Insights</p>
-              </div>
-              <Badge className="bg-gradient-to-r from-green-100 to-green-200 text-green-700 border-green-300 px-3 py-1 shadow-sm mobile-interactive hover:scale-110 transition-all">
-                <Sparkles className="h-3 w-3 mr-1" />
-                AI Powered
-              </Badge>
+      <div className="relative z-10 p-6 pb-28 space-y-8">
+        {/* Enhanced Welcome Header */}
+        <motion.div 
+          className="relative"
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <Card className="bg-gradient-to-br from-primary via-primary/95 to-primary/80 text-white border-0 shadow-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent" />
+            <div className="absolute inset-0">
+              <div className="absolute top-4 right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse" />
+              <div className="absolute bottom-4 left-4 w-24 h-24 bg-white/10 rounded-full blur-xl animate-pulse" />
             </div>
             
-            <div className="grid grid-cols-3 gap-3 mb-5">
-              <div className="text-center p-4 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-150 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition-all mobile-interactive wave-animation animate-delay-300">
-                <p className="text-xs text-blue-700 font-medium mb-2">Market Growth</p>
-                <p className="text-xl font-bold text-blue-800">+{saudiMarketStats.yearlyGrowth}%</p>
-              </div>
-              <div className="text-center p-4 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-150 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition-all mobile-interactive wave-animation animate-delay-400">
-                <p className="text-xs text-purple-700 font-medium mb-2">AI Score</p>
-                <p className="text-xl font-bold text-purple-800">{mockInvestor.aiScore}</p>
-              </div>
-              <div className="text-center p-4 bg-gradient-to-br from-green-50 via-green-100 to-green-150 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition-all mobile-interactive wave-animation animate-delay-500">
-                <p className="text-xs text-green-700 font-medium mb-2">Vision 2030</p>
-                <p className="text-xl font-bold text-green-800">{saudiMarketStats.vision2030Projects}</p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-green-50 to-green-100 text-green-700 border-green-200 px-3 py-1 shadow-sm mobile-interactive hover:scale-110 transition-all animate-delay-600">
-                <Shield className="h-3 w-3 mr-1" />
-                {t('shariah_compliant')}
-              </Badge>
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-blue-200 px-3 py-1 shadow-sm mobile-interactive hover:scale-110 transition-all animate-delay-600">
-                <Target className="h-3 w-3 mr-1" />
-                {t('vision_2030')}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Premium AI Assistant & Chat Quick Access */}
-        <div className="grid grid-cols-2 gap-4 mobile-grid">
-          <Link href="/mobile/ai-advisor">
-            <Card className="enhanced-card mobile-fade-in-up mobile-interactive border-0 shadow-xl cursor-pointer group interactive-bounce glow-effect" data-testid="card-ai-assistant">
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-primary/10 via-primary/20 to-primary/30 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all shadow-lg wave-animation glow-effect">
-                  <Brain className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="font-bold text-sm mb-2">{t('ai_assistant')}</h3>
-                <p className="text-xs text-muted-foreground mb-4">Smart Investment Advisor</p>
-                <Button size="sm" className="w-full text-xs h-9 shadow-lg" data-testid="button-ai-assistant">
-                  <Bot className="h-3 w-3 mr-1" />
-                  {t('ask_ai')}
-                </Button>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/mobile/chat">
-            <Card className="enhanced-card mobile-fade-in-up mobile-interactive animate-delay-100 border-0 shadow-xl cursor-pointer group interactive-bounce glow-effect" data-testid="card-live-chat">
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all shadow-lg wave-animation glow-effect animate-delay-100">
-                  <MessageSquare className="h-7 w-7 text-blue-600" />
-                </div>
-                <h3 className="font-bold text-sm mb-2">{t('live_chat')}</h3>
-                <p className="text-xs text-muted-foreground mb-4">Expert Advisors Online</p>
-                <Button size="sm" variant="outline" className="w-full text-xs h-9 shadow-lg border-2" data-testid="button-live-chat">
-                  <MessageSquare className="h-3 w-3 mr-1" />
-                  {t('chat_with_advisor')}
-                </Button>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-
-        {/* AI Insights Section */}
-        <AIInsights />
-
-        {/* Live Chat Section */}
-        <MobileChat />
-
-        {/* Premium Quick Actions */}
-        <div className="grid grid-cols-2 gap-4 mobile-grid">
-          <Link href="/mobile/properties">
-            <Button className="w-full h-16 gap-4 mobile-button mobile-interactive text-base font-bold rounded-2xl shadow-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary morph-button glow-effect" data-testid="button-browse-properties">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
-                <Building className="h-5 w-5" />
-              </div>
-              {t('browse_properties')}
-            </Button>
-          </Link>
-          <Link href="/mobile/portfolio">
-            <Button variant="outline" className="w-full h-16 gap-4 mobile-button mobile-interactive text-base font-bold rounded-2xl shadow-xl border-2 bg-gradient-to-r from-white to-muted/30 morph-button glow-effect touch-feedback" data-testid="button-view-portfolio">
-              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-lg">
-                <Eye className="h-5 w-5" />
-              </div>
-              {t('view_portfolio')}
-            </Button>
-          </Link>
-        </div>
-
-        {/* Outstanding Active Investments */}
-        <Card className="enhanced-card mobile-fade-in-up animate-delay-200 border-0 shadow-xl bg-gradient-to-br from-white via-white to-primary/5 interactive-bounce glow-effect">
-          <CardHeader className="pb-5">
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl flex items-center justify-center shadow-lg">
-                  <Star className="h-6 w-6 text-primary" />
-                </div>
-                <span className="text-xl font-bold">{t('active_investments')}</span>
-              </div>
-              <Badge variant="secondary" className="bg-gradient-to-r from-primary/10 to-primary/20 text-primary font-bold px-4 py-2 text-base shadow-sm">
-                {mockInvestor.activeInvestments}
-              </Badge>
-            </CardTitle>
-            <CardDescription className="text-base text-muted-foreground">{t('current_property_investments')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            {mockInvestor.portfolio.map((investment, index) => (
-              <div key={investment.id} className={`border-0 rounded-2xl p-6 space-y-5 mobile-interactive property-card bg-gradient-to-r from-white via-white to-muted/20 shadow-lg mobile-fade-in-up animate-delay-${(index + 1) * 100}`} data-testid={`investment-card-${investment.id}`}>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg mb-2" data-testid={`text-investment-name-${investment.id}`}>{t(investment.name as keyof typeof import("@/lib/translations").translations.en)}</h3>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground" data-testid={`text-investment-location-${investment.id}`}>{t(investment.location as keyof typeof import("@/lib/translations").translations.en)}</p>
-                    </div>
-                  </div>
-                  <Badge 
-                    variant={investment.performance === 'excellent' ? 'default' : 'secondary'}
-                    className="text-sm px-4 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-700 border-green-300 shadow-sm"
-                    data-testid={`badge-performance-${investment.id}`}
-                  >
-                    {t(investment.performance as keyof typeof import("@/lib/translations").translations.en)}
-                  </Badge>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-gradient-to-br from-white to-muted/50 rounded-xl border border-muted/30 shadow-sm" data-testid={`metric-invested-${investment.id}`}>
-                    <p className="text-xs text-muted-foreground font-medium mb-2">{t('invested')}</p>
-                    <p className="text-sm font-bold">SAR {investment.invested.toLocaleString()}</p>
-                  </div>
-                  <div className="text-center p-4 bg-gradient-to-br from-white to-muted/50 rounded-xl border border-muted/30 shadow-sm" data-testid={`metric-current-value-${investment.id}`}>
-                    <p className="text-xs text-muted-foreground font-medium mb-2">{t('current_value')}</p>
-                    <p className="text-sm font-bold">SAR {investment.currentValue.toLocaleString()}</p>
-                  </div>
-                  <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200 shadow-sm" data-testid={`metric-return-${investment.id}`}>
-                    <p className="text-xs text-muted-foreground font-medium mb-2">{t('return')}</p>
-                    <p className="text-sm font-bold text-green-600">
-                      +{investment.returnPercentage}%
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="space-y-3" data-testid={`progress-section-${investment.id}`}>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground font-medium">Performance Progress</span>
-                    <span className="font-bold text-green-600" data-testid={`text-progress-${investment.id}`}>{investment.returnPercentage}% of 15%</span>
-                  </div>
-                  <Progress 
-                    value={investment.returnPercentage} 
-                    className="h-4 bg-muted/50 shadow-inner"
-                    max={15}
-                    data-testid={`progress-bar-${investment.id}`}
-                  />
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Premium Performance Summary */}
-        <Card className="enhanced-card mobile-fade-in-up animate-delay-300 border-0 shadow-xl bg-gradient-to-br from-white via-primary/5 to-primary/10">
-          <CardHeader className="pb-5">
-            <CardTitle className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
-                <TrendingUp className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold">{t('performance_summary')}</span>
-            </CardTitle>
-            <CardDescription className="text-base">{t('investment_performance_overview')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-5 bg-gradient-to-br from-white to-muted/30 rounded-2xl text-center border border-muted/30 shadow-lg">
-                  <p className="text-sm text-muted-foreground font-medium mb-3">{t('total_invested')}</p>
-                  <p className="text-2xl font-bold">SAR {mockInvestor.totalInvestment.toLocaleString()}</p>
-                </div>
-                <div className="p-5 bg-gradient-to-br from-white to-muted/30 rounded-2xl text-center border border-muted/30 shadow-lg">
-                  <p className="text-sm text-muted-foreground font-medium mb-3">{t('current_value')}</p>
-                  <p className="text-2xl font-bold">SAR {mockInvestor.currentValue.toLocaleString()}</p>
-                </div>
-              </div>
-              
-              <div className="p-5 bg-gradient-to-r from-green-50 via-green-100 to-green-150 rounded-2xl text-center border border-green-200 shadow-lg">
-                <p className="text-sm text-green-700 font-medium mb-3">{t('total_return')}</p>
-                <p className="text-3xl font-bold text-green-600">+SAR {mockInvestor.totalReturn.toLocaleString()}</p>
-                <p className="text-lg font-bold text-green-600 mt-1">+{mockInvestor.returnPercentage}%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Outstanding Available Properties */}
-        <Card className="enhanced-card mobile-fade-in-up animate-delay-400 border-0 shadow-xl bg-gradient-to-br from-white via-white to-muted/5">
-          <CardHeader className="pb-5">
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-lg">
-                  <Building className="h-6 w-6 text-blue-600" />
-                </div>
-                <span className="text-xl font-bold">{t('available_properties')}</span>
-              </div>
-              <Link href="/mobile/properties">
-                <Button size="sm" variant="outline" className="gap-2 shadow-lg border-2">
-                  View All
-                  <ArrowRight className="h-3 w-3" />
-                </Button>
-              </Link>
-            </CardTitle>
-            <CardDescription className="text-base">{t('new_investment_opportunities')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-5">
-              {availableProperties.map((property, index) => (
-                <div 
-                  key={property.id} 
-                  className="glass-card stagger-animation haptic-feedback morph-premium p-6 space-y-5 mobile-interactive property-card cursor-pointer" 
-                  onClick={() => {
-                    setSelectedProperty(property)
-                    setIsBottomSheetOpen(true)
-                  }}
-                  data-testid={`property-card-${property.id}`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-2" data-testid={`text-property-name-${property.id}`}>{property.name}</h3>
-                      <div className="flex items-center gap-2 mb-3">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground" data-testid={`text-property-location-${property.id}`}>{property.location}</p>
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed" data-testid={`text-property-description-${property.id}`}>{property.description}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 shadow-sm" data-testid={`metric-min-investment-${property.id}`}>
-                      <p className="text-xs text-blue-700 font-medium mb-2">{t('min_investment')}</p>
-                      <p className="text-sm font-bold text-blue-800">SAR {property.minInvestment.toLocaleString()}</p>
-                    </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200 shadow-sm" data-testid={`metric-expected-return-${property.id}`}>
-                      <p className="text-xs text-green-700 font-medium mb-2">{t('expected_return')}</p>
-                      <p className="text-sm font-bold text-green-800">{property.expectedReturn}%</p>
-                    </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 shadow-sm" data-testid={`metric-duration-${property.id}`}>
-                      <p className="text-xs text-purple-700 font-medium mb-2">{t('duration')}</p>
-                      <p className="text-sm font-bold text-purple-800">{property.duration}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-5">
-                    <div className="flex justify-between text-sm mb-3">
-                      <span className="text-muted-foreground font-medium">Funding Progress</span>
-                      <span className="font-bold text-primary">{Math.round((property.soldUnits / property.totalUnits) * 100)}% Complete</span>
-                    </div>
-                    <Progress 
-                      value={(property.soldUnits / property.totalUnits) * 100} 
-                      className="h-4 bg-muted/50 shadow-inner"
-                    />
-                    <p className="text-xs text-muted-foreground mt-2">{property.soldUnits} of {property.totalUnits} units sold</p>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <Button size="sm" className="flex-1 h-12 text-sm gap-2 mobile-button font-bold rounded-xl shadow-lg" data-testid={`button-invest-${property.id}`}>
-                      <Plus className="h-4 w-4" />
-                      {t('invest_now')}
-                    </Button>
-                    <Button size="sm" variant="outline" className="flex-1 h-12 text-sm gap-2 mobile-button font-bold rounded-xl border-2 shadow-lg" data-testid={`button-learn-more-${property.id}`}>
-                      <ArrowRight className="h-4 w-4" />
-                      {t('learn_more')}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Bottom Sheet for Property Details */}
-        <BottomSheet
-          isOpen={isBottomSheetOpen}
-          onClose={() => {
-            setIsBottomSheetOpen(false)
-            setSelectedProperty(null)
-          }}
-          title={selectedProperty ? `${selectedProperty.name} Details` : "Property Details"}
-          height="full"
-        >
-          {selectedProperty && (
-            <div className="space-y-6">
-              {/* Property Header */}
-              <div className="glass-overlay p-4 rounded-xl">
-                <h3 className="text-xl font-bold mb-2">{selectedProperty.name}</h3>
-                <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">{selectedProperty.location}</p>
-                </div>
-                <p className="text-sm leading-relaxed">{selectedProperty.description}</p>
-              </div>
-              
-              {/* Key Metrics */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="glass-card p-4 text-center">
-                  <p className="text-xs text-muted-foreground font-medium mb-2">Min Investment</p>
-                  <p className="text-lg font-bold text-primary">SAR {selectedProperty.minInvestment.toLocaleString()}</p>
-                </div>
-                <div className="glass-card p-4 text-center">
-                  <p className="text-xs text-muted-foreground font-medium mb-2">Expected Return</p>
-                  <p className="text-lg font-bold text-green-600">{selectedProperty.expectedReturn}%</p>
-                </div>
-              </div>
-              
-              {/* Investment Progress */}
-              <div className="glass-overlay p-4 rounded-xl">
-                <div className="flex justify-between text-sm mb-3">
-                  <span className="font-medium">Funding Progress</span>
-                  <span className="font-bold text-primary">
-                    {Math.round((selectedProperty.soldUnits / selectedProperty.totalUnits) * 100)}% Complete
-                  </span>
-                </div>
-                <Progress 
-                  value={(selectedProperty.soldUnits / selectedProperty.totalUnits) * 100} 
-                  className="h-3 mb-2"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {selectedProperty.soldUnits} of {selectedProperty.totalUnits} units sold
-                </p>
-              </div>
-              
-              {/* Investment Action */}
-              <Button 
-                className="w-full haptic-feedback morph-premium advanced-glow" 
-                size="lg"
-                data-testid="button-invest-property"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Invest in This Property
-              </Button>
-              
-              {/* Vision 2030 Badge */}
-              {selectedProperty.vision2030 && (
-                <div className="glass-overlay p-3 rounded-xl flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
-                    <Target className="h-4 w-4 text-green-600" />
+            <CardContent className="p-8 relative z-10">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg">
+                    <GreetingIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-green-700">Vision 2030 Project</p>
-                    <p className="text-xs text-muted-foreground">Part of Saudi Arabia's transformative vision</p>
+                    <h1 className="text-2xl font-bold">{getGreeting()}</h1>
+                    <p className="text-white/80 text-lg">{t("Investor")}</p>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-        </BottomSheet>
+                
+                <button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-xl border border-white/30 hover:bg-white/30 transition-all duration-300"
+                  data-testid="button-refresh"
+                >
+                  <RefreshCw className={`w-5 h-5 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="text-white/70 text-sm uppercase tracking-widest">{t("Total Portfolio Value")}</p>
+                  <div className="text-4xl font-bold mt-2">
+                    {(totalInvested + totalReturn).toLocaleString()} {t("SAR")}
+                  </div>
+                </div>
+
+                {/* Time & Date */}
+                <div className="bg-white/15 rounded-2xl p-4 backdrop-blur-xl border border-white/20">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">
+                      {currentTime.toLocaleTimeString(language === 'ar' ? 'ar-SA' : language === 'hi' ? 'hi-IN' : 'en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                    <div className="text-white/80 text-sm mt-1">
+                      {currentTime.toLocaleDateString(language === 'ar' ? 'ar-SA' : language === 'hi' ? 'hi-IN' : 'en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long', 
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Performance Metrics */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="grid grid-cols-2 gap-4"
+        >
+          <Card className="bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-emerald-700">{t("Total Return")}</p>
+                  <p className="text-2xl font-bold text-emerald-800">+{totalReturn.toLocaleString()}</p>
+                </div>
+              </div>
+              <Badge className="bg-emerald-500/10 text-emerald-700 border-emerald-300">
+                <Sparkles className="w-3 h-3 mr-1" />
+                +{((totalReturn / totalInvested) * 100).toFixed(1)}%
+              </Badge>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-50 to-cyan-100 border-blue-200 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-blue-700">{t("Avg ROI")}</p>
+                  <p className="text-2xl font-bold text-blue-800">{averageROI.toFixed(1)}%</p>
+                </div>
+              </div>
+              <Badge className="bg-blue-500/10 text-blue-700 border-blue-300">
+                <Target className="w-3 h-3 mr-1" />
+                {mockInvestments.length} {t("Properties")}
+              </Badge>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Timeframe Selector */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <Card className="shadow-xl border-0 bg-gradient-to-r from-card to-card/70 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-primary" />
+                {t("Market Performance")}
+              </h3>
+              
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {timeframes.map((timeframe) => (
+                  <button
+                    key={timeframe.id}
+                    onClick={() => setSelectedTimeframe(timeframe.id)}
+                    className={`p-4 rounded-xl transition-all duration-300 ${
+                      selectedTimeframe === timeframe.id
+                        ? 'bg-primary text-white shadow-lg'
+                        : 'bg-muted/50 hover:bg-muted'
+                    }`}
+                    data-testid={`button-timeframe-${timeframe.id}`}
+                  >
+                    <timeframe.icon className="w-5 h-5 mx-auto mb-2" />
+                    <div className="text-xs font-medium">{timeframe.label}</div>
+                    <div className="text-sm font-bold">{timeframe.value}</div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-xl">
+                  <p className="text-sm text-muted-foreground">{t("Active Projects")}</p>
+                  <p className="text-xl font-bold text-primary">{marketData.activeProjects}</p>
+                </div>
+                <div className="bg-gradient-to-r from-green-500/10 to-green-500/5 p-4 rounded-xl">
+                  <p className="text-sm text-muted-foreground">{t("Vision 2030")}</p>
+                  <p className="text-xl font-bold text-green-600">{marketData.vision2030Progress}%</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Quick Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="space-y-4"
+        >
+          <h3 className="text-xl font-bold flex items-center gap-2">
+            <Zap className="w-6 h-6 text-primary" />
+            {t("Quick Actions")}
+          </h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            {quickActions.map((action, index) => (
+              <Link key={action.path} href={action.path}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="relative group"
+                >
+                  <Card className="h-32 cursor-pointer border-0 shadow-xl overflow-hidden bg-gradient-to-br from-card to-card/60 backdrop-blur-sm">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-10 group-hover:opacity-20 transition-opacity duration-300`} />
+                    <CardContent className="h-full flex flex-col items-center justify-center relative z-10 text-center p-4">
+                      <div className={`w-12 h-12 bg-gradient-to-br ${action.gradient} rounded-xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                        <action.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="font-semibold text-sm">{action.label}</div>
+                      <div className="text-xs text-muted-foreground mt-1">{action.description}</div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Featured Vision 2030 Properties */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <Crown className="w-6 h-6 text-primary" />
+              {t("Featured Properties")}
+            </h3>
+            <Link href="/mobile/properties">
+              <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10" data-testid="button-view-all-properties">
+                {t("View All")}
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="space-y-4">
+            {saudiProperties.filter(p => p.featured).map((property, index) => (
+              <motion.div
+                key={property.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+              >
+                <Card className="shadow-xl border-0 overflow-hidden bg-gradient-to-r from-card to-card/70 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 group cursor-pointer">
+                  <CardContent className="p-6">
+                    <div className="flex gap-4">
+                      <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <Building className="w-10 h-10 text-primary" />
+                      </div>
+                      
+                      <div className="flex-1 space-y-3">
+                        <div>
+                          <h4 className="font-bold text-lg leading-tight">
+                            {language === 'ar' ? property.titleAr : language === 'hi' ? property.titleHi : property.title}
+                          </h4>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                            <MapPin className="w-3 h-3" />
+                            {language === 'ar' ? property.locationAr : language === 'hi' ? property.locationHi : property.location}
+                          </p>
+                        </div>
+                        
+                        <div className="flex gap-2 flex-wrap">
+                          {property.vision2030 && (
+                            <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+                              {t("Vision 2030")}
+                            </Badge>
+                          )}
+                          {property.shariahCompliant && (
+                            <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs">
+                              <Shield className="w-3 h-3 mr-1" />
+                              {t("Halal")}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="text-lg font-bold text-primary">
+                            {property.price.toLocaleString()} {t("SAR")}
+                          </div>
+                          <div className="flex items-center gap-1 bg-emerald-50 px-3 py-1 rounded-full">
+                            <TrendingUp className="w-3 h-3 text-emerald-600" />
+                            <span className="text-sm font-semibold text-emerald-600">{property.roi}% ROI</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Active Investments */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <Star className="w-6 h-6 text-primary" />
+              {t("Your Investments")}
+            </h3>
+            <Link href="/mobile/portfolio">
+              <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10" data-testid="button-view-portfolio">
+                {t("View Portfolio")}
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {mockInvestments.slice(0, 3).map((investment, index) => (
+              <motion.div
+                key={investment.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+              >
+                <Card className="shadow-lg border-0 bg-gradient-to-r from-card to-card/70 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+                  <CardContent className="p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-base mb-1">{investment.propertyTitle}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {t("Invested")}: {investment.amount.toLocaleString()} {t("SAR")}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-emerald-600 mb-1">
+                          +{investment.roi}%
+                        </div>
+                        <Badge 
+                          className={`text-xs ${
+                            investment.performance === 'excellent' 
+                              ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                              : 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+                          }`}
+                        >
+                          {t(investment.performance)}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* AI Insights CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
+        >
+          <Link href="/mobile/ai-advisor">
+            <Card className="cursor-pointer shadow-xl border-0 overflow-hidden bg-gradient-to-br from-purple-50 via-violet-50 to-pink-50 hover:shadow-2xl transition-all duration-300 group">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-pink-500/10" />
+              <CardContent className="p-8 relative z-10">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 via-violet-600 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                    <Brain className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-xl font-bold mb-2">{t("AI Investment Advisor")}</h4>
+                    <p className="text-muted-foreground">
+                      {t("Get personalized Saudi Vision 2030 investment recommendations powered by AI")}
+                    </p>
+                  </div>
+                  <ArrowUpRight className="w-6 h-6 text-purple-600 group-hover:transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </motion.div>
       </div>
     </div>
   )
