@@ -149,10 +149,22 @@ export default function MobileDashboard() {
       )}
     
       <div className="space-y-6 pb-20 mobile-enhanced bg-gradient-to-br from-background via-muted/10 to-primary/5 min-h-screen">
-        {/* Outstanding Premium Welcome Header */}
-        <div className="bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 rounded-3xl text-white relative overflow-hidden mobile-scale-in glass-card shadow-2xl border border-white/20 backdrop-blur-xl" data-testid="header-welcome">
+        {/* Outstanding Premium Welcome Header with Particle Background */}
+        <div className="bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 rounded-3xl text-white relative overflow-hidden mobile-scale-in glass-card shadow-2xl border border-white/20 backdrop-blur-xl interactive-bounce" data-testid="header-welcome">
+          {/* Floating Particle Background */}
+          <div className="particle-bg">
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent backdrop-blur-xl" />
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 backdrop-blur-sm" />
+          {/* Dynamic gradient overlay */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20 animate-pulse" />
+          </div>
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -160,11 +172,11 @@ export default function MobileDashboard() {
                 <p className="text-xl font-semibold" data-testid="text-investor-name">{mockInvestor.name}</p>
                 <p className="text-primary-foreground/80 mt-1 text-sm" data-testid="text-track-investments">{t('track_investments')}</p>
               </div>
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg animate-float" data-testid="icon-portfolio-value">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg animate-float glow-effect wave-animation" data-testid="icon-portfolio-value">
                 <DollarSign className="h-8 w-8 text-white" />
               </div>
             </div>
-            <div className="bg-white/15 rounded-xl p-4 backdrop-blur-xl border border-white/20 shadow-lg" data-testid="card-portfolio-value">
+            <div className="bg-white/15 rounded-xl p-4 backdrop-blur-xl border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 mobile-interactive" data-testid="card-portfolio-value">
               <p className="text-xs text-primary-foreground/70 uppercase tracking-wide">{t('total_portfolio_value')}</p>
               <p className="text-2xl font-bold" data-testid="text-portfolio-value">SAR {mockInvestor.currentValue.toLocaleString()}</p>
             </div>
@@ -177,10 +189,10 @@ export default function MobileDashboard() {
 
         {/* Enhanced Portfolio Overview Cards */}
         <div className="grid grid-cols-2 gap-4 mobile-grid">
-          <Card className="enhanced-card mobile-fade-in-up mobile-interactive border-0 shadow-xl" data-testid="card-total-value">
+          <Card className="enhanced-card mobile-fade-in-up mobile-interactive border-0 shadow-xl interactive-bounce glow-effect" data-testid="card-total-value">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center shadow-lg" data-testid="icon-total-value">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center shadow-lg wave-animation hover:scale-110 transition-all" data-testid="icon-total-value">
                   <DollarSign className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="flex-1">
@@ -197,10 +209,10 @@ export default function MobileDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="enhanced-card mobile-fade-in-up mobile-interactive animate-delay-100 border-0 shadow-xl" data-testid="card-total-return">
+          <Card className="enhanced-card mobile-fade-in-up mobile-interactive animate-delay-100 border-0 shadow-xl interactive-bounce glow-effect" data-testid="card-total-return">
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-lg" data-testid="icon-total-return">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-lg wave-animation hover:scale-110 transition-all animate-delay-200" data-testid="icon-total-return">
                   <TrendingUp className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="flex-1">
@@ -214,43 +226,43 @@ export default function MobileDashboard() {
         </div>
 
         {/* Premium Saudi Market Overview */}
-        <Card className="enhanced-card mobile-fade-in-up animate-delay-200 border-0 shadow-xl bg-gradient-to-br from-white via-white to-primary/5">
+        <Card className="enhanced-card mobile-fade-in-up animate-delay-200 border-0 shadow-xl bg-gradient-to-br from-white via-white to-primary/5 interactive-bounce glow-effect">
           <CardContent className="p-6">
             <div className="flex items-center gap-4 mb-5">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-100 via-green-200 to-green-300 rounded-xl flex items-center justify-center shadow-lg animate-pulse-slow">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-100 via-green-200 to-green-300 rounded-xl flex items-center justify-center shadow-lg animate-pulse-slow wave-animation glow-effect">
                 <Globe className="h-6 w-6 text-green-600" />
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-lg">{t('saudi_market')}</h3>
                 <p className="text-sm text-muted-foreground">Live Market Analytics with AI Insights</p>
               </div>
-              <Badge className="bg-gradient-to-r from-green-100 to-green-200 text-green-700 border-green-300 px-3 py-1 shadow-sm">
+              <Badge className="bg-gradient-to-r from-green-100 to-green-200 text-green-700 border-green-300 px-3 py-1 shadow-sm mobile-interactive hover:scale-110 transition-all">
                 <Sparkles className="h-3 w-3 mr-1" />
                 AI Powered
               </Badge>
             </div>
             
             <div className="grid grid-cols-3 gap-3 mb-5">
-              <div className="text-center p-4 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-150 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition-all">
+              <div className="text-center p-4 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-150 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition-all mobile-interactive wave-animation animate-delay-300">
                 <p className="text-xs text-blue-700 font-medium mb-2">Market Growth</p>
                 <p className="text-xl font-bold text-blue-800">+{saudiMarketStats.yearlyGrowth}%</p>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-150 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition-all">
+              <div className="text-center p-4 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-150 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition-all mobile-interactive wave-animation animate-delay-400">
                 <p className="text-xs text-purple-700 font-medium mb-2">AI Score</p>
                 <p className="text-xl font-bold text-purple-800">{mockInvestor.aiScore}</p>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-green-50 via-green-100 to-green-150 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition-all">
+              <div className="text-center p-4 bg-gradient-to-br from-green-50 via-green-100 to-green-150 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition-all mobile-interactive wave-animation animate-delay-500">
                 <p className="text-xs text-green-700 font-medium mb-2">Vision 2030</p>
                 <p className="text-xl font-bold text-green-800">{saudiMarketStats.vision2030Projects}</p>
               </div>
             </div>
 
             <div className="flex gap-3">
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-green-50 to-green-100 text-green-700 border-green-200 px-3 py-1 shadow-sm">
+              <Badge variant="outline" className="text-xs bg-gradient-to-r from-green-50 to-green-100 text-green-700 border-green-200 px-3 py-1 shadow-sm mobile-interactive hover:scale-110 transition-all animate-delay-600">
                 <Shield className="h-3 w-3 mr-1" />
                 {t('shariah_compliant')}
               </Badge>
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-blue-200 px-3 py-1 shadow-sm">
+              <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-blue-200 px-3 py-1 shadow-sm mobile-interactive hover:scale-110 transition-all animate-delay-600">
                 <Target className="h-3 w-3 mr-1" />
                 {t('vision_2030')}
               </Badge>
@@ -261,9 +273,9 @@ export default function MobileDashboard() {
         {/* Premium AI Assistant & Chat Quick Access */}
         <div className="grid grid-cols-2 gap-4 mobile-grid">
           <Link href="/mobile/ai-advisor">
-            <Card className="enhanced-card mobile-fade-in-up mobile-interactive border-0 shadow-xl cursor-pointer group" data-testid="card-ai-assistant">
+            <Card className="enhanced-card mobile-fade-in-up mobile-interactive border-0 shadow-xl cursor-pointer group interactive-bounce glow-effect" data-testid="card-ai-assistant">
               <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-primary/10 via-primary/20 to-primary/30 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all shadow-lg">
+                <div className="w-14 h-14 bg-gradient-to-br from-primary/10 via-primary/20 to-primary/30 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all shadow-lg wave-animation glow-effect">
                   <Brain className="h-7 w-7 text-primary" />
                 </div>
                 <h3 className="font-bold text-sm mb-2">{t('ai_assistant')}</h3>
@@ -277,9 +289,9 @@ export default function MobileDashboard() {
           </Link>
 
           <Link href="/mobile/chat">
-            <Card className="enhanced-card mobile-fade-in-up mobile-interactive animate-delay-100 border-0 shadow-xl cursor-pointer group" data-testid="card-live-chat">
+            <Card className="enhanced-card mobile-fade-in-up mobile-interactive animate-delay-100 border-0 shadow-xl cursor-pointer group interactive-bounce glow-effect" data-testid="card-live-chat">
               <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all shadow-lg">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all shadow-lg wave-animation glow-effect animate-delay-100">
                   <MessageSquare className="h-7 w-7 text-blue-600" />
                 </div>
                 <h3 className="font-bold text-sm mb-2">{t('live_chat')}</h3>
@@ -302,7 +314,7 @@ export default function MobileDashboard() {
         {/* Premium Quick Actions */}
         <div className="grid grid-cols-2 gap-4 mobile-grid">
           <Link href="/mobile/properties">
-            <Button className="w-full h-16 gap-4 mobile-button mobile-interactive text-base font-bold rounded-2xl shadow-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary" data-testid="button-browse-properties">
+            <Button className="w-full h-16 gap-4 mobile-button mobile-interactive text-base font-bold rounded-2xl shadow-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary morph-button glow-effect" data-testid="button-browse-properties">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
                 <Building className="h-5 w-5" />
               </div>
@@ -310,7 +322,7 @@ export default function MobileDashboard() {
             </Button>
           </Link>
           <Link href="/mobile/portfolio">
-            <Button variant="outline" className="w-full h-16 gap-4 mobile-button mobile-interactive text-base font-bold rounded-2xl shadow-xl border-2 bg-gradient-to-r from-white to-muted/30" data-testid="button-view-portfolio">
+            <Button variant="outline" className="w-full h-16 gap-4 mobile-button mobile-interactive text-base font-bold rounded-2xl shadow-xl border-2 bg-gradient-to-r from-white to-muted/30 morph-button glow-effect touch-feedback" data-testid="button-view-portfolio">
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-lg">
                 <Eye className="h-5 w-5" />
               </div>
@@ -320,7 +332,7 @@ export default function MobileDashboard() {
         </div>
 
         {/* Outstanding Active Investments */}
-        <Card className="enhanced-card mobile-fade-in-up animate-delay-200 border-0 shadow-xl bg-gradient-to-br from-white via-white to-primary/5">
+        <Card className="enhanced-card mobile-fade-in-up animate-delay-200 border-0 shadow-xl bg-gradient-to-br from-white via-white to-primary/5 interactive-bounce glow-effect">
           <CardHeader className="pb-5">
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-4">
