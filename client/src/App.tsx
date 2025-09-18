@@ -27,6 +27,8 @@ import MobileDashboard from "@/pages/mobile/dashboard";
 import MobileProperties from "@/pages/mobile/properties";
 import MobilePortfolio from "@/pages/mobile/portfolio";
 import MobileProfile from "@/pages/mobile/profile";
+import MobileChat from "@/pages/mobile/chat";
+import MobileAIAdvisor from "@/pages/mobile/ai-advisor";
 
 function AdminRouter() {
   return (
@@ -50,6 +52,8 @@ function MobileRouter() {
     <Switch>
       <Route path="/mobile" component={MobileDashboard} />
       <Route path="/mobile/properties" component={MobileProperties} />
+      <Route path="/mobile/chat" component={MobileChat} />
+      <Route path="/mobile/ai-advisor" component={MobileAIAdvisor} />
       <Route path="/mobile/portfolio" component={MobilePortfolio} />
       <Route path="/mobile/profile" component={MobileProfile} />
       <Route component={NotFound} />

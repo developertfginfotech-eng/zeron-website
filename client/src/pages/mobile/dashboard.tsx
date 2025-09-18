@@ -2,76 +2,90 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { TrendingUp, TrendingDown, DollarSign, Building, Eye, Plus, Star, MapPin, ArrowRight } from "lucide-react"
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  DollarSign, 
+  Building, 
+  Eye, 
+  Plus, 
+  Star, 
+  MapPin, 
+  ArrowRight,
+  MessageSquare,
+  Brain,
+  Sparkles,
+  Shield,
+  Globe,
+  Target,
+  Bot
+} from "lucide-react"
 import { Link } from "wouter"
 import { useTranslation } from "@/hooks/use-translation"
+import { MobileChat } from "@/components/mobile-chat"
+import { AIInsights } from "@/components/ai-insights"
+import { saudiProperties, saudiMarketStats } from "@/lib/saudi-data"
 import apartmentImg from "@assets/generated_images/luxury_apartment_building_exterior_e11af77f.png"
 import officeImg from "@assets/generated_images/commercial_office_building_f8c8d53a.png"
 import retailImg from "@assets/generated_images/retail_shopping_complex_10ee6fbf.png"
 import villaImg from "@assets/generated_images/luxury_villa_property_b02d7e37.png"
 
-// Mock investor data
+// Enhanced Saudi investor data
 const mockInvestor = {
   id: "inv_001",
   name: "Ahmed Al-Rashid",
-  totalInvestment: 125000,
-  currentValue: 138750,
-  totalReturn: 13750,
-  returnPercentage: 11.0,
-  activeInvestments: 3,
+  nameAr: "أحمد الراشد",
+  nameHi: "अहमद अल-राशिद",
+  totalInvestment: 1250000,
+  currentValue: 1582000,
+  totalReturn: 332000,
+  returnPercentage: 26.6,
+  activeInvestments: 5,
+  aiScore: 92,
+  vision2030Aligned: true,
+  shariahCompliant: true,
   portfolio: [
     {
       id: "1",
-      name: "luxury_apartment_complex",
-      location: "riyadh",
-      invested: 75000,
-      currentValue: 82500,
-      returnAmount: 7500,
-      returnPercentage: 10.0,
-      performance: "excellent"
+      name: "neom_the_line_residential",
+      location: "neom",
+      invested: 500000,
+      currentValue: 634000,
+      returnAmount: 134000,
+      returnPercentage: 26.8,
+      performance: "excellent",
+      vision2030: true,
+      shariah: true
     },
     {
-      id: "4", 
-      name: "retail_shopping_complex",
-      location: "jeddah",
-      invested: 50000,
-      currentValue: 56250,
-      returnAmount: 6250,
-      returnPercentage: 12.5,
-      performance: "excellent"
+      id: "2", 
+      name: "red_sea_global_marina",
+      location: "red_sea",
+      invested: 400000,
+      currentValue: 498000,
+      returnAmount: 98000,
+      returnPercentage: 24.5,
+      performance: "excellent",
+      vision2030: true,
+      shariah: true
+    },
+    {
+      id: "3",
+      name: "riyadh_financial_district",
+      location: "riyadh",
+      invested: 350000,
+      currentValue: 450000,
+      returnAmount: 100000,
+      returnPercentage: 28.6,
+      performance: "excellent",
+      vision2030: true,
+      shariah: true
     }
   ]
 }
 
-// Available properties for investment
-const availableProperties = [
-  {
-    id: "prop_001",
-    name: "commercial_office_building",
-    location: "riyadh",
-    image: officeImg,
-    minInvestment: 25000,
-    expectedReturn: 12.5,
-    duration: "3-5 years",
-    price: 1200000,
-    totalUnits: 100,
-    soldUnits: 68,
-    status: "selling"
-  },
-  {
-    id: "prop_002",
-    name: "luxury_villa_property",
-    location: "jeddah",
-    image: villaImg,
-    minInvestment: 50000,
-    expectedReturn: 15.0,
-    duration: "2-4 years", 
-    price: 850000,
-    totalUnits: 50,
-    soldUnits: 12,
-    status: "new"
-  }
-]
+// Use Saudi properties from saudi-data.ts
+const availableProperties = saudiProperties.slice(0, 3)
 
 export default function MobileDashboard() {
   const { t } = useTranslation()
@@ -139,6 +153,88 @@ export default function MobileDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Saudi Market Overview */}
+      <Card className="mobile-card mobile-fade-in-up animate-delay-200 border-0 shadow-lg">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center">
+              <Globe className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-base">{t('saudi_market')}</h3>
+              <p className="text-sm text-muted-foreground">Live Market Analytics</p>
+            </div>
+            <Badge className="bg-green-100 text-green-700 border-green-200">
+              <Sparkles className="h-3 w-3 mr-1" />
+              AI Powered
+            </Badge>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+              <p className="text-xs text-blue-700 font-medium mb-1">Market Growth</p>
+              <p className="text-lg font-bold text-blue-800">+{saudiMarketStats.yearlyGrowth}%</p>
+            </div>
+            <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+              <p className="text-xs text-purple-700 font-medium mb-1">AI Score</p>
+              <p className="text-lg font-bold text-purple-800">{mockInvestor.aiScore}</p>
+            </div>
+            <div className="text-center p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+              <p className="text-xs text-green-700 font-medium mb-1">Vision 2030</p>
+              <p className="text-lg font-bold text-green-800">{saudiMarketStats.vision2030Projects}</p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+              <Shield className="h-3 w-3 mr-1" />
+              {t('shariah_compliant')}
+            </Badge>
+            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+              <Target className="h-3 w-3 mr-1" />
+              {t('vision_2030')}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Assistant & Chat Quick Access */}
+      <div className="grid grid-cols-2 gap-4 mobile-grid">
+        <Card className="mobile-card mobile-fade-in-up mobile-interactive border-0 shadow-lg cursor-pointer hover:shadow-xl" data-testid="card-ai-assistant">
+          <CardContent className="p-5 text-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Brain className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="font-bold text-sm mb-1">{t('ai_assistant')}</h3>
+            <p className="text-xs text-muted-foreground mb-3">Smart Investment Advisor</p>
+            <Button size="sm" className="w-full text-xs" data-testid="button-ai-assistant">
+              <Bot className="h-3 w-3 mr-1" />
+              {t('ask_ai')}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="mobile-card mobile-fade-in-up mobile-interactive animate-delay-100 border-0 shadow-lg cursor-pointer hover:shadow-xl" data-testid="card-live-chat">
+          <CardContent className="p-5 text-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-3">
+              <MessageSquare className="h-6 w-6 text-blue-600" />
+            </div>
+            <h3 className="font-bold text-sm mb-1">{t('live_chat')}</h3>
+            <p className="text-xs text-muted-foreground mb-3">Expert Advisors Online</p>
+            <Button size="sm" variant="outline" className="w-full text-xs" data-testid="button-live-chat">
+              <MessageSquare className="h-3 w-3 mr-1" />
+              {t('chat_with_advisor')}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* AI Insights Section */}
+      <AIInsights />
+
+      {/* Live Chat Section */}
+      <MobileChat />
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-4 mobile-grid">
