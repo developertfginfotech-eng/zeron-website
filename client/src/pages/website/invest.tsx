@@ -67,31 +67,42 @@ const featuredProperties = [
   }
 ]
 
-const investmentBenefits = [
-  {
-    icon: TrendingUp,
-    title: "High Returns",
-    description: "Average returns of 12-18% annually on real estate investments"
-  },
-  {
-    icon: Shield,
-    title: "Shariah Compliant",
-    description: "All investments are vetted and certified as Shariah compliant"
-  },
-  {
-    icon: Building2,
-    title: "Premium Properties",
-    description: "Curated selection of high-quality real estate projects"
-  },
-  {
-    icon: Users,
-    title: "Fractional Ownership",
-    description: "Start investing with as little as 1,000 SAR"
-  }
-]
+// Investment benefits will be localized within the component
 
 export default function InvestPage() {
   const { t } = useTranslation()
+  
+  // Localized featured properties with translated tags
+  const localizedFeaturedProperties = featuredProperties.map(property => ({
+    ...property,
+    tags: property.id === 1 ? [t("vision_2030"), t("shariah_compliant_tag"), t("high_yield")] :
+          property.id === 2 ? [t("prime_location"), t("commercial"), t("stable_returns")] :
+          [t("tourism"), t("luxury"), t("mega_project")]
+  }))
+  
+  // Localized investment benefits
+  const localizedInvestmentBenefits = [
+    {
+      icon: TrendingUp,
+      title: t("superior_returns"),
+      description: t("superior_desc")
+    },
+    {
+      icon: Shield,
+      title: t("shariah_compliance"),
+      description: t("shariah_desc")
+    },
+    {
+      icon: Building2,
+      title: t("premium_properties"),
+      description: t("premium_desc")
+    },
+    {
+      icon: Users,
+      title: t("fractional_ownership"),
+      description: t("fractional_desc")
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,7 +169,7 @@ export default function InvestPage() {
               </Badge>
               <Badge className="bg-amber-500/20 text-amber-100 border border-amber-500/30 backdrop-blur-sm px-4 py-2 text-sm">
                 <Award className="w-4 h-4 mr-2" />
-                SAMA Regulated
+                {t("sama_regulated_title")}
               </Badge>
             </motion.div>
 
@@ -170,11 +181,7 @@ export default function InvestPage() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <span className="bg-gradient-to-r from-emerald-300 via-white to-blue-300 bg-clip-text text-transparent">
-                Invest in Saudi's
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-amber-300 via-emerald-300 to-blue-300 bg-clip-text text-transparent">
-                Future Today
+                {t("hero_title")}
               </span>
             </motion.h1>
 
@@ -185,8 +192,7 @@ export default function InvestPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              Join <span className="text-amber-300 font-semibold">25,000+</span> investors building wealth through 
-              <span className="text-emerald-300 font-semibold"> premium real estate crowdfunding</span> in the Kingdom
+              {t("hero_subtitle")}
             </motion.p>
 
             {/* Hero Stats */}
@@ -197,16 +203,16 @@ export default function InvestPage() {
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">SAR 2.5B+</div>
-                <div className="text-emerald-200/80 text-sm">Total Invested</div>
+                <div className="text-3xl font-bold text-white mb-1">{t("invested_amount")}</div>
+                <div className="text-emerald-200/80 text-sm">{t("total_invested")}</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">15.2%</div>
-                <div className="text-emerald-200/80 text-sm">Avg. Returns</div>
+                <div className="text-3xl font-bold text-white mb-1">{t("avg_returns")}</div>
+                <div className="text-emerald-200/80 text-sm">{t("avg_returns_label")}</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">450+</div>
-                <div className="text-emerald-200/80 text-sm">Properties Funded</div>
+                <div className="text-3xl font-bold text-white mb-1">{t("total_properties")}</div>
+                <div className="text-emerald-200/80 text-sm">{t("properties_funded")}</div>
               </div>
             </motion.div>
 
@@ -224,7 +230,7 @@ export default function InvestPage() {
                   data-testid="button-start-investing"
                 >
                   <Zap className="w-5 h-5 mr-2" />
-                  Start Investing Now
+                  {t("start_investing_now")}
                 </Button>
               </AuthDialog>
               
@@ -239,7 +245,7 @@ export default function InvestPage() {
                 data-testid="button-explore-opportunities"
               >
                 <Eye className="w-5 h-5 mr-2" />
-                Explore Opportunities
+                {t("explore_opportunities")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </motion.div>
@@ -253,15 +259,15 @@ export default function InvestPage() {
             >
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
-                Shariah Certified
+                {t("shariah_certified")}
               </div>
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
-                4.9/5 Rating
+                {t("rating_display")}
               </div>
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4" />
-                SAMA Licensed
+                {t("sama_licensed")}
               </div>
             </motion.div>
           </div>
@@ -296,38 +302,38 @@ export default function InvestPage() {
               {[
                 {
                   icon: PieChart,
-                  title: "Fractional Ownership",
-                  description: "Start with as little as SAR 1,000 and own a piece of premium real estate in Saudi Arabia's most promising projects.",
+                  title: t("fractional_ownership"),
+                  description: t("fractional_desc"),
                   highlight: "Min. SAR 1,000"
                 },
                 {
                   icon: TrendingUp,
-                  title: "Superior Returns",
-                  description: "Historical returns of 12-18% annually from carefully selected real estate projects aligned with Vision 2030.",
+                  title: t("superior_returns"),
+                  description: t("superior_desc"),
                   highlight: "12-18% Returns"
                 },
                 {
                   icon: Shield,
-                  title: "Shariah Compliant",
-                  description: "All investments are certified halal by our Shariah board, ensuring your investments align with Islamic principles.",
+                  title: t("shariah_compliance"),
+                  description: t("shariah_desc"),
                   highlight: "100% Halal"
                 },
                 {
                   icon: Building2,
-                  title: "Premium Properties",
-                  description: "Curated selection of high-quality developments in Riyadh, NEOM, and other strategic locations.",
+                  title: t("premium_properties"),
+                  description: t("premium_desc"),
                   highlight: "Prime Locations"
                 },
                 {
                   icon: Users,
-                  title: "Professional Management",
-                  description: "Expert property management and transparent reporting so you can invest passively and confidently.",
+                  title: t("professional_mgmt"),
+                  description: t("professional_desc"),
                   highlight: "Hands-Free"
                 },
                 {
                   icon: Globe,
-                  title: "Vision 2030 Aligned",
-                  description: "Invest in the Kingdom's transformation with projects that are driving Saudi Arabia's economic diversification.",
+                  title: t("vision_alignment"),
+                  description: t("vision_desc"),
                   highlight: "Future-Ready"
                 }
               ].map((benefit, index) => (
@@ -398,7 +404,7 @@ export default function InvestPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProperties.map((property, index) => (
+            {localizedFeaturedProperties.map((property, index) => (
               <motion.div
                 key={property.id}
                 initial={{ opacity: 0, y: 20 }}
