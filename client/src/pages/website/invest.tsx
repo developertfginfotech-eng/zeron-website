@@ -24,7 +24,8 @@ import {
   BarChart3,
   Crown,
   Zap,
-  Award
+  Award,
+  FileCheck
 } from "lucide-react"
 
 const featuredProperties = [
@@ -527,6 +528,195 @@ export default function InvestPage() {
                 Browse All Properties
               </Button>
             </AuthDialog>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Trust Building - Testimonials */}
+      <section className="py-20 bg-gradient-to-br from-emerald-50/50 to-blue-50/50 dark:from-emerald-950/30 dark:to-blue-950/30">
+        <div className="container mx-auto px-6">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+              Trusted by Thousands of Investors
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Join our community of successful real estate investors across Saudi Arabia
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {[
+              {
+                name: "Ahmed Al-Rashid",
+                title: "Private Equity Investor",
+                location: "Riyadh",
+                testimonial: "Zaron has transformed my investment strategy. The platform's transparency and Shariah-compliant options align perfectly with my values. I've achieved 18% returns consistently.",
+                returns: "18% Annual Returns",
+                avatar: "AR"
+              },
+              {
+                name: "Fatima Al-Zahra",
+                title: "Business Owner",
+                location: "Jeddah", 
+                testimonial: "As a busy entrepreneur, Zaron's passive investment model is perfect. Professional property management and regular returns without the hassle of direct ownership.",
+                returns: "16% Annual Returns",
+                avatar: "FZ"
+              },
+              {
+                name: "Omar Al-Mansouri",
+                title: "Tech Executive",
+                location: "Khobar",
+                testimonial: "The Vision 2030 aligned properties on Zaron have been exceptional investments. Clear reporting, professional management, and impressive growth potential.",
+                returns: "22% Annual Returns", 
+                avatar: "OM"
+              }
+            ].map((testimonial, index) => (
+              <motion.div
+                key={index}
+                className="bg-card/80 backdrop-blur-sm p-8 rounded-xl border hover-elevate"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+                viewport={{ once: true }}
+                data-testid={`testimonial-${index}`}
+              >
+                <div className="flex items-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg">{testimonial.name}</h4>
+                    <p className="text-muted-foreground">{testimonial.title}</p>
+                    <p className="text-sm text-emerald-600 dark:text-emerald-400">{testimonial.location}</p>
+                  </div>
+                </div>
+                <blockquote className="text-muted-foreground mb-4 italic">
+                  "{testimonial.testimonial}"
+                </blockquote>
+                <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 p-3 rounded-lg">
+                  <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                    <TrendingUp className="w-4 h-4 inline mr-2" />
+                    {testimonial.returns}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Trust Statistics */}
+          <motion.div 
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
+              <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">4.9/5</div>
+              <p className="text-muted-foreground">Investor Rating</p>
+            </div>
+            <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
+              <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">99.2%</div>
+              <p className="text-muted-foreground">Success Rate</p>
+            </div>
+            <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
+              <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">72h</div>
+              <p className="text-muted-foreground">Avg. Payout</p>
+            </div>
+            <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
+              <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">24/7</div>
+              <p className="text-muted-foreground">Support</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Security & Compliance */}
+      <section className="py-16 bg-background border-y">
+        <div className="container mx-auto px-6">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-bold mb-4">Security & Compliance</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Your investments are protected by industry-leading security measures and regulatory compliance
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {[
+              {
+                icon: Shield,
+                title: "SAMA Regulated",
+                description: "Licensed by Saudi Arabian Monetary Authority"
+              },
+              {
+                icon: CheckCircle,
+                title: "Shariah Compliant",
+                description: "All investments certified by Shariah board"
+              },
+              {
+                icon: Lock,
+                title: "Bank-Grade Security",
+                description: "256-bit SSL encryption and secure data storage"
+              },
+              {
+                icon: FileCheck,
+                title: "Legal Protection",
+                description: "Full legal documentation and investor protection"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                className="text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border hover-elevate"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                data-testid={`security-feature-${index}`}
+              >
+                <feature.icon className="w-12 h-12 mx-auto mb-4 text-emerald-600 dark:text-emerald-400" />
+                <h4 className="font-semibold mb-2">{feature.title}</h4>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Partner Logos */}
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="text-xl font-semibold mb-8 text-muted-foreground">Trusted Partners</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
+              {[
+                { name: "Al Rajhi Bank", logo: "ARB" },
+                { name: "Saudi Investment Bank", logo: "SIB" }, 
+                { name: "Riyad Capital", logo: "RC" },
+                { name: "Jadwa Investment", logo: "JI" }
+              ].map((partner, index) => (
+                <div 
+                  key={index}
+                  className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 p-6 rounded-lg flex items-center justify-center h-20 font-bold text-gray-600 dark:text-gray-300"
+                  data-testid={`partner-${index}`}
+                >
+                  {partner.logo}
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
