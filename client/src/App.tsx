@@ -69,12 +69,12 @@ function WebsiteRouter() {
   return (
     <WebsiteLayout>
       <Switch>
-        <Route path="/website" component={WebsiteHome} />
+        <Route path="/website" component={WebsiteInvest} />
         <Route path="/website/invest" component={WebsiteInvest} />
         <Route path="/website/about" component={WebsiteAbout} />
         <Route path="/website/business" component={WebsiteBusiness} />
         <Route path="/website/contact" component={WebsiteContact} />
-        <Route path="/" component={WebsiteHome} />
+        <Route path="/" component={WebsiteInvest} />
         <Route component={NotFound} />
       </Switch>
     </WebsiteLayout>
