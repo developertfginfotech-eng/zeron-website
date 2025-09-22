@@ -81,6 +81,18 @@ const investmentBenefits = [
 export default function InvestPage() {
   const { t } = useTranslation()
 
+  const handleInvestClick = (propertyId: number, propertyTitle: string) => {
+    alert(`Investment in ${propertyTitle} coming soon! Full investment functionality will be available in the complete platform.`)
+  }
+
+  const handleBrowseInvestments = () => {
+    alert("Browse all investments feature coming soon! This will show expanded property listings.")
+  }
+
+  const handleGetStarted = () => {
+    alert("Registration and KYC process coming soon! This will guide you through account setup.")
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -90,7 +102,8 @@ export default function InvestPage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="mb-6">
               <Badge className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-0 mb-4">
-                🏗️ Vision 2030 Projects Available
+                <Building2 className="w-4 h-4 mr-2" />
+                Vision 2030 Projects Available
               </Badge>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-emerald-600 to-blue-800 bg-clip-text text-transparent">
@@ -101,7 +114,7 @@ export default function InvestPage() {
               All investments are Shariah compliant and aligned with Vision 2030.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700" data-testid="button-browse-investments">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600" onClick={handleBrowseInvestments} data-testid="button-browse-investments">
                 <Building2 className="w-5 h-5 mr-2" />
                 Browse Investments
               </Button>
@@ -205,7 +218,11 @@ export default function InvestPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700" data-testid={`button-invest-${property.id}`}>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-600 to-emerald-600" 
+                    onClick={() => handleInvestClick(property.id, property.title)}
+                    data-testid={`button-invest-${property.id}`}
+                  >
                     <DollarSign className="w-4 h-4 mr-2" />
                     Invest Now
                   </Button>
@@ -264,7 +281,7 @@ export default function InvestPage() {
             ))}
           </div>
           <div className="text-center mt-12">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700" data-testid="button-get-started">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600" onClick={handleGetStarted} data-testid="button-get-started">
               <CheckCircle className="w-5 h-5 mr-2" />
               Get Started Today
             </Button>

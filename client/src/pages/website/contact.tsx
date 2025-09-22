@@ -139,7 +139,8 @@ export default function ContactPage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="mb-6">
               <Badge className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-0 mb-4">
-                📞 We're Here to Help
+                <Headphones className="w-4 h-4 mr-2" />
+                We're Here to Help
               </Badge>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-emerald-600 to-blue-800 bg-clip-text text-transparent">

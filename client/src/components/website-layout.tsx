@@ -7,17 +7,17 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/components/language-provider"
-import { Languages, Globe } from "lucide-react"
+import { Languages, Globe, Flag } from "lucide-react"
 import { Link, useLocation } from "wouter"
 
 const languages = [
-  { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "ar", name: "العربية", flag: "🇸🇦" },
-  { code: "ur", name: "اردو", flag: "🇵🇰" },
-  { code: "hi", name: "हिंदी", flag: "🇮🇳" },
-  { code: "pa", name: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
-  { code: "bn", name: "বাংলা", flag: "🇧🇩" },
-  { code: "ml", name: "മലയാളം", flag: "🇮🇳" },
+  { code: "en", name: "English" },
+  { code: "ar", name: "العربية" },
+  { code: "ur", name: "اردو" },
+  { code: "hi", name: "हिंदी" },
+  { code: "pa", name: "ਪੰਜਾਬੀ" },
+  { code: "bn", name: "বাংলা" },
+  { code: "ml", name: "മലയാളം" },
 ] as const
 
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
@@ -61,14 +61,18 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
             {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               {navigation.map((item) => (
-                <Link key={item.href} href={item.href} data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <a className={`text-sm font-medium transition-colors hover:text-primary ${
+                <Link 
+                  key={item.href} 
+                  href={item.href} 
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
                     isActive(item.href, item.exact) 
                       ? "text-primary" 
                       : "text-muted-foreground"
-                  }`}>
-                    {item.name}
-                  </a>
+                  }`}
+                  data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  aria-current={isActive(item.href, item.exact) ? "page" : undefined}
+                >
+                  {item.name}
                 </Link>
               ))}
             </nav>
@@ -93,7 +97,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                       className={language === lang.code ? "bg-accent" : ""}
                       data-testid={`option-language-${lang.code}`}
                     >
-                      <span className="mr-2">{lang.flag}</span>
+                      <Flag className="mr-2 h-4 w-4" />
                       {lang.name}
                     </DropdownMenuItem>
                   ))}
@@ -148,9 +152,9 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
             <div>
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/website/invest"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-invest">Start Investing</a></Link></li>
-                <li><Link href="/website/about"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-about">{t("about_us")}</a></Link></li>
-                <li><Link href="/website/business"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-business">{t("business_model")}</a></Link></li>
+                <li><Link href="/website/invest" className="text-muted-foreground hover:text-primary" data-testid="footer-link-invest">Start Investing</Link></li>
+                <li><Link href="/website/about" className="text-muted-foreground hover:text-primary" data-testid="footer-link-about">{t("about_us")}</Link></li>
+                <li><Link href="/website/business" className="text-muted-foreground hover:text-primary" data-testid="footer-link-business">{t("business_model")}</Link></li>
                 <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-properties">Properties</a></li>
               </ul>
             </div>
@@ -159,7 +163,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/website/contact"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-contact">{t("contact_us")}</a></Link></li>
+                <li><Link href="/website/contact" className="text-muted-foreground hover:text-primary" data-testid="footer-link-contact">{t("contact_us")}</Link></li>
                 <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-help">Help Center</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-faq">FAQ</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-terms">Terms & Conditions</a></li>
@@ -174,10 +178,10 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
               </p>
               <div className="space-y-2">
                 <Button variant="outline" size="sm" className="w-full" data-testid="button-download-ios">
-                  📱 Download for iOS
+                  Download for iOS
                 </Button>
                 <Button variant="outline" size="sm" className="w-full" data-testid="button-download-android">
-                  🤖 Download for Android
+                  Download for Android
                 </Button>
               </div>
             </div>

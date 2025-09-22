@@ -152,7 +152,8 @@ export default function BusinessModelPage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="mb-6">
               <Badge className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-0 mb-4">
-                📊 Our Business Model
+                <PieChart className="w-4 h-4 mr-2" />
+                Our Business Model
               </Badge>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-emerald-600 to-blue-800 bg-clip-text text-transparent">
@@ -163,7 +164,7 @@ export default function BusinessModelPage() {
               strategic partnerships, and unwavering commitment to Shariah compliance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700" data-testid="button-view-opportunities">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600" data-testid="button-view-opportunities">
                 <PieChart className="w-5 h-5 mr-2" />
                 View Opportunities
               </Button>
