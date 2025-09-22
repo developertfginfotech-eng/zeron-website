@@ -30,6 +30,10 @@ import MobileProfile from "@/pages/mobile/profile";
 
 // Website Pages
 import WebsiteHome from "@/pages/website/home";
+import WebsiteInvest from "@/pages/website/invest";
+import WebsiteAbout from "@/pages/website/about";
+import WebsiteBusiness from "@/pages/website/business";
+import WebsiteContact from "@/pages/website/contact";
 import WebsiteLayout from "@/components/website-layout";
 
 function AdminRouter() {
@@ -66,6 +70,10 @@ function WebsiteRouter() {
     <WebsiteLayout>
       <Switch>
         <Route path="/website" component={WebsiteHome} />
+        <Route path="/website/invest" component={WebsiteInvest} />
+        <Route path="/website/about" component={WebsiteAbout} />
+        <Route path="/website/business" component={WebsiteBusiness} />
+        <Route path="/website/contact" component={WebsiteContact} />
         <Route path="/" component={WebsiteHome} />
         <Route component={NotFound} />
       </Switch>
