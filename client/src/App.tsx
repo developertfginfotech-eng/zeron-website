@@ -28,6 +28,10 @@ import MobileProperties from "@/pages/mobile/properties";
 import MobilePortfolio from "@/pages/mobile/portfolio";
 import MobileProfile from "@/pages/mobile/profile";
 
+// Website Pages
+import WebsiteHome from "@/pages/website/home";
+import WebsiteLayout from "@/components/website-layout";
+
 function AdminRouter() {
   return (
     <Switch>
@@ -57,9 +61,23 @@ function MobileRouter() {
   );
 }
 
+function WebsiteRouter() {
+  return (
+    <WebsiteLayout>
+      <Switch>
+        <Route path="/website" component={WebsiteHome} />
+        <Route path="/" component={WebsiteHome} />
+        <Route component={NotFound} />
+      </Switch>
+    </WebsiteLayout>
+  );
+}
+
 export default function App() {
   const [location] = useLocation()
   const isMobile = location.startsWith('/mobile')
+  const isWebsite = location === '/' || location.startsWith('/website')
+  const isAdmin = !isMobile && !isWebsite
 
   // Custom sidebar width for better content display
   const style = {
@@ -77,6 +95,9 @@ export default function App() {
             <MobileLayout>
               <MobileRouter />
             </MobileLayout>
+          ) : isWebsite ? (
+            // Website Layout for Public
+            <WebsiteRouter />
           ) : (
             // Admin Panel Layout
             <SidebarProvider style={style as React.CSSProperties}>

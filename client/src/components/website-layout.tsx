@@ -1,0 +1,193 @@
+import { Button } from "@/components/ui/button"
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useTranslation } from "@/hooks/use-translation"
+import { useLanguage } from "@/components/language-provider"
+import { Languages, Globe } from "lucide-react"
+import { Link, useLocation } from "wouter"
+
+const languages = [
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "ar", name: "العربية", flag: "🇸🇦" },
+  { code: "ur", name: "اردو", flag: "🇵🇰" },
+  { code: "hi", name: "हिंदी", flag: "🇮🇳" },
+  { code: "pa", name: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
+  { code: "bn", name: "বাংলা", flag: "🇧🇩" },
+  { code: "ml", name: "മലയാളം", flag: "🇮🇳" },
+] as const
+
+export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation()
+  const { language, setLanguage } = useLanguage()
+  const [location] = useLocation()
+
+  const navigation = [
+    { name: t("home"), href: "/website", exact: true },
+    { name: "Invest", href: "/website/invest" },
+    { name: t("about_us"), href: "/website/about" },
+    { name: t("business_model"), href: "/website/business" },
+    { name: t("contact_us"), href: "/website/contact" },
+  ]
+
+  const isActive = (href: string, exact = false) => {
+    if (exact) {
+      return location === href
+    }
+    return location.startsWith(href)
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-6">
+          <div className="flex h-16 items-center justify-between">
+            {/* Logo */}
+            <Link href="/website" data-testid="link-home">
+              <div className="flex items-center space-x-2">
+                <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                  <Globe className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                  Zaron
+                </span>
+              </div>
+            </Link>
+
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              {navigation.map((item) => (
+                <Link key={item.href} href={item.href} data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <a className={`text-sm font-medium transition-colors hover:text-primary ${
+                    isActive(item.href, item.exact) 
+                      ? "text-primary" 
+                      : "text-muted-foreground"
+                  }`}>
+                    {item.name}
+                  </a>
+                </Link>
+              ))}
+            </nav>
+
+            {/* Actions */}
+            <div className="flex items-center space-x-4">
+              {/* Language Switcher */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" data-testid="button-language-switcher">
+                    <Languages className="h-4 w-4" />
+                    <span className="ml-2 hidden sm:inline">
+                      {languages.find(l => l.code === language)?.name}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => setLanguage(lang.code as any)}
+                      className={language === lang.code ? "bg-accent" : ""}
+                      data-testid={`option-language-${lang.code}`}
+                    >
+                      <span className="mr-2">{lang.flag}</span>
+                      {lang.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Auth Buttons */}
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" data-testid="button-login">
+                  {t("login")}
+                </Button>
+                <Button data-testid="button-register">
+                  {t("register_now")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1">
+        {children}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t bg-muted/50">
+        <div className="container mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <div className="h-6 w-6 bg-gradient-to-r from-blue-600 to-emerald-600 rounded flex items-center justify-center">
+                  <Globe className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-lg font-bold">Zaron</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                The premier platform for real estate investment in Saudi Arabia's growing market.
+              </p>
+              <div className="flex space-x-4">
+                <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded">
+                  {t("shariah_compliant")}
+                </span>
+                <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
+                  {t("vision_2030")}
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/website/invest"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-invest">Start Investing</a></Link></li>
+                <li><Link href="/website/about"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-about">{t("about_us")}</a></Link></li>
+                <li><Link href="/website/business"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-business">{t("business_model")}</a></Link></li>
+                <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-properties">Properties</a></li>
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h3 className="font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/website/contact"><a className="text-muted-foreground hover:text-primary" data-testid="footer-link-contact">{t("contact_us")}</a></Link></li>
+                <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-help">Help Center</a></li>
+                <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-faq">FAQ</a></li>
+                <li><a href="#" className="text-muted-foreground hover:text-primary" data-testid="footer-link-terms">Terms & Conditions</a></li>
+              </ul>
+            </div>
+
+            {/* Download App */}
+            <div>
+              <h3 className="font-semibold mb-4">{t("download_app")}</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Get the Zaron mobile app for the best investment experience.
+              </p>
+              <div className="space-y-2">
+                <Button variant="outline" size="sm" className="w-full" data-testid="button-download-ios">
+                  📱 Download for iOS
+                </Button>
+                <Button variant="outline" size="sm" className="w-full" data-testid="button-download-android">
+                  🤖 Download for Android
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
+            <p>© 2024 Zaron. All rights reserved. Licensed and regulated in Saudi Arabia.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}
