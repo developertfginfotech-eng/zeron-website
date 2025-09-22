@@ -1,4 +1,7 @@
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,8 +15,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { useTranslation } from "@/hooks/use-translation"
 import { Eye, EyeOff, Lock, Mail, User, Phone } from "lucide-react"
+
+// Zod schemas for form validation
+const createLoginSchema = (t: (key: string) => string) => z.object({
+  email: z.string().min(1, t("email_required")).email(t("email_invalid")),
+  password: z.string().min(6, t("password_min_length")),
+  remember: z.boolean().optional(),
+})
+
+const createRegisterSchema = (t: (key: string) => string) => z.object({
+  firstName: z.string().min(2, t("first_name_min_length")),
+  lastName: z.string().min(2, t("last_name_min_length")),
+  email: z.string().min(1, t("email_required")).email(t("email_invalid")),
+  phone: z.string().min(10, t("phone_min_length")).regex(/^\+?[1-9]\d{1,14}$/, t("phone_invalid")),
+  password: z.string().min(8, t("password_min_length_register")).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, t("password_complexity")),
+  confirmPassword: z.string(),
+  terms: z.boolean().refine(val => val === true, t("terms_required")),
+  shariah: z.boolean().optional(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: t("password_mismatch"),
+  path: ["confirmPassword"],
+})
+
+type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>
+type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>
 
 interface AuthDialogProps {
   children: React.ReactNode
@@ -27,9 +62,41 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [activeTab, setActiveTab] = useState(defaultTab)
 
-  const handleSubmit = (e: React.FormEvent, type: "login" | "register") => {
-    e.preventDefault()
-    alert(`${type === "login" ? "Login" : "Registration"} functionality coming soon! This will integrate with the backend authentication system.`)
+  const loginSchema = createLoginSchema(t)
+  const registerSchema = createRegisterSchema(t)
+
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      remember: false,
+    },
+  })
+
+  const registerForm = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
+      shariah: false,
+    },
+  })
+
+  const handleLogin = (data: LoginFormData) => {
+    console.log("Login data:", data)
+    alert(`Login functionality coming soon! Email: ${data.email}`)
+    setOpen(false)
+  }
+
+  const handleRegister = (data: RegisterFormData) => {
+    console.log("Register data:", data)
+    alert(`Registration functionality coming soon! Email: ${data.email}`)
     setOpen(false)
   }
 
@@ -55,193 +122,308 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
           </TabsList>
 
           <TabsContent value="login" className="space-y-4">
-            <form onSubmit={(e) => handleSubmit(e, "login")} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">{t("email")}</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="login-email"
-                    type="email"
-                    placeholder="investor@example.com"
-                    className="pl-10"
-                    required
-                    data-testid="input-login-email"
-                  />
-                </div>
-              </div>
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("email")}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            type="email"
+                            placeholder="investor@example.com"
+                            className="pl-10"
+                            data-testid="input-login-email"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <Label htmlFor="login-password">{t("password")}</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="login-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={t("enter_password")}
-                    className="pl-10 pr-10"
-                    required
-                    data-testid="input-login-password"
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("password")}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            type={showPassword ? "text" : "password"}
+                            placeholder={t("enter_password")}
+                            className="pl-10 pr-10"
+                            data-testid="input-login-password"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                            data-testid="button-toggle-password"
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-center justify-between">
+                  <FormField
+                    control={loginForm.control}
+                    name="remember"
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="remember"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="checkbox-remember"
+                        />
+                        <Label htmlFor="remember" className="text-sm">
+                          {t("remember_me")}
+                        </Label>
+                      </div>
+                    )}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                    data-testid="button-toggle-password"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  <Button variant="ghost" className="p-0 h-auto text-sm" data-testid="link-forgot-password">
+                    {t("forgot_password")}
                   </Button>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" data-testid="checkbox-remember" />
-                  <Label htmlFor="remember" className="text-sm">{t("remember_me")}</Label>
-                </div>
-                <Button variant="ghost" className="p-0 h-auto text-sm" data-testid="link-forgot-password">
-                  {t("forgot_password")}
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
+                  disabled={loginForm.formState.isSubmitting}
+                  data-testid="button-login-submit"
+                >
+                  {loginForm.formState.isSubmitting ? t("logging_in") + "..." : t("login")}
                 </Button>
-              </div>
-
-              <Button type="submit" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-login-submit">
-                {t("login")}
-              </Button>
-            </form>
+              </form>
+            </Form>
           </TabsContent>
 
           <TabsContent value="register" className="space-y-4">
-            <form onSubmit={(e) => handleSubmit(e, "register")} className="space-y-4">
+            <Form {...registerForm}>
+              <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="first-name">{t("first_name")}</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="first-name"
-                      placeholder={t("first_name")}
-                      className="pl-10"
-                      required
-                      data-testid="input-first-name"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="last-name">{t("last_name")}</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="last-name"
-                      placeholder={t("last_name")}
-                      className="pl-10"
-                      required
-                      data-testid="input-last-name"
-                    />
-                  </div>
-                </div>
+                <FormField
+                  control={registerForm.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("first_name")}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            placeholder={t("first_name")}
+                            className="pl-10"
+                            data-testid="input-first-name"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("last_name")}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            placeholder={t("last_name")}
+                            className="pl-10"
+                            data-testid="input-last-name"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="register-email">{t("email")}</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="register-email"
-                    type="email"
-                    placeholder="investor@example.com"
-                    className="pl-10"
-                    required
-                    data-testid="input-register-email"
-                  />
-                </div>
-              </div>
+              <FormField
+                control={registerForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("email")}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="investor@example.com"
+                          className="pl-10"
+                          data-testid="input-register-email"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">{t("phone_number")}</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="phone"
-                    type="tel"
-                    placeholder="+966 50 123 4567"
-                    className="pl-10"
-                    required
-                    data-testid="input-phone"
-                  />
-                </div>
-              </div>
+              <FormField
+                control={registerForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("phone_number")}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          type="tel"
+                          placeholder="+966 50 123 4567"
+                          className="pl-10"
+                          data-testid="input-phone"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="register-password">{t("password")}</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="register-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={t("create_password")}
-                    className="pl-10 pr-10"
-                    required
-                    data-testid="input-register-password"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                    data-testid="button-toggle-register-password"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
+              <FormField
+                control={registerForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("password")}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          type={showPassword ? "text" : "password"}
+                          placeholder={t("create_password")}
+                          className="pl-10 pr-10"
+                          data-testid="input-register-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                          data-testid="button-toggle-register-password"
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">{t("confirm_password")}</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="confirm-password"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder={t("confirm_password")}
-                    className="pl-10 pr-10"
-                    required
-                    data-testid="input-confirm-password"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    data-testid="button-toggle-confirm-password"
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
+              <FormField
+                control={registerForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("confirm_password")}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder={t("confirm_password")}
+                          className="pl-10 pr-10"
+                          data-testid="input-confirm-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          data-testid="button-toggle-confirm-password"
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="space-y-3">
-                <div className="flex items-start space-x-2">
-                  <Checkbox id="terms" required data-testid="checkbox-terms" className="mt-0.5" />
-                  <Label htmlFor="terms" className="text-sm leading-5">
-                    {t("agree_to")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-terms">{t("terms_conditions")}</Button> {t("and")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-privacy">{t("privacy_policy")}</Button>
-                  </Label>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Checkbox id="shariah" data-testid="checkbox-shariah" className="mt-0.5" />
-                  <Label htmlFor="shariah" className="text-sm leading-5">
-                    {t("confirm_shariah_compliant")}
-                  </Label>
-                </div>
+                <FormField
+                  control={registerForm.control}
+                  name="terms"
+                  render={({ field }) => (
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="terms"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        data-testid="checkbox-terms"
+                        className="mt-0.5"
+                      />
+                      <Label htmlFor="terms" className="text-sm leading-5">
+                        {t("agree_to")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-terms">{t("terms_conditions")}</Button> {t("and")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-privacy">{t("privacy_policy")}</Button>
+                      </Label>
+                    </div>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="shariah"
+                  render={({ field }) => (
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="shariah"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        data-testid="checkbox-shariah"
+                        className="mt-0.5"
+                      />
+                      <Label htmlFor="shariah" className="text-sm leading-5">
+                        {t("confirm_shariah_compliant")}
+                      </Label>
+                    </div>
+                  )}
+                />
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-register-submit">
-                {t("create_account")}
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
+                disabled={registerForm.formState.isSubmitting}
+                data-testid="button-register-submit"
+              >
+                {registerForm.formState.isSubmitting ? t("creating_account") + "..." : t("create_account")}
               </Button>
             </form>
+          </Form>
           </TabsContent>
         </Tabs>
 
