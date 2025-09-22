@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 
-type Language = "en" | "ar" | "hi"
+type Language = "en" | "ar" | "ur" | "hi" | "pa" | "bn" | "ml"
 
 type LanguageProviderProps = {
   children: React.ReactNode
@@ -32,13 +32,13 @@ export function LanguageProvider({
     () => (localStorage.getItem(storageKey) as Language) || defaultLanguage
   )
 
-  const isRTL = language === "ar"
+  const isRTL = language === "ar" || language === "ur"
 
   useEffect(() => {
     const root = window.document.documentElement
 
     // Remove existing language and direction classes
-    root.classList.remove("en", "ar", "hi", "rtl", "ltr")
+    root.classList.remove("en", "ar", "ur", "hi", "pa", "bn", "ml", "rtl", "ltr")
     
     // Add current language class
     root.classList.add(language)
