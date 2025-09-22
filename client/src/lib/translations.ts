@@ -100,7 +100,29 @@ export const translations = {
     download_app: "Download App",
     how_it_works: "How It Works",
     why_zaron: "Why Zaron",
-    contact_us: "Contact Us"
+    contact_us: "Contact Us",
+    
+    // Auth Dialog
+    welcome_to_zaron: "Welcome to Zaron",
+    join_thousands_investors: "Join thousands of investors in Saudi Arabia's future",
+    register: "Register",
+    email: "Email",
+    password: "Password",
+    enter_password: "Enter your password",
+    remember_me: "Remember me",
+    forgot_password: "Forgot password?",
+    first_name: "First Name",
+    last_name: "Last Name",
+    phone_number: "Phone Number",
+    create_password: "Create a password",
+    confirm_password: "Confirm Password",
+    agree_to: "I agree to the",
+    terms_conditions: "Terms & Conditions",
+    and: "and",
+    privacy_policy: "Privacy Policy",
+    confirm_shariah_compliant: "I confirm this investment aligns with Shariah principles",
+    create_account: "Create Account",
+    sama_regulated: "SAMA Regulated"
   },
   
   ar: {
@@ -202,7 +224,29 @@ export const translations = {
     download_app: "تحميل التطبيق",
     how_it_works: "كيف يعمل",
     why_zaron: "لماذا زارون",
-    contact_us: "اتصل بنا"
+    contact_us: "اتصل بنا",
+    
+    // Auth Dialog
+    welcome_to_zaron: "مرحباً بك في زارون",
+    join_thousands_investors: "انضم إلى آلاف المستثمرين في مستقبل المملكة العربية السعودية",
+    register: "التسجيل",
+    email: "البريد الإلكتروني",
+    password: "كلمة المرور",
+    enter_password: "أدخل كلمة المرور",
+    remember_me: "تذكرني",
+    forgot_password: "نسيت كلمة المرور؟",
+    first_name: "الاسم الأول",
+    last_name: "اسم العائلة",
+    phone_number: "رقم الهاتف",
+    create_password: "أنشئ كلمة مرور",
+    confirm_password: "تأكيد كلمة المرور",
+    agree_to: "أوافق على",
+    terms_conditions: "الشروط والأحكام",
+    and: "و",
+    privacy_policy: "سياسة الخصوصية",
+    confirm_shariah_compliant: "أؤكد أن هذا الاستثمار متوافق مع مبادئ الشريعة الإسلامية",
+    create_account: "إنشاء حساب",
+    sama_regulated: "مرخص من ساما"
   },
   
   ur: {

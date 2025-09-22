@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/components/language-provider"
+import { AuthDialog } from "@/components/auth-dialog"
 import { Languages, Globe, Flag } from "lucide-react"
 import { Link, useLocation } from "wouter"
 
@@ -26,11 +27,8 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
   const [location] = useLocation()
 
   const navigation = [
-    { name: t("home"), href: "/website", exact: true },
     { name: "Invest", href: "/website/invest" },
     { name: t("about_us"), href: "/website/about" },
-    { name: t("business_model"), href: "/website/business" },
-    { name: t("contact_us"), href: "/website/contact" },
   ]
 
   const isActive = (href: string, exact = false) => {
@@ -47,7 +45,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
         <div className="container mx-auto px-6">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/website" data-testid="link-home">
+            <Link href="/website/invest" data-testid="link-home">
               <div className="flex items-center space-x-2">
                 <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
                   <Globe className="h-5 w-5 text-white" />
@@ -65,12 +63,12 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                   key={item.href} 
                   href={item.href} 
                   className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive(item.href, item.exact) 
+                    isActive(item.href) 
                       ? "text-primary" 
                       : "text-muted-foreground"
                   }`}
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  aria-current={isActive(item.href, item.exact) ? "page" : undefined}
+                  aria-current={isActive(item.href) ? "page" : undefined}
                 >
                   {item.name}
                 </Link>
@@ -106,12 +104,16 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 
               {/* Auth Buttons */}
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" data-testid="button-login">
-                  {t("login")}
-                </Button>
-                <Button data-testid="button-register">
-                  {t("register_now")}
-                </Button>
+                <AuthDialog defaultTab="login">
+                  <Button variant="ghost" data-testid="button-login">
+                    {t("login")}
+                  </Button>
+                </AuthDialog>
+                <AuthDialog defaultTab="register">
+                  <Button data-testid="button-register">
+                    {t("register_now")}
+                  </Button>
+                </AuthDialog>
               </div>
             </div>
           </div>
