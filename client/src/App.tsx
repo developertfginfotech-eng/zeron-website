@@ -35,7 +35,8 @@ import WebsiteAbout from "@/pages/website/about";
 import WebsiteBusiness from "@/pages/website/business";
 import WebsiteContact from "@/pages/website/contact";
 import WebsiteLayout from "@/components/website-layout";
-
+import KYCVerificationPage from "@/pages/kyc-verification";
+import UserDashboard from "@/pages/user-dashboard"; 
 function AdminRouter() {
   return (
     <Switch>
@@ -48,6 +49,7 @@ function AdminRouter() {
       <Route path="/notifications" component={Notifications} />
       <Route path="/admin" component={Admin} />
       <Route path="/settings" component={Settings} />
+      
       <Route component={NotFound} />
     </Switch>
   );
@@ -74,6 +76,8 @@ function WebsiteRouter() {
         <Route path="/website/about" component={WebsiteAbout} />
         <Route path="/website/business" component={WebsiteBusiness} />
         <Route path="/website/contact" component={WebsiteContact} />
+        <Route path="/kyc-verification" component={KYCVerificationPage} />
+        <Route path="/user-dashboard" component={UserDashboard} />
         <Route path="/" component={WebsiteInvest} />
         <Route component={NotFound} />
       </Switch>
@@ -84,7 +88,7 @@ function WebsiteRouter() {
 export default function App() {
   const [location] = useLocation()
   const isMobile = location.startsWith('/mobile')
-  const isWebsite = location === '/' || location.startsWith('/website')
+  const isWebsite = location === '/' || location.startsWith('/website') || location.startsWith('/kyc-verification')|| location === '/user-dashboard'
   const isAdmin = !isMobile && !isWebsite
 
   // Custom sidebar width for better content display

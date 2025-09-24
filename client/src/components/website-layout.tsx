@@ -4,12 +4,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/components/language-provider"
 import { AuthDialog } from "@/components/auth-dialog"
-import { Languages, Globe, Flag } from "lucide-react"
+import { Languages, Globe, Flag, User, LogOut, Settings, BarChart3 } from "lucide-react"
 import { Link, useLocation } from "wouter"
+import { useState, useEffect } from "react"
 
 const languages = [
   { code: "en", name: "English" },
@@ -21,10 +23,52 @@ const languages = [
   { code: "ml", name: "മലയാളം" },
 ] as const
 
+// Mock user data - replace with your actual auth context/hook
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   const { language, setLanguage } = useLanguage()
   const [location] = useLocation()
+  
+  // Authentication state - replace with your actual auth hook
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Mock authentication check - replace with your actual auth logic
+  useEffect(() => {
+    const checkAuth = () => {
+      // Check localStorage, cookies, or make API call
+      const token = localStorage.getItem('authToken')
+      const userData = localStorage.getItem('userData')
+      
+      if (token && userData) {
+        try {
+          setUser(JSON.parse(userData))
+        } catch (error) {
+          console.error('Error parsing user data:', error)
+          localStorage.removeItem('authToken')
+          localStorage.removeItem('userData')
+        }
+      }
+      setIsLoading(false)
+    }
+
+    checkAuth()
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('userData')
+    setUser(null)
+    // Optionally redirect to home page
+    window.location.href = '/website/invest'
+  }
 
   const navigation = [
     { name: "Invest", href: "/website/invest" },
@@ -36,6 +80,15 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
       return location === href
     }
     return location.startsWith(href)
+  }
+
+  // Show loading state if checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (
@@ -102,19 +155,76 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Auth Buttons */}
-              <div className="flex items-center space-x-2">
-                <AuthDialog defaultTab="login">
-                  <Button variant="ghost" data-testid="button-login">
-                    {t("login")}
-                  </Button>
-                </AuthDialog>
-                <AuthDialog defaultTab="register">
-                  <Button data-testid="button-register">
-                    {t("register_now")}
-                  </Button>
-                </AuthDialog>
-              </div>
+              {/* Conditional Auth Buttons or User Menu */}
+              {user ? (
+                // User is logged in - show user menu
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center space-x-2" data-testid="button-user-menu">
+                      {user.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name}
+                          className="h-6 w-6 rounded-full"
+                        />
+                      ) : (
+                        <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                          <User className="h-4 w-4 text-primary-foreground" />
+                        </div>
+                      )}
+                      <span className="hidden sm:inline font-medium">{user.name}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-2 py-1.5">
+                      <p className="text-sm font-medium">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/user-dashboard" data-testid="menu-dashboard">
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/user-profile" data-testid="menu-profile">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/user-settings" data-testid="menu-settings">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="text-red-600 focus:text-red-600"
+                      data-testid="button-logout"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                // User is not logged in - show auth buttons
+                <div className="flex items-center space-x-2">
+                  <AuthDialog defaultTab="login">
+                    <Button variant="ghost" data-testid="button-login">
+                      {t("login")}
+                    </Button>
+                  </AuthDialog>
+                  <AuthDialog defaultTab="register">
+                    <Button data-testid="button-register">
+                      {t("register_now")}
+                    </Button>
+                  </AuthDialog>
+                </div>
+              )}
             </div>
           </div>
         </div>

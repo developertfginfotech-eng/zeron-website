@@ -24,7 +24,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useTranslation } from "@/hooks/use-translation"
+import { useAuth } from "@/hooks/use-auth"
 import { Eye, EyeOff, Lock, Mail, User, Phone } from "lucide-react"
+import { useLocation } from "wouter"
 
 // Zod schemas for form validation
 const createLoginSchema = (t: (key: string) => string) => z.object({
@@ -57,6 +59,8 @@ interface AuthDialogProps {
 
 export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) {
   const { t } = useTranslation()
+  const { login } = useAuth()
+  const [, setLocation] = useLocation()
   const [open, setOpen] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -88,24 +92,154 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
     },
   })
 
-  const handleLogin = (data: LoginFormData) => {
-    console.log("Login data:", data)
-    alert(`Login functionality coming soon! Email: ${data.email}`)
-    setOpen(false)
+  const showToast = (title: string, description: string, variant: "default" | "destructive" = "default") => {
+    // Simple alert fallback - you can replace with your toast implementation
+    if (variant === "destructive") {
+      alert(`${title}: ${description}`)
+    } else {
+      alert(`${title}: ${description}`)
+    }
   }
 
-  const handleRegister = (data: RegisterFormData) => {
-    console.log("Register data:", data)
-    alert(`Registration functionality coming soon! Email: ${data.email}`)
-    setOpen(false)
-  }
+  const handleLogin = async (data: LoginFormData) => {
+    console.log("API Login attempt with:", data);
+    
+    try {
+      const response = await fetch('http://13.53.177.188:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Login API Response:", result);
+      
+      if (response.ok && result.success) {
+        // Create user data object for auth context
+        const userData = {
+          id: result.data.user.id || result.data.user._id,
+          name: `${result.data.user.firstName} ${result.data.user.lastName}`,
+          email: result.data.user.email,
+          firstName: result.data.user.firstName,
+          lastName: result.data.user.lastName,
+          kycStatus: result.data.user.kycStatus,
+          avatar: result.data.user.avatar
+        };
+        
+        // Store additional data for KYC
+        localStorage.setItem('zaron_user', JSON.stringify(result.data.user));
+        
+        // Use auth context to update global state
+        login(userData, result.data.token);
+        
+        // Show success message
+        showToast("Welcome back!", `Hello ${result.data.user.firstName}, you've successfully logged in.`);
+        
+        // Close modal
+        setOpen(false);
+        
+        // Navigate based on KYC status without page refresh
+        const kycStatus = result.data.user.kycStatus;
+        console.log("User KYC Status:", kycStatus);
+        
+        if (kycStatus === 'pending' || kycStatus === 'not_started' || !kycStatus) {
+          setLocation('/kyc-verification');
+        } else if (kycStatus === 'approved' || kycStatus === 'completed') {
+          setLocation('/user-dashboard');
+        }
+        
+      } else {
+        throw new Error(result.message || 'Login failed');
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      showToast("Login Failed", error.message, "destructive");
+    }
+  };
+
+  const handleRegister = async (data: RegisterFormData) => {
+    console.log("API Register attempt with:", data);
+    
+    try {
+      const { confirmPassword, terms, shariah, ...registerData } = data;
+      
+      console.log("Data being sent to API:", registerData);
+      
+      const response = await fetch('http://13.53.177.188:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registerData),
+      });
+
+      const result = await response.json();
+      console.log("Register API Response:", result);
+      
+      if (!response.ok) {
+        console.log("Response status:", response.status);
+        
+        if (result.errors) {
+          console.log("Validation errors:", result.errors);
+          
+          const errorMessages = result.errors.map((error: any) => 
+            `${error.path || error.field || 'Field'}: ${error.message}`
+          ).join(', ');
+          
+          showToast("Registration Failed", `Validation Errors: ${errorMessages}`, "destructive");
+          return;
+        }
+        
+        throw new Error(result.message || 'Registration failed');
+      }
+      
+      if (result.success) {
+        // Create user data object for auth context
+        const userData = {
+          id: result.data.user.id || result.data.user._id,
+          name: `${result.data.user.firstName} ${result.data.user.lastName}`,
+          email: result.data.user.email,
+          firstName: result.data.user.firstName,
+          lastName: result.data.user.lastName,
+          kycStatus: result.data.user.kycStatus,
+          avatar: result.data.user.avatar
+        };
+        
+        // Store additional data for KYC
+        localStorage.setItem('zaron_user', JSON.stringify(result.data.user));
+        
+        // Use auth context to update global state
+        login(userData, result.data.token);
+        
+        // Show success message
+        showToast("Welcome to Zaron!", `Welcome ${result.data.user.firstName}! Please complete your KYC verification.`);
+        
+        // Close modal
+        setOpen(false);
+        
+        // Navigate to KYC without page refresh
+        setLocation('/kyc-verification');
+        
+      } else {
+        throw new Error(result.message || 'Registration failed');
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      showToast("Registration Failed", error.message, "destructive");
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
             {t("welcome_to_zaron")}
@@ -139,6 +273,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                             placeholder="investor@example.com"
                             className="pl-10"
                             data-testid="input-login-email"
+                            disabled={loginForm.formState.isSubmitting}
                           />
                         </div>
                       </FormControl>
@@ -162,6 +297,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                             placeholder={t("enter_password")}
                             className="pl-10 pr-10"
                             data-testid="input-login-password"
+                            disabled={loginForm.formState.isSubmitting}
                           />
                           <Button
                             type="button"
@@ -170,6 +306,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                             className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                             onClick={() => setShowPassword(!showPassword)}
                             data-testid="button-toggle-password"
+                            disabled={loginForm.formState.isSubmitting}
                           >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </Button>
@@ -191,6 +328,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           data-testid="checkbox-remember"
+                          disabled={loginForm.formState.isSubmitting}
                         />
                         <Label htmlFor="remember" className="text-sm">
                           {t("remember_me")}
@@ -218,21 +356,69 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
           <TabsContent value="register" className="space-y-4">
             <Form {...registerForm}>
               <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={registerForm.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              {...field}
+                              placeholder={t("first_name")}
+                              className="pl-10"
+                              data-testid="input-first-name"
+                              disabled={registerForm.formState.isSubmitting}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              {...field}
+                              placeholder={t("last_name")}
+                              className="pl-10"
+                              data-testid="input-last-name"
+                              disabled={registerForm.formState.isSubmitting}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={registerForm.control}
-                  name="firstName"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("first_name")}</FormLabel>
+                      <FormLabel>{t("email")}</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Input
                             {...field}
-                            placeholder={t("first_name")}
+                            type="email"
+                            placeholder="investor@example.com"
                             className="pl-10"
-                            data-testid="input-first-name"
+                            data-testid="input-register-email"
+                            disabled={registerForm.formState.isSubmitting}
                           />
                         </div>
                       </FormControl>
@@ -240,20 +426,23 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={registerForm.control}
-                  name="lastName"
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("last_name")}</FormLabel>
+                      <FormLabel>{t("phone_number")}</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Input
                             {...field}
-                            placeholder={t("last_name")}
+                            type="tel"
+                            placeholder="+966 50 123 4567"
                             className="pl-10"
-                            data-testid="input-last-name"
+                            data-testid="input-phone"
+                            disabled={registerForm.formState.isSubmitting}
                           />
                         </div>
                       </FormControl>
@@ -261,169 +450,128 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <FormField
-                control={registerForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("email")}</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          type="email"
-                          placeholder="investor@example.com"
-                          className="pl-10"
-                          data-testid="input-register-email"
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("phone_number")}</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          type="tel"
-                          placeholder="+966 50 123 4567"
-                          className="pl-10"
-                          data-testid="input-phone"
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("password")}</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          type={showPassword ? "text" : "password"}
-                          placeholder={t("create_password")}
-                          className="pl-10 pr-10"
-                          data-testid="input-register-password"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                          onClick={() => setShowPassword(!showPassword)}
-                          data-testid="button-toggle-register-password"
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("confirm_password")}</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder={t("confirm_password")}
-                          className="pl-10 pr-10"
-                          data-testid="input-confirm-password"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          data-testid="button-toggle-confirm-password"
-                        >
-                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="space-y-3">
                 <FormField
                   control={registerForm.control}
-                  name="terms"
+                  name="password"
                   render={({ field }) => (
-                    <div className="flex items-start space-x-2">
-                      <Checkbox
-                        id="terms"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        data-testid="checkbox-terms"
-                        className="mt-0.5"
-                      />
-                      <Label htmlFor="terms" className="text-sm leading-5">
-                        {t("agree_to")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-terms">{t("terms_conditions")}</Button> {t("and")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-privacy">{t("privacy_policy")}</Button>
-                      </Label>
-                    </div>
+                    <FormItem>
+                      <FormLabel>{t("password")}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            type={showPassword ? "text" : "password"}
+                            placeholder={t("create_password")}
+                            className="pl-10 pr-10"
+                            data-testid="input-register-password"
+                            disabled={registerForm.formState.isSubmitting}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                            data-testid="button-toggle-register-password"
+                            disabled={registerForm.formState.isSubmitting}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
+
                 <FormField
                   control={registerForm.control}
-                  name="shariah"
+                  name="confirmPassword"
                   render={({ field }) => (
-                    <div className="flex items-start space-x-2">
-                      <Checkbox
-                        id="shariah"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        data-testid="checkbox-shariah"
-                        className="mt-0.5"
-                      />
-                      <Label htmlFor="shariah" className="text-sm leading-5">
-                        {t("confirm_shariah_compliant")}
-                      </Label>
-                    </div>
+                    <FormItem>
+                      <FormLabel>{t("confirm_password")}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder={t("confirm_password")}
+                            className="pl-10 pr-10"
+                            data-testid="input-confirm-password"
+                            disabled={registerForm.formState.isSubmitting}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            data-testid="button-toggle-confirm-password"
+                            disabled={registerForm.formState.isSubmitting}
+                          >
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
-              </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
-                disabled={registerForm.formState.isSubmitting}
-                data-testid="button-register-submit"
-              >
-                {registerForm.formState.isSubmitting ? t("creating_account") + "..." : t("create_account")}
-              </Button>
-            </form>
-          </Form>
+                <div className="space-y-3">
+                  <FormField
+                    control={registerForm.control}
+                    name="terms"
+                    render={({ field }) => (
+                      <div className="flex items-start space-x-2">
+                        <Checkbox
+                          id="terms"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="checkbox-terms"
+                          className="mt-0.5"
+                          disabled={registerForm.formState.isSubmitting}
+                        />
+                        <Label htmlFor="terms" className="text-sm leading-5">
+                          {t("agree_to")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-terms">{t("terms_conditions")}</Button> {t("and")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-privacy">{t("privacy_policy")}</Button>
+                        </Label>
+                      </div>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="shariah"
+                    render={({ field }) => (
+                      <div className="flex items-start space-x-2">
+                        <Checkbox
+                          id="shariah"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="checkbox-shariah"
+                          className="mt-0.5"
+                          disabled={registerForm.formState.isSubmitting}
+                        />
+                        <Label htmlFor="shariah" className="text-sm leading-5">
+                          {t("confirm_shariah_compliant")}
+                        </Label>
+                      </div>
+                    )}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
+                  disabled={registerForm.formState.isSubmitting}
+                  data-testid="button-register-submit"
+                >
+                  {registerForm.formState.isSubmitting ? t("creating_account") + "..." : t("create_account")}
+                </Button>
+              </form>
+            </Form>
           </TabsContent>
         </Tabs>
 
