@@ -25,15 +25,58 @@ import {
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [kycStatus, setKycStatus] = useState('pending');
+  const [kycCompletionPercentage, setKycCompletionPercentage] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load user data from localStorage
-    const userData = localStorage.getItem('zaron_user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setKycStatus(parsedUser.kycStatus || 'pending');
-    }
+    const loadUserData = async () => {
+      try {
+        // Load initial data from localStorage
+        const userData = localStorage.getItem('zaron_user');
+        if (userData) {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+          setKycStatus(parsedUser.kycStatus || 'pending');
+
+          // Fetch latest KYC data from backend
+          const token = parsedUser.token || localStorage.getItem('zaron_token');
+          if (token) {
+            const response = await fetch('http://13.50.13.193:5000/api/kyc', {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              const kycData = await response.json();
+              console.log('KYC API Response:', kycData);
+              
+              if (kycData.success) {
+                // Update KYC status from backend
+                setKycStatus(kycData.data.status || 'pending');
+                setKycCompletionPercentage(kycData.data.completionPercentage || 0);
+                
+                // Update localStorage with fresh KYC status
+                const updatedUser = { ...parsedUser, kycStatus: kycData.data.status };
+                localStorage.setItem('zaron_user', JSON.stringify(updatedUser));
+                setUser(updatedUser);
+              }
+            } else if (response.status === 404) {
+              // No KYC data found - user hasn't started KYC
+              setKycStatus('pending');
+              setKycCompletionPercentage(0);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch KYC data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserData();
   }, []);
 
   // Mock user investment data - replace with real API calls
@@ -89,6 +132,29 @@ const UserDashboard = () => {
     window.location.href = '/website/invest';
   };
 
+  const getKYCStatusDisplay = () => {
+    switch (kycStatus) {
+      case 'approved': return { text: 'Approved', variant: 'default' };
+      case 'submitted': return { text: 'Under Review', variant: 'secondary' };
+      case 'under_review': return { text: 'Under Review', variant: 'secondary' };
+      case 'rejected': return { text: 'Rejected', variant: 'destructive' };
+      default: return { text: 'Pending', variant: 'secondary' };
+    }
+  };
+
+  const statusDisplay = getKYCStatusDisplay();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50">
       {/* Header */}
@@ -101,7 +167,7 @@ const UserDashboard = () => {
             <div>
               <h1 className="text-xl font-bold">My Portfolio</h1>
               <p className="text-sm text-muted-foreground">
-                Welcome back, {user?.firstName || 'Investor'}!
+                Welcome back, {user?.firstName || user?.fullNameEnglish || 'Investor'}!
               </p>
             </div>
           </div>
@@ -109,10 +175,10 @@ const UserDashboard = () => {
           <div className="flex items-center gap-4">
             {/* KYC Status Badge */}
             <Badge 
-              variant={kycStatus === 'approved' ? 'default' : kycStatus === 'pending' ? 'secondary' : 'destructive'}
+              variant={statusDisplay.variant}
               className="capitalize"
             >
-              KYC: {kycStatus}
+              KYC: {statusDisplay.text}
             </Badge>
             
             <Button variant="ghost" size="sm">
@@ -129,29 +195,72 @@ const UserDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {/* KYC Warning for pending users */}
+        {/* KYC Warning for non-approved users */}
         {kycStatus !== 'approved' && (
           <Card className="border-yellow-200 bg-yellow-50">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <Clock className="h-8 w-8 text-yellow-600 mt-1" />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-yellow-900 mb-2">Complete Your KYC Verification</h3>
+                  <h3 className="font-semibold text-yellow-900 mb-2">
+                    {kycStatus === 'submitted' || kycStatus === 'under_review' 
+                      ? 'KYC Under Review' 
+                      : kycStatus === 'rejected'
+                      ? 'KYC Verification Required'
+                      : 'Complete Your KYC Verification'
+                    }
+                  </h3>
                   <p className="text-yellow-800 text-sm mb-4">
-                    Your account has limited features. Complete KYC verification to unlock full investment capabilities.
+                    {kycStatus === 'submitted' || kycStatus === 'under_review' 
+                      ? 'Your KYC documents are being reviewed. You\'ll be notified once approved.'
+                      : kycStatus === 'rejected'
+                      ? 'Your KYC was rejected. Please resubmit with correct documents.'
+                      : 'Your account has limited features. Complete KYC verification to unlock full investment capabilities.'
+                    }
                   </p>
+                  
+                  {/* Show completion progress if KYC is in progress */}
+                  {kycCompletionPercentage > 0 && kycStatus === 'pending' && (
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>KYC Progress</span>
+                        <span>{kycCompletionPercentage}%</span>
+                      </div>
+                      <Progress value={kycCompletionPercentage} className="h-2" />
+                    </div>
+                  )}
+
                   <div className="flex gap-3">
-                    <Button 
-                      size="sm" 
-                      onClick={() => window.location.href = '/kyc-verification'}
-                      className="bg-yellow-600 hover:bg-yellow-700"
-                    >
-                      Complete KYC
-                    </Button>
+                    {(kycStatus === 'pending' || kycStatus === 'rejected') && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => window.location.href = '/kyc-verification'}
+                        className="bg-yellow-600 hover:bg-yellow-700"
+                      >
+                        {kycStatus === 'rejected' ? 'Resubmit KYC' : 'Complete KYC'}
+                      </Button>
+                    )}
                     <Button variant="outline" size="sm">
                       Learn More
                     </Button>
                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Success message for approved KYC */}
+        {kycStatus === 'approved' && (
+          <Card className="border-green-200 bg-green-50">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <ArrowUpRight className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-green-900 mb-1">KYC Verified</h3>
+                  <p className="text-green-800 text-sm">Your account is fully verified. You can now access all investment features.</p>
                 </div>
               </div>
             </CardContent>
@@ -344,7 +453,7 @@ const UserDashboard = () => {
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="font-semibold mb-2">Portfolio Analysis</h3>
+              <h3 className="font-semibulous mb-2">Portfolio Analysis</h3>
               <p className="text-sm text-muted-foreground">Detailed performance insights</p>
             </CardContent>
           </Card>

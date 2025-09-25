@@ -29,8 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem('zaron_token') // Match your token key
-        const userData = localStorage.getItem('zaron_user') // Match your user key
+        const token = localStorage.getItem('zaron_token') 
+        const userData = localStorage.getItem('zaron_user')
         
         if (token && userData && isMounted) {
           const parsedUser = JSON.parse(userData)
@@ -65,8 +65,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (userData: User, token: string) => {
     localStorage.setItem('zaron_token', token)
-    localStorage.setItem('authToken', token) // For WebsiteLayout compatibility
-    localStorage.setItem('userData', JSON.stringify(userData)) // For WebsiteLayout compatibility
+    localStorage.setItem('authToken', token) 
+    const userWithToken = { ...userData, token };
+    localStorage.setItem('zaron_user', JSON.stringify(userWithToken))
+    localStorage.setItem('userData', JSON.stringify(userData))
     setUser(userData)
   }
 

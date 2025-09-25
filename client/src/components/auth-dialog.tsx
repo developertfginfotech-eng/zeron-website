@@ -105,7 +105,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
     console.log("API Login attempt with:", data);
     
     try {
-      const response = await fetch('http://13.53.177.188:5000/api/auth/login', {
+      const response = await fetch('http://13.50.13.193:5000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
       
       console.log("Data being sent to API:", registerData);
       
-      const response = await fetch('http://13.53.177.188:5000/api/auth/register', {
+      const response = await fetch('http://13.50.13.193:5000/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

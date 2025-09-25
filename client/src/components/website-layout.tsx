@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/components/language-provider"
+import { useAuth } from "@/hooks/use-auth" // Add this import
 import { AuthDialog } from "@/components/auth-dialog"
 import { Languages, Globe, Flag, User, LogOut, Settings, BarChart3 } from "lucide-react"
 import { Link, useLocation } from "wouter"
-import { useState, useEffect } from "react"
 
 const languages = [
   { code: "en", name: "English" },
@@ -20,55 +20,16 @@ const languages = [
   { code: "hi", name: "हिंदी" },
   { code: "pa", name: "ਪੰਜਾਬੀ" },
   { code: "bn", name: "বাংলা" },
-  { code: "ml", name: "മലയാളം" },
+  { code: "ml", name: "മলയাളം" },
 ] as const
-
-// Mock user data - replace with your actual auth context/hook
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
 
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   const { language, setLanguage } = useLanguage()
   const [location] = useLocation()
   
-  // Authentication state - replace with your actual auth hook
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Mock authentication check - replace with your actual auth logic
-  useEffect(() => {
-    const checkAuth = () => {
-      // Check localStorage, cookies, or make API call
-      const token = localStorage.getItem('authToken')
-      const userData = localStorage.getItem('userData')
-      
-      if (token && userData) {
-        try {
-          setUser(JSON.parse(userData))
-        } catch (error) {
-          console.error('Error parsing user data:', error)
-          localStorage.removeItem('authToken')
-          localStorage.removeItem('userData')
-        }
-      }
-      setIsLoading(false)
-    }
-
-    checkAuth()
-  }, [])
-
-  const handleLogout = () => {
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('userData')
-    setUser(null)
-    // Optionally redirect to home page
-    window.location.href = '/website/invest'
-  }
+  // Use the auth hook instead of local state
+  const { user, isLoading, logout, isAuthenticated } = useAuth()
 
   const navigation = [
     { name: "Invest", href: "/website/invest" },
@@ -82,11 +43,34 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
     return location.startsWith(href)
   }
 
+  const handleLogout = () => {
+    logout()
+    // Optional: redirect to home page with client-side routing
+    window.location.href = '/website/invest'
+  }
+
   // Show loading state if checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container mx-auto px-6">
+            <div className="flex h-16 items-center justify-between">
+              <Link href="/website/invest">
+                <div className="flex items-center space-x-2">
+                  <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <Globe className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                    Zaron
+                  </span>
+                </div>
+              </Link>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </header>
+        <main>{children}</main>
       </div>
     )
   }
@@ -156,7 +140,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
               </DropdownMenu>
 
               {/* Conditional Auth Buttons or User Menu */}
-              {user ? (
+              {isAuthenticated && user ? (
                 // User is logged in - show user menu
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -165,20 +149,22 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                         <img 
                           src={user.avatar} 
                           alt={user.name}
-                          className="h-6 w-6 rounded-full"
+                          className="h-6 w-6 rounded-full object-cover"
                         />
                       ) : (
                         <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
                           <User className="h-4 w-4 text-primary-foreground" />
                         </div>
                       )}
-                      <span className="hidden sm:inline font-medium">{user.name}</span>
+                      <span className="hidden sm:inline font-medium max-w-24 truncate">
+                        {user.name}
+                      </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="px-2 py-1.5">
-                      <p className="text-sm font-medium">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="text-sm font-medium truncate">{user.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
@@ -188,9 +174,9 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/user-profile" data-testid="menu-profile">
+                      <Link href="/kyc-verification" data-testid="menu-kyc">
                         <User className="mr-2 h-4 w-4" />
-                        Profile
+                        KYC Verification
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -202,7 +188,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleLogout}
-                      className="text-red-600 focus:text-red-600"
+                      className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                       data-testid="button-logout"
                     >
                       <LogOut className="mr-2 h-4 w-4" />

@@ -1,10 +1,14 @@
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { useTranslation } from "@/hooks/use-translation"
+import { useAuth } from "@/hooks/use-auth"
 import { AuthDialog } from "@/components/auth-dialog"
 import { motion } from "framer-motion"
+import { useLocation } from 'wouter';
+
 import { 
   Building2, 
   TrendingUp, 
@@ -25,90 +29,188 @@ import {
   Crown,
   Zap,
   Award,
-  FileCheck
+  FileCheck,
+  Loader2
 } from "lucide-react"
 
-const featuredProperties = [
-  {
-    id: 1,
-    title: "NEOM Residential Complex",
-    location: "NEOM, Tabuk Province",
-    price: "500,000",
-    expectedReturn: "12%",
-    fundingProgress: 85,
-    remainingDays: 15,
-    investors: 234,
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400",
-    tags: ["Vision 2030", "Shariah Compliant", "High Yield"]
-  },
-  {
-    id: 2,
-    title: "Riyadh Downtown Tower",
-    location: "King Fahd District, Riyadh",
-    price: "750,000",
-    expectedReturn: "10%",
-    fundingProgress: 65,
-    remainingDays: 22,
-    investors: 189,
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400",
-    tags: ["Prime Location", "Commercial", "Stable Returns"]
-  },
-  {
-    id: 3,
-    title: "Red Sea Resort Development",
-    location: "Red Sea Project",
-    price: "1,200,000",
-    expectedReturn: "15%",
-    fundingProgress: 45,
-    remainingDays: 35,
-    investors: 156,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400",
-    tags: ["Tourism", "Luxury", "Mega Project"]
-  }
-]
+// Backend property interface
+interface BackendProperty {
+  _id: string;
+  title: string;
+  description?: string;
+  location: {
+    city: string;
+    address: string;
+  };
+  images: Array<{
+    url: string;
+    alt: string;
+    isPrimary: boolean;
+  }>;
+  financials: {
+    totalValue: number;
+    minInvestment: number;
+    projectedYield: number;
+  };
+  propertyType: 'residential' | 'commercial' | 'retail';
+  status: 'active' | 'upcoming' | 'fully_funded' | 'completed' | 'cancelled' | 'closed';
+  investorCount: number;
+  fundingProgress: number;
+  timeline?: {
+    fundingDeadline: string;
+  };
+}
 
-// Investment benefits will be localized within the component
+// Helper function to get auth token
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('zaron_token') || 
+         localStorage.getItem('authToken') || 
+         sessionStorage.getItem('authToken') ||
+         sessionStorage.getItem('token');
+};
+
+// Helper function to calculate remaining days
+const getRemainingDays = (deadline?: string): number => {
+  if (!deadline) return 30; // Default fallback
+  const deadlineDate = new Date(deadline);
+  const currentDate = new Date();
+  const diffTime = deadlineDate.getTime() - currentDate.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDays);
+};
+
+// Helper function to format currency
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-SA', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+// Helper function to get property tags
+const getPropertyTags = (property: BackendProperty) => {
+  const tags = [];
+  
+  // Add status-based tags
+  if (property.status === 'active') {
+    tags.push({ text: 'Live', class: 'bg-blue-500/90' });
+  } else if (property.status === 'upcoming') {
+    tags.push({ text: 'Coming Soon', class: 'bg-purple-500/90' });
+  }
+  
+  // Add property type tags
+  if (property.propertyType === 'commercial') {
+    tags.push({ text: 'Commercial', class: 'bg-emerald-500/90' });
+  } else if (property.propertyType === 'residential') {
+    tags.push({ text: 'Residential', class: 'bg-blue-500/90' });
+  } else if (property.propertyType === 'retail') {
+    tags.push({ text: 'Retail', class: 'bg-orange-500/90' });
+  }
+  
+  // Add yield-based tags
+  if (property.financials.projectedYield >= 15) {
+    tags.push({ text: 'High Yield', class: 'bg-amber-500/90' });
+  }
+  
+  // Add Shariah compliant tag
+  tags.push({ text: 'Shariah Compliant', class: 'bg-emerald-500/90' });
+  
+  return tags.slice(0, 3);
+};
 
 export default function InvestPage() {
+  const [, setLocation] = useLocation();
   const { t } = useTranslation()
-  
-  // Localized featured properties with translated tags
-  const localizedFeaturedProperties = featuredProperties.map(property => ({
-    ...property,
-    tags: property.id === 1 ? [t("vision_2030"), t("shariah_compliant_tag"), t("high_yield")] :
-          property.id === 2 ? [t("prime_location"), t("commercial"), t("stable_returns")] :
-          [t("tourism"), t("luxury"), t("mega_project")]
-  }))
-  
-  // Localized investment benefits
-  const localizedInvestmentBenefits = [
-    {
-      icon: TrendingUp,
-      title: t("superior_returns"),
-      description: t("superior_desc")
-    },
-    {
-      icon: Shield,
-      title: t("shariah_compliance"),
-      description: t("shariah_desc")
-    },
-    {
-      icon: Building2,
-      title: t("premium_properties"),
-      description: t("premium_desc")
-    },
-    {
-      icon: Users,
-      title: t("fractional_ownership"),
-      description: t("fractional_desc")
+  const { user, isAuthenticated } = useAuth()
+  const [properties, setProperties] = useState<BackendProperty[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch properties from API
+  const fetchProperties = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const token = getAuthToken();
+      
+      // Use different endpoints based on authentication
+      const endpoint = isAuthenticated 
+        ? 'http://13.50.13.193:5000/api/admin/properties' 
+        : 'http://13.50.13.193:5000/api/properties';
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      
+      console.log('Fetching properties from:', endpoint)
+      console.log('Authentication status:', isAuthenticated)
+      console.log('User:', user)
+      
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers,
+      })
+      
+      const result = await response.json()
+      console.log('Properties response:', result)
+      
+      if (!response.ok) {
+        throw new Error(result.message || `HTTP error! status: ${response.status}`)
+      }
+      
+      if (result.success && result.data.properties) {
+        // Filter to show only active and upcoming properties
+        const availableProperties = result.data.properties.filter(
+          (prop: BackendProperty) => ['active', 'upcoming'].includes(prop.status)
+        ).slice(0, 6); // Limit to 6 properties for the landing page
+        
+        setProperties(availableProperties)
+      } else {
+        setError('No properties available')
+      }
+    } catch (err: any) {
+      console.error('Error fetching properties:', err)
+      setError(err.message || 'Failed to load properties')
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
+
+  // Fetch properties on component mount and when auth status changes
+  useEffect(() => {
+    fetchProperties()
+  }, [isAuthenticated, user])
+
+  // Process image URL
+  const getImageUrl = (property: BackendProperty): string => {
+    const fallbackImages = {
+      residential: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop',
+      commercial: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop',
+      retail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop'
+    }
+
+    if (property.images && property.images.length > 0) {
+      const primaryImage = property.images.find(img => img.isPrimary) || property.images[0]
+      if (primaryImage.url.startsWith('/uploads/')) {
+        return `http://13.50.13.193:5000${primaryImage.url}`
+      }
+      if (primaryImage.url.startsWith('http')) {
+        return primaryImage.url
+      }
+    }
+
+    return fallbackImages[property.propertyType] || fallbackImages.residential
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section with Beautiful Saudi-inspired Design */}
+      {/* Hero Section */}
       <section className="relative min-h-[90vh] overflow-hidden bg-gradient-to-br from-emerald-900 via-blue-900 to-emerald-800">
-        {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -116,13 +218,10 @@ export default function InvestPage() {
               backgroundImage: `url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop')`
             }}
           />
-          {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-blue-900/85 to-emerald-800/80" />
-          {/* Golden accent overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-amber-500/10 via-transparent to-transparent" />
         </div>
 
-        {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
             className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-400/20 rounded-full blur-3xl"
@@ -152,7 +251,6 @@ export default function InvestPage() {
 
         <div className="relative container mx-auto px-6 pt-32 pb-20">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Hero Badges */}
             <motion.div 
               className="mb-8 flex justify-center gap-4 flex-wrap"
               initial={{ opacity: 0, y: 20 }}
@@ -173,7 +271,6 @@ export default function InvestPage() {
               </Badge>
             </motion.div>
 
-            {/* Main Hero Heading */}
             <motion.h1 
               className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 text-white leading-tight"
               initial={{ opacity: 0, y: 30 }}
@@ -185,7 +282,6 @@ export default function InvestPage() {
               </span>
             </motion.h1>
 
-            {/* Hero Subtitle */}
             <motion.p 
               className="text-xl md:text-2xl text-emerald-100/90 mb-8 max-w-3xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
@@ -195,7 +291,20 @@ export default function InvestPage() {
               {t("hero_subtitle")}
             </motion.p>
 
-            {/* Hero Stats */}
+            {isAuthenticated && user && (
+              <motion.div 
+                className="mb-8 p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+              >
+                <p className="text-emerald-100">
+                  Welcome back, <span className="font-semibold text-white">{user.firstName}</span>! 
+                  {user.kycStatus === 'approved' ? ' Ready to invest.' : ' Please complete your KYC verification.'}
+                </p>
+              </motion.div>
+            )}
+
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
@@ -211,28 +320,42 @@ export default function InvestPage() {
                 <div className="text-emerald-200/80 text-sm">{t("avg_returns_label")}</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">{t("total_properties")}</div>
+                <div className="text-3xl font-bold text-white mb-1">{properties.length}+</div>
                 <div className="text-emerald-200/80 text-sm">{t("properties_funded")}</div>
               </div>
             </motion.div>
 
-            {/* Hero CTAs */}
             <motion.div 
               className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
             >
-              <AuthDialog defaultTab="register">
+              {isAuthenticated ? (
                 <Button 
                   size="lg" 
                   className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-2xl"
+                  onClick={() => {
+                    const propertiesSection = document.getElementById('properties-section');
+                    propertiesSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                   data-testid="button-start-investing"
                 >
                   <Zap className="w-5 h-5 mr-2" />
-                  {t("start_investing_now")}
+                  View Investment Opportunities
                 </Button>
-              </AuthDialog>
+              ) : (
+                <AuthDialog defaultTab="register">
+                  <Button 
+                    size="lg" 
+                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-2xl"
+                    data-testid="button-start-investing"
+                  >
+                    <Zap className="w-5 h-5 mr-2" />
+                    {t("start_investing_now")}
+                  </Button>
+                </AuthDialog>
+              )}
               
               <Button 
                 size="lg" 
@@ -250,7 +373,6 @@ export default function InvestPage() {
               </Button>
             </motion.div>
 
-            {/* Trust Indicators */}
             <motion.div 
               className="mt-12 flex items-center justify-center gap-8 text-emerald-200/60 text-sm"
               initial={{ opacity: 0 }}
@@ -369,18 +491,25 @@ export default function InvestPage() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <AuthDialog defaultTab="register">
+              {isAuthenticated ? (
                 <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-why-invest-cta">
                   <CheckCircle className="w-5 h-5 mr-2" />
-                  Start Your Investment Journey
+                  View Available Properties
                 </Button>
-              </AuthDialog>
+              ) : (
+                <AuthDialog defaultTab="register">
+                  <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-why-invest-cta">
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    Start Your Investment Journey
+                  </Button>
+                </AuthDialog>
+              )}
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Featured Properties - Teaser Mode */}
+      {/* Featured Properties Section */}
       <section id="properties-section" className="py-20 bg-gradient-to-br from-gray-50 to-emerald-50/50 dark:from-gray-900 dark:to-emerald-950/50">
         <div className="container mx-auto px-6">
           <motion.div 
@@ -398,128 +527,198 @@ export default function InvestPage() {
               Exclusive Saudi Projects
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Premium real estate opportunities in Saudi Arabia's most promising developments. 
-              Register to unlock detailed investment information and secure your allocation.
+              Premium real estate opportunities in Saudi Arabia's most promising developments.
+              {!isAuthenticated && " Register to unlock detailed investment information and secure your allocation."}
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {localizedFeaturedProperties.map((property, index) => (
-              <motion.div
-                key={property.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="overflow-hidden hover-elevate group cursor-pointer border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm" data-testid={`card-property-${property.id}`}>
-                  <div className="relative">
-                    <img 
-                      src={property.image} 
-                      alt={property.title}
-                      className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    {/* Overlay with gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                    
-                    {/* Tags */}
-                    <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                      {property.tags.slice(0, 2).map((tag, index) => (
-                        <Badge key={index} className="bg-emerald-500/90 text-white border-0 backdrop-blur-sm">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-20">
+              <Loader2 className="animate-spin h-12 w-12 text-emerald-600 mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading investment opportunities...</p>
+            </div>
+          )}
 
-                    {/* Status Badge */}
-                    <div className="absolute top-4 right-4">
-                      <Badge className="bg-blue-500/90 text-white border-0 backdrop-blur-sm">
-                        <Zap className="w-3 h-3 mr-1" />
-                        Live
-                      </Badge>
-                    </div>
+          {/* Error State */}
+          {error && !loading && (
+            <div className="text-center py-20">
+              <div className="text-red-500 mb-4">⚠️ Error loading properties</div>
+              <p className="text-muted-foreground mb-4">{error}</p>
+              <Button onClick={fetchProperties} variant="outline">
+                Try Again
+              </Button>
+            </div>
+          )}
 
-                    {/* Location */}
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-xl font-bold text-white mb-1">{property.title}</h3>
-                      <div className="flex items-center text-emerald-200">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        <span className="text-sm">{property.location}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <CardContent className="p-6">
-                    {/* Public Information - Always Visible */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">{property.investors}+ investors</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">{property.remainingDays} days left</span>
-                        </div>
-                      </div>
-
-                      {/* Basic Progress Bar */}
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Funding Progress</span>
-                          <span className="font-medium">{property.fundingProgress}%</span>
-                        </div>
-                        <Progress value={property.fundingProgress} className="h-2" />
-                      </div>
-
-                      {/* Gated Information with Blur Effect */}
+          {/* Properties Grid */}
+          {!loading && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {properties.map((property, index) => {
+                const remainingDays = getRemainingDays(property.timeline?.fundingDeadline)
+                const tags = getPropertyTags(property)
+                
+                return (
+                  <motion.div
+                    key={property._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Card className="overflow-hidden hover-elevate group cursor-pointer border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm" data-testid={`card-property-${property._id}`}>
                       <div className="relative">
-                        <div className="filter blur-sm pointer-events-none">
-                          <div className="grid grid-cols-2 gap-4 py-4">
-                            <div>
-                              <p className="text-sm text-muted-foreground">Min. Investment</p>
-                              <p className="text-lg font-bold">SAR {property.price}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">Expected Return</p>
-                              <p className="text-lg font-bold text-emerald-600">{property.expectedReturn}</p>
-                            </div>
-                          </div>
-                        </div>
+                        <img 
+                          src={getImageUrl(property)} 
+                          alt={property.title}
+                          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                         
-                        {/* Lock Overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-lg">
-                          <div className="text-center">
-                            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                              <Lock className="w-6 h-6 text-white" />
-                            </div>
-                            <p className="text-sm font-medium text-foreground mb-1">Investment Details</p>
-                            <p className="text-xs text-muted-foreground">Register to unlock</p>
+                        {/* Tags */}
+                        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                          {tags.slice(0, 2).map((tag, tagIndex) => (
+                            <Badge key={tagIndex} className={`${tag.class} text-white border-0 backdrop-blur-sm`}>
+                              {tag.text}
+                            </Badge>
+                          ))}
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="absolute top-4 right-4">
+                          <Badge className="bg-blue-500/90 text-white border-0 backdrop-blur-sm">
+                            <Zap className="w-3 h-3 mr-1" />
+                            {property.status === 'active' ? 'Live' : 'Coming Soon'}
+                          </Badge>
+                        </div>
+
+                        {/* Location */}
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <h3 className="text-xl font-bold text-white mb-1">{property.title}</h3>
+                          <div className="flex items-center text-emerald-200">
+                            <MapPin className="w-4 h-4 mr-1" />
+                            <span className="text-sm">{property.location.address}, {property.location.city}</span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
-                      <div className="grid grid-cols-2 gap-3 pt-2">
-                        <AuthDialog defaultTab="login">
-                          <Button variant="outline" size="sm" className="w-full" data-testid={`button-view-details-${property.id}`}>
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Details
-                          </Button>
-                        </AuthDialog>
-                        <AuthDialog defaultTab="register">
-                          <Button size="sm" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid={`button-invest-${property.id}`}>
-                            <DollarSign className="w-4 h-4 mr-2" />
-                            Invest Now
-                          </Button>
-                        </AuthDialog>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                      <CardContent className="p-6">
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">{property.investorCount}+ investors</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">{remainingDays} days left</span>
+                            </div>
+                          </div>
+
+                          {/* Progress Bar */}
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Funding Progress</span>
+                              <span className="font-medium">{property.fundingProgress}%</span>
+                            </div>
+                            <Progress value={property.fundingProgress} className="h-2" />
+                          </div>
+
+                          {/* Investment Details - Show/Hide based on auth */}
+                          {isAuthenticated ? (
+                            // Authenticated users see all details
+                            <div className="grid grid-cols-2 gap-4 py-4">
+                              <div>
+                                <p className="text-sm text-muted-foreground">Min. Investment</p>
+                                <p className="text-lg font-bold">SAR {formatCurrency(property.financials.minInvestment)}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-muted-foreground">Expected Return</p>
+                                <p className="text-lg font-bold text-emerald-600">{property.financials.projectedYield}%</p>
+                              </div>
+                            </div>
+                          ) : (
+                            // Non-authenticated users see blurred content
+                            <div className="relative">
+                              <div className="filter blur-sm pointer-events-none">
+                                <div className="grid grid-cols-2 gap-4 py-4">
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Min. Investment</p>
+                                    <p className="text-lg font-bold">SAR {formatCurrency(property.financials.minInvestment)}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Expected Return</p>
+                                    <p className="text-lg font-bold text-emerald-600">{property.financials.projectedYield}%</p>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Lock Overlay */}
+                              <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-lg">
+                                <div className="text-center">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Lock className="w-6 h-6 text-white" />
+                                  </div>
+                                  <p className="text-sm font-medium text-foreground mb-1">Investment Details</p>
+                                  <p className="text-xs text-muted-foreground">Register to unlock</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Action Buttons */}
+                          <div className="grid grid-cols-2 gap-3 pt-2">
+                            {isAuthenticated ? (
+                              // Authenticated users get functional buttons
+                              <>
+                                <Button variant="outline" size="sm" className="w-full" data-testid={`button-view-details-${property._id}`}>
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  View Details
+                                </Button>
+                                <Button size="sm" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid={`button-invest-${property._id}`}>
+                                  <DollarSign className="w-4 h-4 mr-2" />
+                                  Invest Now
+                                </Button>
+                              </>
+                            ) : (
+                              // Non-authenticated users get auth dialogs
+                              <>
+                                <AuthDialog defaultTab="login">
+                                  <Button variant="outline" size="sm" className="w-full" data-testid={`button-view-details-${property._id}`}>
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    View Details
+                                  </Button>
+                                </AuthDialog>
+                                <AuthDialog defaultTab="register">
+                                  <Button size="sm" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid={`button-invest-${property._id}`}>
+                                    <DollarSign className="w-4 h-4 mr-2" />
+                                    Invest Now
+                                  </Button>
+                                </AuthDialog>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* No Properties State */}
+          {!loading && !error && properties.length === 0 && (
+            <div className="text-center py-20">
+              <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No Investment Opportunities Available</h3>
+              <p className="text-muted-foreground mb-6">Check back soon for new property listings</p>
+              <Button onClick={fetchProperties} variant="outline">
+                <Eye className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          )}
 
           <motion.div 
             className="text-center mt-16"
@@ -528,12 +727,21 @@ export default function InvestPage() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <AuthDialog defaultTab="register">
-              <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-browse-all-properties">
+            {isAuthenticated ? (
+              <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-browse-all-properties"
+                onClick={() => setLocation('/properties')}
+                >
                 <Building2 className="w-5 h-5 mr-2" />
                 Browse All Properties
               </Button>
-            </AuthDialog>
+            ) : (
+              <AuthDialog defaultTab="register">
+                <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-browse-all-properties">
+                  <Building2 className="w-5 h-5 mr-2" />
+                  Browse All Properties
+                </Button>
+              </AuthDialog>
+            )}
           </motion.div>
         </div>
       </section>
@@ -643,90 +851,6 @@ export default function InvestPage() {
         </div>
       </section>
 
-      {/* Security & Compliance */}
-      <section className="py-16 bg-background border-y">
-        <div className="container mx-auto px-6">
-          <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl font-bold mb-4">Security & Compliance</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Your investments are protected by industry-leading security measures and regulatory compliance
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {[
-              {
-                icon: Shield,
-                title: "SAMA Regulated",
-                description: "Licensed by Saudi Arabian Monetary Authority"
-              },
-              {
-                icon: CheckCircle,
-                title: "Shariah Compliant",
-                description: "All investments certified by Shariah board"
-              },
-              {
-                icon: Lock,
-                title: "Bank-Grade Security",
-                description: "256-bit SSL encryption and secure data storage"
-              },
-              {
-                icon: FileCheck,
-                title: "Legal Protection",
-                description: "Full legal documentation and investor protection"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className="text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border hover-elevate"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                data-testid={`security-feature-${index}`}
-              >
-                <feature.icon className="w-12 h-12 mx-auto mb-4 text-emerald-600 dark:text-emerald-400" />
-                <h4 className="font-semibold mb-2">{feature.title}</h4>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Partner Logos */}
-          <motion.div 
-            className="text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h3 className="text-xl font-semibold mb-8 text-muted-foreground">Trusted Partners</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
-              {[
-                { name: "Al Rajhi Bank", logo: "ARB" },
-                { name: "Saudi Investment Bank", logo: "SIB" }, 
-                { name: "Riyad Capital", logo: "RC" },
-                { name: "Jadwa Investment", logo: "JI" }
-              ].map((partner, index) => (
-                <div 
-                  key={index}
-                  className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 p-6 rounded-lg flex items-center justify-center h-20 font-bold text-gray-600 dark:text-gray-300"
-                  data-testid={`partner-${index}`}
-                >
-                  {partner.logo}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* How It Works Section */}
       <section className="py-20 bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-950/30 dark:to-blue-950/30">
         <div className="container mx-auto px-6">
@@ -809,12 +933,19 @@ export default function InvestPage() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <AuthDialog defaultTab="register">
+            {isAuthenticated ? (
               <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-get-started-process">
                 <Zap className="w-5 h-5 mr-2" />
-                Get Started Now
+                View Your Dashboard
               </Button>
-            </AuthDialog>
+            ) : (
+              <AuthDialog defaultTab="register">
+                <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-get-started-process">
+                  <Zap className="w-5 h-5 mr-2" />
+                  Get Started Now
+                </Button>
+              </AuthDialog>
+            )}
           </motion.div>
         </div>
       </section>
