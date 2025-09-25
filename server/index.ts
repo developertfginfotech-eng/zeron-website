@@ -145,14 +145,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Use PORT from env or fallback to 5000
   const port = parseInt(process.env.PORT || "3000", 10);
 
-  // Use 'localhost' instead of '0.0.0.0' to avoid ENOTSUP on macOS
-  const host = "127.0.0.1";
-
-  // Start the server
-  server.listen(port, host, () => {
-    log(`🚀 Server running at http://${host}:${port}`);
-  });
+server.listen(port, "0.0.0.0", () => {
+  log(`🚀 Server running at http://0.0.0.0:${port}`);
+});
 })();
