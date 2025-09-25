@@ -146,7 +146,7 @@ app.use((req, res, next) => {
   }
 
   // Use PORT from env or fallback to 5000
-  const port = parseInt(process.env.PORT || "5000", 10);
+  const port = parseInt(process.env.PORT || "3000", 10);
 
   // Use 'localhost' instead of '0.0.0.0' to avoid ENOTSUP on macOS
   const host = "127.0.0.1";
