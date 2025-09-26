@@ -32,6 +32,7 @@ import MobileProfile from "@/pages/mobile/profile";
 // Website Pages
 import WebsiteHome from "@/pages/website/home";
 import WebsiteInvest from "@/pages/website/invest";
+import WebsiteProperties from "@/pages/website/properties";
 import WebsiteAbout from "@/pages/website/about";
 import WebsiteBusiness from "@/pages/website/business";
 import WebsiteContact from "@/pages/website/contact";
@@ -75,6 +76,7 @@ function WebsiteRouter() {
       <Switch>
         <Route path="/website" component={WebsiteInvest} />
         <Route path="/website/invest" component={WebsiteInvest} />
+        <Route path="/website/properties" component={WebsiteProperties} />
         <Route path="/website/about" component={WebsiteAbout} />
         <Route path="/website/business" component={WebsiteBusiness} />
         <Route path="/website/contact" component={WebsiteContact} />

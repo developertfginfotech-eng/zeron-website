@@ -63,10 +63,37 @@ interface BackendProperty {
 
 // Helper function to get auth token
 const getAuthToken = (): string | null => {
-  return localStorage.getItem('zaron_token') || 
-         localStorage.getItem('authToken') || 
+  return localStorage.getItem('zaron_token') ||
+         localStorage.getItem('authToken') ||
          sessionStorage.getItem('authToken') ||
          sessionStorage.getItem('token');
+};
+
+// Helper function to get KYC status
+const getKYCStatus = (): {
+  isKYCCompleted: boolean;
+  kycStatus: string;
+  isLoggedIn: boolean;
+} => {
+  try {
+    const userData = localStorage.getItem('zaron_user');
+    if (!userData) {
+      return { isKYCCompleted: false, kycStatus: 'not_submitted', isLoggedIn: false };
+    }
+
+    const user = JSON.parse(userData);
+    const kycStatus = user.kycStatus || 'not_submitted';
+    // Allow access for both submitted and approved KYC
+    const isKYCCompleted = kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'approved';
+
+    return {
+      isKYCCompleted,
+      kycStatus,
+      isLoggedIn: true
+    };
+  } catch {
+    return { isKYCCompleted: false, kycStatus: 'not_submitted', isLoggedIn: false };
+  }
 };
 
 // Helper function to calculate remaining days
@@ -126,6 +153,9 @@ export default function InvestPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Get KYC status
+  const { isKYCCompleted, kycStatus, isLoggedIn } = getKYCStatus()
+
   // Fetch properties from API
   const fetchProperties = async () => {
     try {
@@ -134,10 +164,7 @@ export default function InvestPage() {
       
       const token = getAuthToken();
       
-      // Use different endpoints based on authentication
-      const endpoint = isAuthenticated 
-        ? 'http://13.50.13.193:5000/api/admin/properties' 
-        : 'http://13.50.13.193:5000/api/properties';
+      const endpoint = 'http://13.50.13.193:5000/api/admin/properties';
       
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -167,7 +194,7 @@ export default function InvestPage() {
         // Filter to show only active and upcoming properties
         const availableProperties = result.data.properties.filter(
           (prop: BackendProperty) => ['active', 'upcoming'].includes(prop.status)
-        ).slice(0, 6); // Limit to 6 properties for the landing page
+        ); // Show all available properties
         
         setProperties(availableProperties)
       } else {
@@ -568,11 +595,55 @@ export default function InvestPage() {
                   >
                     <Card className="overflow-hidden hover-elevate group cursor-pointer border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm" data-testid={`card-property-${property._id}`}>
                       <div className="relative">
-                        <img 
-                          src={getImageUrl(property)} 
-                          alt={property.title}
-                          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
+                        {/* Image with KYC Lock */}
+                        {isKYCCompleted ? (
+                          // Show normal image for KYC-approved users
+                          <img
+                            src={getImageUrl(property)}
+                            alt={property.title}
+                            className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          // Show blurred/locked image for non-KYC users
+                          <div className="relative w-full h-56">
+                            <img
+                              src={getImageUrl(property)}
+                              alt={property.title}
+                              className="w-full h-full object-cover blur-md"
+                            />
+                            {/* Lock Overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                              <div className="text-center p-4">
+                                <div className="mx-auto w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-3 backdrop-blur-sm">
+                                  <Lock className="h-6 w-6 text-white" />
+                                </div>
+                                <h3 className="font-semibold text-white mb-2 text-sm">KYC Required</h3>
+                                <p className="text-xs text-white/80 mb-3">
+                                  {!isLoggedIn
+                                    ? "Login and verify your identity"
+                                    : kycStatus === 'submitted' || kycStatus === 'under_review'
+                                    ? "Your verification is under review"
+                                    : "Complete identity verification"}
+                                </p>
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    if (!isLoggedIn) {
+                                      const propertiesSection = document.getElementById('properties-section');
+                                      propertiesSection?.scrollIntoView({ behavior: 'smooth' });
+                                    } else {
+                                      setLocation('/kyc-verification');
+                                    }
+                                  }}
+                                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-white/30 text-xs"
+                                  variant="outline"
+                                >
+                                  {!isLoggedIn ? "Login" : "Verify Now"}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                         
                         {/* Tags */}
@@ -607,11 +678,15 @@ export default function InvestPage() {
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                               <Users className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm text-muted-foreground">{property.investorCount}+ investors</span>
+                              <span className="text-sm text-muted-foreground">
+                                {isKYCCompleted ? `${property.investorCount}+ investors` : 'Multiple investors'}
+                              </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm text-muted-foreground">{remainingDays} days left</span>
+                              <span className="text-sm text-muted-foreground">
+                                {isKYCCompleted && remainingDays > 0 ? `${remainingDays} days left` : 'Investment Open'}
+                              </span>
                             </div>
                           </div>
 
@@ -619,57 +694,33 @@ export default function InvestPage() {
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                               <span className="text-muted-foreground">Funding Progress</span>
-                              <span className="font-medium">{property.fundingProgress}%</span>
+                              <span className="font-medium">
+                                {isKYCCompleted ? `${property.fundingProgress}%` : '●●%'}
+                              </span>
                             </div>
-                            <Progress value={property.fundingProgress} className="h-2" />
+                            <Progress value={isKYCCompleted ? property.fundingProgress : 0} className="h-2" />
                           </div>
 
-                          {/* Investment Details - Show/Hide based on auth */}
-                          {isAuthenticated ? (
-                            // Authenticated users see all details
-                            <div className="grid grid-cols-2 gap-4 py-4">
-                              <div>
-                                <p className="text-sm text-muted-foreground">Min. Investment</p>
-                                <p className="text-lg font-bold">SAR {formatCurrency(property.financials.minInvestment)}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-muted-foreground">Expected Return</p>
-                                <p className="text-lg font-bold text-emerald-600">{property.financials.projectedYield}%</p>
-                              </div>
+                          {/* Investment Details - Show/Hide based on KYC */}
+                          <div className="grid grid-cols-2 gap-4 py-4">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Min. Investment</p>
+                              <p className="text-lg font-bold">
+                                {isKYCCompleted ? `SAR ${formatCurrency(property.financials.minInvestment)}` : 'SAR ●●●,●●●'}
+                              </p>
                             </div>
-                          ) : (
-                            // Non-authenticated users see blurred content
-                            <div className="relative">
-                              <div className="filter blur-sm pointer-events-none">
-                                <div className="grid grid-cols-2 gap-4 py-4">
-                                  <div>
-                                    <p className="text-sm text-muted-foreground">Min. Investment</p>
-                                    <p className="text-lg font-bold">SAR {formatCurrency(property.financials.minInvestment)}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm text-muted-foreground">Expected Return</p>
-                                    <p className="text-lg font-bold text-emerald-600">{property.financials.projectedYield}%</p>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Lock Overlay */}
-                              <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-lg">
-                                <div className="text-center">
-                                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <Lock className="w-6 h-6 text-white" />
-                                  </div>
-                                  <p className="text-sm font-medium text-foreground mb-1">Investment Details</p>
-                                  <p className="text-xs text-muted-foreground">Register to unlock</p>
-                                </div>
-                              </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Expected Return</p>
+                              <p className="text-lg font-bold text-emerald-600">
+                                {isKYCCompleted ? `${property.financials.projectedYield}%` : '●●%'}
+                              </p>
                             </div>
-                          )}
+                          </div>
 
                           {/* Action Buttons */}
                           <div className="grid grid-cols-2 gap-3 pt-2">
-                            {isAuthenticated ? (
-                              // Authenticated users get functional buttons
+                            {isKYCCompleted ? (
+                              // KYC approved users get functional buttons
                               <>
                                 <Button variant="outline" size="sm" className="w-full" data-testid={`button-view-details-${property._id}`}>
                                   <Eye className="w-4 h-4 mr-2" />
@@ -681,23 +732,64 @@ export default function InvestPage() {
                                 </Button>
                               </>
                             ) : (
-                              // Non-authenticated users get auth dialogs
+                              // Non-KYC users get appropriate actions
                               <>
-                                <AuthDialog defaultTab="login">
-                                  <Button variant="outline" size="sm" className="w-full" data-testid={`button-view-details-${property._id}`}>
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    View Details
+                                {isAuthenticated ? (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={() => setLocation('/kyc-verification')}
+                                    data-testid={`button-view-details-${property._id}`}
+                                  >
+                                    <Lock className="w-4 h-4 mr-2" />
+                                    Complete KYC
                                   </Button>
-                                </AuthDialog>
-                                <AuthDialog defaultTab="register">
-                                  <Button size="sm" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid={`button-invest-${property._id}`}>
-                                    <DollarSign className="w-4 h-4 mr-2" />
-                                    Invest Now
+                                ) : (
+                                  <AuthDialog defaultTab="login">
+                                    <Button variant="outline" size="sm" className="w-full" data-testid={`button-view-details-${property._id}`}>
+                                      <Eye className="w-4 h-4 mr-2" />
+                                      Login to View
+                                    </Button>
+                                  </AuthDialog>
+                                )}
+                                {isAuthenticated ? (
+                                  <Button
+                                    size="sm"
+                                    className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
+                                    onClick={() => setLocation('/kyc-verification')}
+                                    data-testid={`button-invest-${property._id}`}
+                                  >
+                                    <Shield className="w-4 h-4 mr-2" />
+                                    Verify to Invest
                                   </Button>
-                                </AuthDialog>
+                                ) : (
+                                  <AuthDialog defaultTab="register">
+                                    <Button size="sm" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid={`button-invest-${property._id}`}>
+                                      <DollarSign className="w-4 h-4 mr-2" />
+                                      Register to Invest
+                                    </Button>
+                                  </AuthDialog>
+                                )}
                               </>
                             )}
                           </div>
+
+                          {/* KYC Status indicator */}
+                          {!isKYCCompleted && (
+                            <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Shield className="w-4 h-4 text-orange-600" />
+                                <span className="text-orange-800 dark:text-orange-200">
+                                  {!isLoggedIn
+                                    ? "Login and complete KYC to unlock full property details"
+                                    : kycStatus === 'submitted' || kycStatus === 'under_review'
+                                    ? "Your KYC is under review. Full details will be available once approved."
+                                    : "Complete KYC verification to access investment features"}
+                                </span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -729,18 +821,18 @@ export default function InvestPage() {
           >
             {isAuthenticated ? (
               <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-browse-all-properties"
-                onClick={() => setLocation('/properties')}
+                onClick={() => setLocation('/website/properties')}
                 >
                 <Building2 className="w-5 h-5 mr-2" />
                 Browse All Properties
               </Button>
             ) : (
-              <AuthDialog defaultTab="register">
-                <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-browse-all-properties">
-                  <Building2 className="w-5 h-5 mr-2" />
-                  Browse All Properties
-                </Button>
-              </AuthDialog>
+              <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600" data-testid="button-browse-all-properties"
+                onClick={() => setLocation('/website/properties')}
+                >
+                <Building2 className="w-5 h-5 mr-2" />
+                Browse All Properties
+              </Button>
             )}
           </motion.div>
         </div>
