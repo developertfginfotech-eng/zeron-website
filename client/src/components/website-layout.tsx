@@ -36,6 +36,9 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 
   const navigation = [
     { name: "Invest", href: "/website/invest" },
+    { name: "Portfolio", href: "/website/portfolio" },
+    { name: "Wallet", href: "/website/wallet" },
+    { name: "Properties", href: "/website/properties" },
     { name: t("about_us"), href: "/website/about" },
   ]
 
@@ -56,13 +59,13 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
           <div className="container mx-auto px-6">
-            <div className="flex h-16 items-center justify-between">
-              <Link href="/website/invest">
-                <div className="flex items-center space-x-2">
-                  <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <Globe className="h-5 w-5 text-white" />
+            <div className="flex h-18 items-center justify-between">
+              <Link href="/website/invest" className="transition-transform hover:scale-105">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Globe className="h-6 w-6 text-white" />
                   </div>
                   <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
                     Zaron
@@ -81,14 +84,14 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto px-6">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-18 items-center justify-between">
             {/* Logo */}
-            <Link href="/website/invest" data-testid="link-home">
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                  <Globe className="h-5 w-5 text-white" />
+            <Link href="/website/invest" data-testid="link-home" className="transition-transform hover:scale-105">
+              <div className="flex items-center space-x-3">
+                <div className="h-10 w-10 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Globe className="h-6 w-6 text-white" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
                   Zaron
@@ -97,20 +100,23 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
             </Link>
 
             {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden md:flex items-center space-x-2">
               {navigation.map((item) => (
-                <Link 
-                  key={item.href} 
-                  href={item.href} 
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive(item.href) 
-                      ? "text-primary" 
-                      : "text-muted-foreground"
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-muted/50 ${
+                    isActive(item.href)
+                      ? "text-primary bg-primary/10 shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                   aria-current={isActive(item.href) ? "page" : undefined}
                 >
                   {item.name}
+                  {isActive(item.href) && (
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></div>
+                  )}
                 </Link>
               ))}
             </nav>
