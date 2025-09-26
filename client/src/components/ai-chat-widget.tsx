@@ -81,8 +81,18 @@ export function AiChatWidget() {
   const connectWebSocket = () => {
     try {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsUrl = `${protocol}//${window.location.host}/ws`
-      
+
+      // Handle different environments properly
+      let wsUrl: string
+      if (window.location.port && window.location.port !== '80' && window.location.port !== '443') {
+        // Development environment with specific port
+        wsUrl = `${protocol}//${window.location.hostname}:${window.location.port}/ws`
+      } else {
+        // Production environment or default ports
+        wsUrl = `${protocol}//${window.location.host}/ws`
+      }
+
+      console.log('Attempting WebSocket connection to:', wsUrl)
       wsRef.current = new WebSocket(wsUrl)
       
       wsRef.current.onopen = () => {

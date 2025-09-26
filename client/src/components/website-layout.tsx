@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +10,9 @@ import {
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/components/language-provider"
 import { useAuth } from "@/hooks/use-auth" // Add this import
+import { useNotifications } from "@/hooks/use-notifications"
 import { AuthDialog } from "@/components/auth-dialog"
-import { Languages, Globe, Flag, User, LogOut, Settings, BarChart3 } from "lucide-react"
+import { Languages, Globe, Flag, User, LogOut, Settings, BarChart3, Bell } from "lucide-react"
 import { Link, useLocation } from "wouter"
 
 const languages = [
@@ -26,10 +28,11 @@ const languages = [
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   const { language, setLanguage } = useLanguage()
-  const [location] = useLocation()
+  const [location, setLocation] = useLocation()
   
   // Use the auth hook instead of local state
   const { user, isLoading, logout, isAuthenticated } = useAuth()
+  const { unreadCount } = useNotifications()
 
   const navigation = [
     { name: "Invest", href: "/website/invest" },
@@ -141,8 +144,28 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 
               {/* Conditional Auth Buttons or User Menu */}
               {isAuthenticated && user ? (
-                // User is logged in - show user menu
-                <DropdownMenu>
+                <div className="flex items-center gap-2">
+                  {/* Notification Bell */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="relative"
+                    onClick={() => setLocation('/user-notifications')}
+                    data-testid="button-notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0"
+                      >
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </Button>
+
+                  {/* User Menu */}
+                  <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center space-x-2" data-testid="button-user-menu">
                       {user.avatar ? (
@@ -170,7 +193,18 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                     <DropdownMenuItem asChild>
                       <Link href="/user-dashboard" data-testid="menu-dashboard">
                         <BarChart3 className="mr-2 h-4 w-4" />
-                        Dashboard
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/user-notifications" data-testid="menu-notifications">
+                        <Bell className="mr-2 h-4 w-4" />
+                        Notifications
+                        {unreadCount > 0 && (
+                          <Badge variant="destructive" className="ml-auto">
+                            {unreadCount}
+                          </Badge>
+                        )}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -196,6 +230,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </div>
               ) : (
                 // User is not logged in - show auth buttons
                 <div className="flex items-center space-x-2">

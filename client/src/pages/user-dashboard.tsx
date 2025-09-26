@@ -161,9 +161,9 @@ const UserDashboard = () => {
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-lg flex items-center justify-center">
+            {/* <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-lg flex items-center justify-center">
               <PieChart className="h-6 w-6 text-white" />
-            </div>
+            </div> */}
             <div>
               <h1 className="text-xl font-bold">My Portfolio</h1>
               <p className="text-sm text-muted-foreground">

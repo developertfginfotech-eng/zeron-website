@@ -32,7 +32,6 @@ export const translations = {
     invested: "Invested",
     current_value: "Current Value",
     return: "Return",
-    total_invested: "Total Invested",
     roi: "ROI",
     
     // Performance Labels
@@ -73,7 +72,6 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "Saudi Real Estate Market",
-    vision_2030: "Vision 2030 Aligned",
     neom_projects: "NEOM Projects",
     red_sea_developments: "Red Sea Developments",
     shariah_compliant: "Shariah Compliant",
@@ -271,7 +269,6 @@ export const translations = {
     invested: "المستثمر",
     current_value: "القيمة الحالية",
     return: "العائد",
-    total_invested: "إجمالي المستثمر",
     roi: "عائد الاستثمار",
     
     // Performance Labels
@@ -312,7 +309,6 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "سوق العقارات السعودي",
-    vision_2030: "متوافق مع رؤية 2030",
     neom_projects: "مشاريع نيوم",
     red_sea_developments: "تطوير البحر الأحمر",
     shariah_compliant: "متوافق مع الشريعة",
@@ -510,7 +506,6 @@ export const translations = {
     invested: "سرمایہ کاری",
     current_value: "موجودہ ویلیو",
     return: "واپسی",
-    total_invested: "کل سرمایہ کاری",
     roi: "ROI",
     
     // Performance Labels
@@ -551,7 +546,6 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "سعودی ریئل اسٹیٹ مارکیٹ",
-    vision_2030: "ویژن 2030 سے ہم آہنگ",
     neom_projects: "نیوم پروجیکٹس",
     red_sea_developments: "بحیرہ احمر ڈیولپمنٹ",
     shariah_compliant: "شریعت کے مطابق",
@@ -735,7 +729,6 @@ export const translations = {
     invested: "निवेशित",
     current_value: "वर्तमान मूल्य",
     return: "रिटर्न",
-    total_invested: "कुल निवेशित",
     roi: "ROI",
     
     // Performance Labels
@@ -776,7 +769,6 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "सऊदी रियल एस्टेट बाजार",
-    vision_2030: "विज़न 2030 संरेखित",
     neom_projects: "NEOM परियोजनाएं",
     red_sea_developments: "रेड सी डेवलपमेंट",
     shariah_compliant: "शरिया अनुपालन",
@@ -908,7 +900,6 @@ export const translations = {
     invested: "ਨਿਵੇਸ਼ਿਤ",
     current_value: "ਮੌਜੂਦਾ ਮੁੱਲ",
     return: "ਰਿਟਰਨ",
-    total_invested: "ਕੁੱਲ ਨਿਵੇਸ਼ਿਤ",
     roi: "ROI",
     
     // Performance Labels
@@ -949,7 +940,6 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "ਸਾਊਦੀ ਰੀਅਲ ਅਸਟੇਟ ਮਾਰਕੀਟ",
-    vision_2030: "ਵਿਜ਼ਨ 2030 ਨਾਲ ਮੇਲ",
     neom_projects: "ਨਿਓਮ ਪ੍ਰੋਜੈਕਟ",
     red_sea_developments: "ਲਾਲ ਸਾਗਰ ਵਿਕਾਸ",
     shariah_compliant: "ਸ਼ਰੀਆ ਅਨੁਕੂਲ",
@@ -1063,7 +1053,6 @@ export const translations = {
     invested: "বিনিয়োগকৃত",
     current_value: "বর্তমান মূল্য",
     return: "রিটার্ন",
-    total_invested: "মোট বিনিয়োগকৃত",
     roi: "ROI",
     
     // Performance Labels
