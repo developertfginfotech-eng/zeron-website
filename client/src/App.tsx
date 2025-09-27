@@ -80,6 +80,7 @@ function WebsiteRouter() {
         <Route path="/website" component={WebsiteInvest} />
         <Route path="/website/invest" component={WebsiteInvest} />
         <Route path="/website/portfolio" component={WebsitePortfolio} />
+        <Route path="/portfolio" component={WebsitePortfolio} />
         <Route path="/website/wallet" component={WebsiteWallet} />
         <Route path="/website/properties" component={WebsiteProperties} />
         <Route path="/website/about" component={WebsiteAbout} />
@@ -98,7 +99,7 @@ function WebsiteRouter() {
 export default function App() {
   const [location] = useLocation()
   const isMobile = location.startsWith('/mobile')
-  const isWebsite = location === '/' || location.startsWith('/website') || location.startsWith('/kyc-verification')|| location === '/user-dashboard' || location === '/user-notifications'
+  const isWebsite = location === '/' || location.startsWith('/website') || location.startsWith('/kyc-verification')|| location === '/user-dashboard' || location === '/user-notifications' || location === '/portfolio'
   const isAdmin = !isMobile && !isWebsite
 
   // Custom sidebar width for better content display

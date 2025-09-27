@@ -6,8 +6,10 @@ import { Progress } from "@/components/ui/progress"
 import { useTranslation } from "@/hooks/use-translation"
 import { useAuth } from "@/hooks/use-auth"
 import { AuthDialog } from "@/components/auth-dialog"
+import { InvestmentModal } from "@/components/investment-modal"
 import { motion } from "framer-motion"
 import { useLocation } from 'wouter';
+import { useToast } from "@/hooks/use-toast"
 
 import { 
   Building2, 
@@ -152,9 +154,53 @@ export default function InvestPage() {
   const [properties, setProperties] = useState<BackendProperty[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedProperty, setSelectedProperty] = useState<BackendProperty | null>(null)
+  const [isInvestmentModalOpen, setIsInvestmentModalOpen] = useState(false)
+  const { toast } = useToast()
 
   // Get KYC status
   const { isKYCCompleted, kycStatus, isLoggedIn } = getKYCStatus()
+
+  // Handle investment click
+  const handleInvestClick = (property: BackendProperty) => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to start investing",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!isKYCCompleted) {
+      toast({
+        title: "KYC Verification Required",
+        description: "Complete your KYC verification to start investing",
+        variant: "destructive"
+      });
+      setLocation('/kyc-verification');
+      return;
+    }
+
+    setSelectedProperty(property);
+    setIsInvestmentModalOpen(true);
+  };
+
+  /// Handle investment success
+  const handleInvestmentSuccess = () => {
+    // Show success toast
+    toast({
+      title: "Investment Successful! 🎉",
+      description: "Your investment has been processed successfully",
+      variant: "default"
+    });
+
+    // Optionally refresh properties to update funding progress
+    // but without causing page refresh/redirect
+    setTimeout(() => {
+      fetchProperties();
+    }, 2000);
+  };
 
   // Fetch properties from API
   const fetchProperties = async () => {
@@ -726,7 +772,12 @@ export default function InvestPage() {
                                   <Eye className="w-4 h-4 mr-2" />
                                   View Details
                                 </Button>
-                                <Button size="sm" className="w-full bg-gradient-to-r from-emerald-600 to-blue-600" data-testid={`button-invest-${property._id}`}>
+                                <Button
+                                  size="sm"
+                                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
+                                  onClick={() => handleInvestClick(property)}
+                                  data-testid={`button-invest-${property._id}`}
+                                >
                                   <DollarSign className="w-4 h-4 mr-2" />
                                   Invest Now
                                 </Button>
@@ -1041,6 +1092,17 @@ export default function InvestPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Investment Modal */}
+      <InvestmentModal
+        property={selectedProperty}
+        isOpen={isInvestmentModalOpen}
+        onClose={() => {
+          setIsInvestmentModalOpen(false);
+          setSelectedProperty(null);
+        }}
+        onSuccess={handleInvestmentSuccess}
+      />
     </div>
   )
 }

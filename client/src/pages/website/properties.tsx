@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
 import { useTranslation } from "@/hooks/use-translation"
 import { AuthDialog } from "@/components/auth-dialog"
+import { InvestmentModal } from "@/components/investment-modal"
 import { motion } from "framer-motion"
 
 import {
@@ -140,7 +141,7 @@ const getPropertyTags = (property: BackendProperty) => {
 };
 
 // Property Card Component with KYC Lock
-const PropertyCard = ({ property }: { property: BackendProperty }) => {
+const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; onInvestClick: (property: BackendProperty) => void }) => {
   const { isAuthenticated } = useAuth();
   const remainingDays = getRemainingDays(property.timeline?.fundingDeadline);
   const tags = getPropertyTags(property);
@@ -325,7 +326,11 @@ const PropertyCard = ({ property }: { property: BackendProperty }) => {
                   <Eye className="w-4 h-4 mr-2" />
                   View Details
                 </Button>
-                <Button size="sm" className="flex-1 bg-gradient-to-r from-emerald-600 to-blue-600">
+                <Button
+                  size="sm"
+                  className="flex-1 bg-gradient-to-r from-emerald-600 to-blue-600"
+                  onClick={() => onInvestClick(property)}
+                >
                   <DollarSign className="w-4 h-4 mr-2" />
                   Invest Now
                 </Button>
@@ -388,9 +393,52 @@ export default function WebsitePropertiesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [selectedProperty, setSelectedProperty] = useState<BackendProperty | null>(null);
+  const [isInvestmentModalOpen, setIsInvestmentModalOpen] = useState(false);
 
   // Get KYC status for page-level features
   const { isKYCCompleted, kycStatus, isLoggedIn } = getKYCStatus();
+
+  // Handle investment click
+  const handleInvestClick = (property: BackendProperty) => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to start investing",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!isKYCCompleted) {
+      toast({
+        title: "KYC Verification Required",
+        description: "Complete your KYC verification to start investing",
+        variant: "destructive"
+      });
+      setLocation('/kyc-verification');
+      return;
+    }
+
+    setSelectedProperty(property);
+    setIsInvestmentModalOpen(true);
+  };
+
+  // Handle investment success
+  const handleInvestmentSuccess = () => {
+    // Show success toast
+    toast({
+      title: "Investment Successful! 🎉",
+      description: "Your investment has been processed successfully",
+      variant: "default"
+    });
+
+    // Optionally refresh properties to update funding progress
+    // but without causing page refresh/redirect
+    setTimeout(() => {
+      fetchProperties();
+    }, 2000);
+  };
 
   // Fetch all properties
   const fetchProperties = async () => {
@@ -653,7 +701,11 @@ export default function WebsitePropertiesPage() {
         {!loading && !error && filteredProperties.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProperties.map((property) => (
-              <PropertyCard key={property._id} property={property} />
+              <PropertyCard
+                key={property._id}
+                property={property}
+                onInvestClick={handleInvestClick}
+              />
             ))}
           </div>
         )}
@@ -732,6 +784,17 @@ export default function WebsitePropertiesPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Investment Modal */}
+      <InvestmentModal
+        property={selectedProperty}
+        isOpen={isInvestmentModalOpen}
+        onClose={() => {
+          setIsInvestmentModalOpen(false);
+          setSelectedProperty(null);
+        }}
+        onSuccess={handleInvestmentSuccess}
+      />
     </div>
   );
 }
