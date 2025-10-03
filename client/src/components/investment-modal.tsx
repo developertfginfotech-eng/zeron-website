@@ -38,6 +38,8 @@ interface BackendProperty {
     totalValue: number;
     minInvestment: number;
     projectedYield: number;
+    pricePerShare: number;
+    availableShares: number;
   };
   propertyType: 'residential' | 'commercial' | 'retail';
   status: 'active' | 'upcoming' | 'fully_funded' | 'completed' | 'cancelled' | 'closed';
@@ -53,7 +55,7 @@ interface InvestmentModalProps {
 }
 
 export function InvestmentModal({ property, isOpen, onClose, onSuccess }: InvestmentModalProps) {
-  const [amount, setAmount] = useState<string>('');
+  const [units, setUnits] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [investmentSuccess, setInvestmentSuccess] = useState(false);
   const [investmentData, setInvestmentData] = useState<any>(null);
@@ -71,35 +73,42 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
     }).format(value);
   };
 
-  const calculateShares = (investmentAmount: number): number => {
-    return Math.floor(investmentAmount / property.financials.minInvestment);
+  const calculateTotalAmount = (numUnits: number): number => {
+    return numUnits * (property.financials.pricePerShare || 0);
   };
 
-  const calculateProjectedReturn = (investmentAmount: number): number => {
-    return (investmentAmount * property.financials.projectedYield) / 100;
+  const calculateProjectedReturn = (totalAmount: number): number => {
+    return (totalAmount * property.financials.projectedYield) / 100;
+  };
+
+  const getMinUnitsRequired = (): number => {
+    const pricePerShare = property.financials.pricePerShare || 1;
+    return Math.ceil(property.financials.minInvestment / pricePerShare);
   };
 
   // Validation
-  const isValidAmount = (value: string): boolean => {
-    const numValue = parseFloat(value);
-    return !isNaN(numValue) && numValue >= property.financials.minInvestment;
+  const isValidUnits = (value: string): boolean => {
+    const numValue = parseInt(value);
+    const minUnits = getMinUnitsRequired();
+    return !isNaN(numValue) && numValue >= minUnits && numValue <= (property.financials.availableShares || 0);
   };
 
-  const handleAmountChange = (value: string) => {
-    // Only allow numbers and decimal point
-    const cleanValue = value.replace(/[^\d.]/g, '');
-    setAmount(cleanValue);
+  const handleUnitsChange = (value: string) => {
+    // Only allow whole numbers
+    const cleanValue = value.replace(/[^\d]/g, '');
+    setUnits(cleanValue);
   };
 
-  const handleQuickAmount = (value: number) => {
-    setAmount(value.toString());
+  const handleQuickUnits = (value: number) => {
+    setUnits(value.toString());
   };
 
   const handleInvestment = async () => {
-    if (!isValidAmount(amount)) {
+    if (!isValidUnits(units)) {
+      const minUnits = getMinUnitsRequired();
       toast({
-        title: "Invalid Amount",
-        description: `Minimum investment is ${formatCurrency(property.financials.minInvestment)}`,
+        title: "Invalid Units",
+        description: `Minimum ${minUnits} units required (${formatCurrency(property.financials.minInvestment)})`,
         variant: "destructive"
       });
       return;
@@ -116,6 +125,9 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
         throw new Error('Authentication required. Please login again.');
       }
 
+      const numUnits = parseInt(units);
+      const totalAmount = calculateTotalAmount(numUnits);
+
       // Make investment API call
       const response = await fetch(`http://13.50.13.193:5000/api/properties/${property._id}/invest`, {
         method: 'POST',
@@ -124,7 +136,8 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: parseFloat(amount)
+          units: numUnits,
+          shares: numUnits
         }),
       });
 
@@ -140,7 +153,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
 
         toast({
           title: "Investment Successful! 🎉",
-          description: `You've successfully invested ${formatCurrency(parseFloat(amount))} in ${property.title}`,
+          description: `You've successfully purchased ${numUnits} units (${formatCurrency(totalAmount)}) in ${property.title}`,
           variant: "default"
         });
 
@@ -161,12 +174,13 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
     }
   };
 
-  const investmentAmount = parseFloat(amount) || 0;
-  const shares = calculateShares(investmentAmount);
-  const projectedReturn = calculateProjectedReturn(investmentAmount);
+  const numUnits = parseInt(units) || 0;
+  const totalAmount = calculateTotalAmount(numUnits);
+  const projectedReturn = calculateProjectedReturn(totalAmount);
+  const minUnits = getMinUnitsRequired();
 
   const handleClose = () => {
-    setAmount('');
+    setUnits('');
     setInvestmentSuccess(false);
     setInvestmentData(null);
     onClose();
@@ -203,14 +217,18 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                     <span className="font-semibold">{property.title}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-emerald-700 dark:text-emerald-300">Amount Invested:</span>
-                    <span className="font-semibold">{formatCurrency(parseFloat(amount))}</span>
+                    <span className="text-emerald-700 dark:text-emerald-300">Units Purchased:</span>
+                    <span className="font-semibold">{investmentData?.unitsPurchased || units} Units</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-emerald-700 dark:text-emerald-300">Amount Paid:</span>
+                    <span className="font-semibold">{formatCurrency(investmentData?.totalAmountPaid || totalAmount)}</span>
                   </div>
                   {investmentData && (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-emerald-700 dark:text-emerald-300">Shares Acquired:</span>
-                        <span className="font-semibold">{investmentData.shares}</span>
+                        <span className="text-emerald-700 dark:text-emerald-300">Price per Unit:</span>
+                        <span className="font-semibold">{formatCurrency(investmentData.pricePerUnit || property.financials.pricePerShare)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-emerald-700 dark:text-emerald-300">Investment ID:</span>
@@ -288,51 +306,69 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
             </div>
           </div>
 
-          {/* Investment Amount */}
+          {/* Number of Units */}
           <div className="space-y-4">
-            <Label htmlFor="amount" className="text-base font-semibold">
-              Investment Amount (SAR)
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="units" className="text-base font-semibold">
+                Number of Units
+              </Label>
+              <div className="text-sm text-muted-foreground">
+                {formatCurrency(property.financials.pricePerShare)} per unit
+              </div>
+            </div>
             <div className="space-y-2">
               <Input
-                id="amount"
+                id="units"
                 type="text"
-                placeholder={`Minimum ${formatCurrency(property.financials.minInvestment)}`}
-                value={amount}
-                onChange={(e) => handleAmountChange(e.target.value)}
+                placeholder={`Minimum ${minUnits} units`}
+                value={units}
+                onChange={(e) => handleUnitsChange(e.target.value)}
                 className="text-lg py-3"
               />
-              {amount && !isValidAmount(amount) && (
+              {units && !isValidUnits(units) && (
                 <div className="flex items-center gap-2 text-sm text-destructive">
                   <AlertTriangle className="w-4 h-4" />
-                  Minimum investment is {formatCurrency(property.financials.minInvestment)}
+                  {parseInt(units) > property.financials.availableShares
+                    ? `Only ${property.financials.availableShares} units available`
+                    : `Minimum ${minUnits} units required (${formatCurrency(property.financials.minInvestment)})`
+                  }
+                </div>
+              )}
+              {units && isValidUnits(units) && (
+                <div className="text-sm text-emerald-600">
+                  Total: {formatCurrency(totalAmount)}
                 </div>
               )}
             </div>
 
-            {/* Quick Amount Buttons */}
+            {/* Quick Units Buttons */}
             <div className="grid grid-cols-4 gap-2">
               {[
-                property.financials.minInvestment,
-                property.financials.minInvestment * 2,
-                property.financials.minInvestment * 5,
-                property.financials.minInvestment * 10
-              ].map((quickAmount) => (
+                minUnits,
+                minUnits * 2,
+                minUnits * 5,
+                minUnits * 10
+              ].filter(u => u <= property.financials.availableShares).map((quickUnits) => (
                 <Button
-                  key={quickAmount}
+                  key={quickUnits}
                   variant="outline"
                   size="sm"
-                  onClick={() => handleQuickAmount(quickAmount)}
+                  onClick={() => handleQuickUnits(quickUnits)}
                   className="text-xs"
                 >
-                  {formatCurrency(quickAmount)}
+                  {quickUnits} units
                 </Button>
               ))}
+            </div>
+
+            {/* Available units info */}
+            <div className="text-sm text-muted-foreground text-center">
+              {property.financials.availableShares} units available
             </div>
           </div>
 
           {/* Investment Summary */}
-          {investmentAmount >= property.financials.minInvestment && (
+          {numUnits >= minUnits && (
             <div className="space-y-4 p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
               <h4 className="font-semibold text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
                 <Calculator className="w-4 h-4" />
@@ -341,16 +377,20 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-emerald-600 dark:text-emerald-400">Investment Amount</div>
-                  <div className="font-bold text-lg">{formatCurrency(investmentAmount)}</div>
+                  <div className="text-sm text-emerald-600 dark:text-emerald-400">Units to Purchase</div>
+                  <div className="font-bold text-lg">{numUnits} Units</div>
                 </div>
                 <div>
-                  <div className="text-sm text-emerald-600 dark:text-emerald-400">Shares</div>
-                  <div className="font-bold text-lg">{shares}</div>
+                  <div className="text-sm text-emerald-600 dark:text-emerald-400">Total Amount</div>
+                  <div className="font-bold text-lg">{formatCurrency(totalAmount)}</div>
                 </div>
               </div>
 
               <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-emerald-600 dark:text-emerald-400">Price per Unit</span>
+                  <span className="font-semibold">{formatCurrency(property.financials.pricePerShare)}</span>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-emerald-600 dark:text-emerald-400">Projected Annual Return</span>
                   <span className="font-semibold">{formatCurrency(projectedReturn)}</span>
@@ -396,7 +436,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
               </Button>
               <Button
                 onClick={handleInvestment}
-                disabled={!isValidAmount(amount) || loading}
+                disabled={!isValidUnits(units) || loading}
                 className="bg-gradient-to-r from-emerald-600 to-blue-600"
               >
                 {loading ? (
@@ -406,8 +446,8 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                   </>
                 ) : (
                   <>
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    Invest {amount && isValidAmount(amount) ? formatCurrency(parseFloat(amount)) : 'Now'}
+                    <Building2 className="w-4 h-4 mr-2" />
+                    Purchase {units && isValidUnits(units) ? `${numUnits} Units` : 'Now'}
                   </>
                 )}
               </Button>

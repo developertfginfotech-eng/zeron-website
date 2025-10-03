@@ -9,13 +9,11 @@ import {
   Shield,
   CreditCard,
   Bell,
-  Globe,
   Download,
   Lock,
   Settings,
   Clock,
   CheckCircle,
-  AlertCircle,
   ArrowRight,
   LogOut
 } from 'lucide-react';

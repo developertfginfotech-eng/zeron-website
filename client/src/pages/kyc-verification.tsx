@@ -66,7 +66,6 @@ const KYCVerificationPage = () => {
     addressDocType: "utility_bill",
   });
 
-  // Load existing KYC data on component mount
   useEffect(() => {
     const loadExistingKYCData = async () => {
       try {
@@ -92,14 +91,14 @@ const KYCVerificationPage = () => {
               if (kycData.success && kycData.data) {
                 const existingData = kycData.data;
                 
-                // If KYC is already submitted or approved, redirect to dashboard
+                
                 if (existingData.status === 'submitted' || existingData.status === 'under_review' || existingData.status === 'approved') {
                   alert('Your KYC verification is already submitted and under review. Redirecting to dashboard...');
                   window.location.href = '/user-dashboard';
                   return;
                 }
                 
-                // Pre-fill form with existing data only if status is 'pending'
+               
                 setFormData(prev => ({
                   ...prev,
                   fullNameEnglish: existingData.personalInfo?.fullNameEnglish || '',
@@ -120,7 +119,7 @@ const KYCVerificationPage = () => {
                   addressDocType: existingData.documents?.addressProof?.type || 'utility_bill'
                 }));
 
-                // Set uploaded files status
+               
                 const uploadedFilesStatus = {};
                 if (existingData.documents?.nationalId?.url) {
                   uploadedFilesStatus.nationalId = { name: 'Previously uploaded', size: 0 };
