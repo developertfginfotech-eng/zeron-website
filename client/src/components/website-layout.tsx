@@ -213,18 +213,6 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                         )}
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/kyc-verification" data-testid="menu-kyc">
-                        <User className="mr-2 h-4 w-4" />
-                        KYC Verification
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/user-settings" data-testid="menu-settings">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleLogout}
