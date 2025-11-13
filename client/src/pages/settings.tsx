@@ -7,16 +7,17 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Settings as SettingsIcon, 
-  Bell, 
-  Shield, 
-  Globe, 
+import {
+  Settings as SettingsIcon,
+  Bell,
+  Shield,
+  Globe,
   Database,
   Mail,
   Smartphone,
   Save,
-  RefreshCw
+  RefreshCw,
+  TrendingUp
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -31,26 +32,33 @@ export default function Settings() {
     timezone: 'Asia/Riyadh',
     dateFormat: 'DD/MM/YYYY',
     currency: 'SAR',
-    
+
     // Notification Settings
     emailNotifications: true,
     smsNotifications: false,
     pushNotifications: true,
     weeklyReports: true,
-    
+
     // Security Settings
     twoFactorAuth: true,
     sessionTimeout: '8',
     passwordPolicy: 'strong',
     ipWhitelist: true,
-    
+
     // Business Settings
     minimumInvestment: '10000',
     maximumInvestment: '1000000',
     platformFee: '2.5',
     kycRequirement: true,
     autoApproval: false,
-    
+
+    // Investment Settings
+    rentalYieldPercentage: '8.00',
+    appreciationRatePercentage: '5.00',
+    maturityPeriodYears: '3',
+    investmentDurationYears: '5',
+    earlyWithdrawalPenaltyPercentage: '15.00',
+
     // Integration Settings
     emailProvider: 'sendgrid',
     smsProvider: 'twilio',
@@ -334,7 +342,7 @@ export default function Settings() {
                   data-testid="input-minimum-investment"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="maximumInvestment">Maximum Investment (SAR)</Label>
                 <Input
@@ -381,6 +389,97 @@ export default function Settings() {
                 onCheckedChange={(checked) => handleSettingChange('autoApproval', checked)}
                 data-testid="switch-auto-approval"
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Investment Settings */}
+        <Card data-testid="card-investment-settings">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Investment Settings
+            </CardTitle>
+            <CardDescription>Configure investment returns and maturity rules</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="rentalYieldPercentage">Rental Yield (%)</Label>
+                <Input
+                  id="rentalYieldPercentage"
+                  type="number"
+                  step="0.01"
+                  value={settings.rentalYieldPercentage}
+                  onChange={(e) => handleSettingChange('rentalYieldPercentage', e.target.value)}
+                  data-testid="input-rental-yield"
+                />
+                <p className="text-xs text-muted-foreground">Annual rental yield percentage</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="appreciationRatePercentage">Appreciation Rate (%)</Label>
+                <Input
+                  id="appreciationRatePercentage"
+                  type="number"
+                  step="0.01"
+                  value={settings.appreciationRatePercentage}
+                  onChange={(e) => handleSettingChange('appreciationRatePercentage', e.target.value)}
+                  data-testid="input-appreciation-rate"
+                />
+                <p className="text-xs text-muted-foreground">Annual capital appreciation rate</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="maturityPeriodYears">Maturity Period (Years)</Label>
+                <Input
+                  id="maturityPeriodYears"
+                  type="number"
+                  value={settings.maturityPeriodYears}
+                  onChange={(e) => handleSettingChange('maturityPeriodYears', e.target.value)}
+                  data-testid="input-maturity-period"
+                />
+                <p className="text-xs text-muted-foreground">Years until investment matures</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="investmentDurationYears">Investment Duration (Years)</Label>
+                <Input
+                  id="investmentDurationYears"
+                  type="number"
+                  value={settings.investmentDurationYears}
+                  onChange={(e) => handleSettingChange('investmentDurationYears', e.target.value)}
+                  data-testid="input-investment-duration"
+                />
+                <p className="text-xs text-muted-foreground">Total investment duration</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="earlyWithdrawalPenaltyPercentage">Early Withdrawal Penalty (%)</Label>
+              <Input
+                id="earlyWithdrawalPenaltyPercentage"
+                type="number"
+                step="0.01"
+                value={settings.earlyWithdrawalPenaltyPercentage}
+                onChange={(e) => handleSettingChange('earlyWithdrawalPenaltyPercentage', e.target.value)}
+                data-testid="input-early-withdrawal-penalty"
+              />
+              <p className="text-xs text-muted-foreground">Penalty charged for withdrawal before maturity period</p>
+            </div>
+
+            <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg space-y-2">
+              <p className="text-sm font-medium">Investment Example</p>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>• Investment amount: SAR 10,000</p>
+                <p>• Rental yield: {settings.rentalYieldPercentage}% annually</p>
+                <p>• Matures after: {settings.maturityPeriodYears} years</p>
+                <p>• Total duration: {settings.investmentDurationYears} years</p>
+                <p>• Early withdrawal penalty: {settings.earlyWithdrawalPenaltyPercentage}% if withdrawn before {settings.maturityPeriodYears} years</p>
+                <p>• At maturity: Investor gets appreciation capital + rental yield from {settings.maturityPeriodYears} years</p>
+              </div>
             </div>
           </CardContent>
         </Card>

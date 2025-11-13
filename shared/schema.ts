@@ -176,9 +176,16 @@ export const investments = pgTable("investments", {
   currentValue: decimal("current_value", { precision: 12, scale: 2 }),
   totalReturns: decimal("total_returns", { precision: 12, scale: 2 }).default("0"),
   totalDividends: decimal("total_dividends", { precision: 12, scale: 2 }).default("0"),
-  status: text("status").notNull().default("active"), // "active", "sold", "liquidated"
+  status: text("status").notNull().default("active"), // "active", "sold", "liquidated", "withdrawn"
   investmentDate: timestamp("investment_date").defaultNow(),
+  maturityDate: timestamp("maturity_date"), // Date when investment matures (3 years default)
   exitDate: timestamp("exit_date"),
+  // Snapshot of settings at time of investment (for consistency)
+  rentalYieldRate: decimal("rental_yield_rate", { precision: 5, scale: 2 }), // Annual rental yield %
+  appreciationRate: decimal("appreciation_rate", { precision: 5, scale: 2 }), // Annual appreciation %
+  penaltyRate: decimal("penalty_rate", { precision: 5, scale: 2 }), // Early withdrawal penalty %
+  maturityPeriodYears: integer("maturity_period_years"), // Years to maturity (e.g., 3)
+  investmentDurationYears: integer("investment_duration_years"), // Total investment duration (e.g., 5)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -206,6 +213,34 @@ export const aiInsights = pgTable("ai_insights", {
   confidence: decimal("confidence", { precision: 3, scale: 2 }),
   entityId: varchar("entity_id"), // Related property/customer ID
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const investmentSettings = pgTable("investment_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Rental and Returns
+  rentalYieldPercentage: decimal("rental_yield_percentage", { precision: 5, scale: 2 }).notNull().default("8.00"), // Annual rental yield %
+  appreciationRatePercentage: decimal("appreciation_rate_percentage", { precision: 5, scale: 2 }).notNull().default("5.00"), // Annual appreciation %
+
+  // Time Periods
+  maturityPeriodYears: integer("maturity_period_years").notNull().default(3), // Years until investment matures
+  investmentDurationYears: integer("investment_duration_years").notNull().default(5), // Total investment duration
+
+  // Penalties and Fees
+  earlyWithdrawalPenaltyPercentage: decimal("early_withdrawal_penalty_percentage", { precision: 5, scale: 2 }).notNull().default("15.00"), // Penalty before maturity
+  platformFeePercentage: decimal("platform_fee_percentage", { precision: 5, scale: 2 }).default("2.00"), // Platform fee %
+
+  // Investment Limits
+  minInvestmentAmount: decimal("min_investment_amount", { precision: 12, scale: 2 }).notNull().default("1000.00"),
+  maxInvestmentAmount: decimal("max_investment_amount", { precision: 12, scale: 2 }).notNull().default("1000000.00"),
+
+  // Additional Settings
+  isActive: boolean("is_active").notNull().default(true), // Whether these settings are currently active
+  description: text("description"), // Admin notes about these settings
+
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdBy: varchar("created_by").references(() => adminUsers.id), // Admin who created
+  updatedBy: varchar("updated_by").references(() => adminUsers.id), // Admin who last updated
 });
 
 // Insert schemas
@@ -270,6 +305,12 @@ export const insertAiInsightSchema = createInsertSchema(aiInsights).omit({
   createdAt: true,
 });
 
+export const insertInvestmentSettingsSchema = createInsertSchema(investmentSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -294,3 +335,5 @@ export type PortfolioSummary = typeof portfolioSummary.$inferSelect;
 export type InsertPortfolioSummary = z.infer<typeof insertPortfolioSummarySchema>;
 export type AiInsight = typeof aiInsights.$inferSelect;
 export type InsertAiInsight = z.infer<typeof insertAiInsightSchema>;
+export type InvestmentSettings = typeof investmentSettings.$inferSelect;
+export type InsertInvestmentSettings = z.infer<typeof insertInvestmentSettingsSchema>;

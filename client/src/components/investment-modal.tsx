@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
+import { useInvestmentSettings } from "@/hooks/use-investment-settings"
 import {
   DollarSign,
   TrendingUp,
@@ -23,7 +24,9 @@ import {
   Loader2,
   Calculator,
   MapPin,
-  Building2
+  Building2,
+  Clock,
+  Percent
 } from "lucide-react"
 
 interface BackendProperty {
@@ -60,6 +63,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
   const [investmentSuccess, setInvestmentSuccess] = useState(false);
   const [investmentData, setInvestmentData] = useState<any>(null);
   const { toast } = useToast();
+  const { data: investmentSettings, isLoading: settingsLoading } = useInvestmentSettings();
 
   if (!property) return null;
 
@@ -398,6 +402,52 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                 <div className="flex justify-between">
                   <span className="text-sm text-emerald-600 dark:text-emerald-400">Expected Yield</span>
                   <span className="font-semibold">{property.financials.projectedYield}%</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Investment Terms */}
+          {investmentSettings && (
+            <div className="space-y-3 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+              <h4 className="font-semibold text-purple-900 dark:text-purple-100 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Investment Terms
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                    <Percent className="w-3 h-3" />
+                    Rental Yield
+                  </div>
+                  <div className="font-bold text-sm">{investmentSettings.rentalYieldPercentage}% annually</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                    <TrendingUp className="w-3 h-3" />
+                    Appreciation
+                  </div>
+                  <div className="font-bold text-sm">{investmentSettings.appreciationRatePercentage}% annually</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                    <Clock className="w-3 h-3" />
+                    Maturity Period
+                  </div>
+                  <div className="font-bold text-sm">{investmentSettings.maturityPeriodYears} years</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                    <Calendar className="w-3 h-3" />
+                    Total Duration
+                  </div>
+                  <div className="font-bold text-sm">{investmentSettings.investmentDurationYears} years</div>
+                </div>
+              </div>
+              <div className="pt-2 border-t border-purple-200 dark:border-purple-800">
+                <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
+                  <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+                  <span>Early withdrawal (before {investmentSettings.maturityPeriodYears} years): {investmentSettings.earlyWithdrawalPenaltyPercentage}% penalty</span>
                 </div>
               </div>
             </div>

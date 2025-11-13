@@ -1,5 +1,5 @@
-import { 
-  type User, 
+import {
+  type User,
   type InsertUser,
   type Investor,
   type InsertInvestor,
@@ -11,7 +11,11 @@ import {
   type InsertChatMessage,
   type AiInsight,
   type InsertAiInsight,
-  type Notification
+  type Notification,
+  type Investment,
+  type InsertInvestment,
+  type InvestmentSettings,
+  type InsertInvestmentSettings
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -50,7 +54,19 @@ export interface IStorage {
   getAiInsightsByType(type: string): Promise<AiInsight[]>;
   getAllAiInsights(): Promise<AiInsight[]>;
   createAiInsight(insight: InsertAiInsight): Promise<AiInsight>;
-  
+
+  // Investment Settings
+  getActiveInvestmentSettings(): Promise<InvestmentSettings | undefined>;
+  getInvestmentSettings(id: string): Promise<InvestmentSettings | undefined>;
+  createInvestmentSettings(settings: InsertInvestmentSettings): Promise<InvestmentSettings>;
+  updateInvestmentSettings(id: string, updates: Partial<InsertInvestmentSettings>): Promise<InvestmentSettings | undefined>;
+
+  // Investments
+  getInvestment(id: string): Promise<Investment | undefined>;
+  getInvestmentsByInvestor(investorId: string): Promise<Investment[]>;
+  createInvestment(investment: InsertInvestment): Promise<Investment>;
+  updateInvestment(id: string, updates: Partial<InsertInvestment>): Promise<Investment | undefined>;
+
   // Notifications
   getAllNotifications(): Promise<Notification[]>;
 }
@@ -63,6 +79,8 @@ export class MemStorage implements IStorage {
   private chatMessages: Map<string, ChatMessage>;
   private aiInsights: Map<string, AiInsight>;
   private notifications: Map<string, Notification>;
+  private investmentSettings: Map<string, InvestmentSettings>;
+  private investments: Map<string, Investment>;
 
   constructor() {
     this.users = new Map();
@@ -72,7 +90,9 @@ export class MemStorage implements IStorage {
     this.chatMessages = new Map();
     this.aiInsights = new Map();
     this.notifications = new Map();
-    
+    this.investmentSettings = new Map();
+    this.investments = new Map();
+
     // Initialize with some sample data
     this.initializeSampleData();
   }
@@ -229,6 +249,68 @@ export class MemStorage implements IStorage {
     return Array.from(this.notifications.values());
   }
 
+  // Investment Settings
+  async getActiveInvestmentSettings(): Promise<InvestmentSettings | undefined> {
+    return Array.from(this.investmentSettings.values())
+      .find(settings => settings.isActive === true);
+  }
+
+  async getInvestmentSettings(id: string): Promise<InvestmentSettings | undefined> {
+    return this.investmentSettings.get(id);
+  }
+
+  async createInvestmentSettings(insertSettings: InsertInvestmentSettings): Promise<InvestmentSettings> {
+    const id = randomUUID();
+    const settings: InvestmentSettings = {
+      ...insertSettings,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.investmentSettings.set(id, settings);
+    return settings;
+  }
+
+  async updateInvestmentSettings(id: string, updates: Partial<InsertInvestmentSettings>): Promise<InvestmentSettings | undefined> {
+    const settings = this.investmentSettings.get(id);
+    if (!settings) return undefined;
+
+    const updated = { ...settings, ...updates, updatedAt: new Date() };
+    this.investmentSettings.set(id, updated);
+    return updated;
+  }
+
+  // Investments
+  async getInvestment(id: string): Promise<Investment | undefined> {
+    return this.investments.get(id);
+  }
+
+  async getInvestmentsByInvestor(investorId: string): Promise<Investment[]> {
+    return Array.from(this.investments.values())
+      .filter(inv => inv.investorId === investorId);
+  }
+
+  async createInvestment(insertInvestment: InsertInvestment): Promise<Investment> {
+    const id = randomUUID();
+    const investment: Investment = {
+      ...insertInvestment,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.investments.set(id, investment);
+    return investment;
+  }
+
+  async updateInvestment(id: string, updates: Partial<InsertInvestment>): Promise<Investment | undefined> {
+    const investment = this.investments.get(id);
+    if (!investment) return undefined;
+
+    const updated = { ...investment, ...updates, updatedAt: new Date() };
+    this.investments.set(id, updated);
+    return updated;
+  }
+
   private initializeSampleData() {
     // Sample investors with proper typing
     const sampleInvestors: Omit<Investor, 'id' | 'createdAt'>[] = [
@@ -336,6 +418,30 @@ export class MemStorage implements IStorage {
         id,
         createdAt: new Date()
       });
+    });
+
+    // Initialize default investment settings
+    const defaultSettings: Omit<InvestmentSettings, 'id' | 'createdAt' | 'updatedAt'> = {
+      rentalYieldPercentage: '8.00',
+      appreciationRatePercentage: '5.00',
+      maturityPeriodYears: 3,
+      investmentDurationYears: 5,
+      earlyWithdrawalPenaltyPercentage: '15.00',
+      platformFeePercentage: '2.00',
+      minInvestmentAmount: '1000.00',
+      maxInvestmentAmount: '1000000.00',
+      isActive: true,
+      description: 'Default investment settings',
+      createdBy: null,
+      updatedBy: null
+    };
+
+    const settingsId = randomUUID();
+    this.investmentSettings.set(settingsId, {
+      ...defaultSettings,
+      id: settingsId,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
   }
 }
