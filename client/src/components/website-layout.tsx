@@ -34,13 +34,22 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
   const { user, isLoading, logout, isAuthenticated } = useAuth()
   const { unreadCount } = useNotifications()
 
-  const navigation = [
+  // Navigation items based on authentication status
+  const publicNavigation = [
+    { name: "Invest", href: "/website/invest" },
+    { name: "Properties", href: "/website/properties" },
+    { name: t("about_us"), href: "/website/about" },
+  ]
+
+  const authenticatedNavigation = [
     { name: "Invest", href: "/website/invest" },
     { name: "Portfolio", href: "/website/portfolio" },
     { name: "Wallet", href: "/website/wallet" },
     { name: "Properties", href: "/website/properties" },
     { name: t("about_us"), href: "/website/about" },
   ]
+
+  const navigation = isAuthenticated ? authenticatedNavigation : publicNavigation
 
   const isActive = (href: string, exact = false) => {
     if (exact) {
