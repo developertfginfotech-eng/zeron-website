@@ -210,20 +210,21 @@ export default function InvestPage() {
       
       const token = getAuthToken();
       
-      const endpoint = 'http://13.50.13.193:5000/api/admin/properties';
-      
+      // Fetch only 6 featured properties for home page
+      const endpoint = 'http://13.50.13.193:5000/api/admin/properties?limit=6&sort=-createdAt';
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      
+
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
-      
-      console.log('Fetching properties from:', endpoint)
+
+      console.log('Fetching featured properties from:', endpoint)
       console.log('Authentication status:', isAuthenticated)
       console.log('User:', user)
-      
+
       const response = await fetch(endpoint, {
         method: 'GET',
         headers,
