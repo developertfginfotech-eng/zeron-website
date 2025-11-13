@@ -1,12 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { 
-  insertInvestorSchema, 
-  insertPropertySchema, 
-  insertTransactionSchema, 
-  insertChatMessageSchema, 
-  insertAiInsightSchema 
+import {
+  insertInvestorSchema,
+  insertPropertySchema,
+  insertTransactionSchema,
+  insertChatMessageSchema,
+  insertAiInsightSchema,
+  insertInvestmentSettingsSchema,
+  insertInvestmentSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -164,7 +166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/ai/chat", async (req, res) => {
     try {
       const { message, userId, language } = req.body;
-      
+
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
       }
@@ -179,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate AI response (for now, mock response)
       const aiResponse = generateMockAiResponse(message, language);
-      
+
       // Store AI response
       const aiMessage = await storage.createChatMessage({
         userId: userId || null,
@@ -191,6 +193,214 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(aiMessage);
     } catch (error) {
       res.status(500).json({ error: "Failed to process chat message" });
+    }
+  });
+
+  // Investment Settings endpoints
+  app.get("/api/investment-settings", async (req, res) => {
+    try {
+      const settings = await storage.getActiveInvestmentSettings();
+      if (!settings) {
+        return res.status(404).json({ error: "No active investment settings found" });
+      }
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch investment settings" });
+    }
+  });
+
+  app.post("/api/investment-settings", async (req, res) => {
+    try {
+      const validatedData = insertInvestmentSettingsSchema.parse(req.body);
+      const settings = await storage.createInvestmentSettings(validatedData);
+      res.status(201).json(settings);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid investment settings data" });
+    }
+  });
+
+  app.put("/api/investment-settings/:id", async (req, res) => {
+    try {
+      const validatedData = insertInvestmentSettingsSchema.partial().parse(req.body);
+      const settings = await storage.updateInvestmentSettings(req.params.id, validatedData);
+      if (!settings) {
+        return res.status(404).json({ error: "Investment settings not found" });
+      }
+      res.json(settings);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid investment settings data" });
+    }
+  });
+
+  // Investments endpoints
+  app.get("/api/investments/investor/:investorId", async (req, res) => {
+    try {
+      const investments = await storage.getInvestmentsByInvestor(req.params.investorId);
+      res.json(investments);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch investments" });
+    }
+  });
+
+  app.get("/api/investments/:id", async (req, res) => {
+    try {
+      const investment = await storage.getInvestment(req.params.id);
+      if (!investment) {
+        return res.status(404).json({ error: "Investment not found" });
+      }
+      res.json(investment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch investment" });
+    }
+  });
+
+  app.post("/api/investments", async (req, res) => {
+    try {
+      const validatedData = insertInvestmentSchema.parse(req.body);
+
+      // Get active investment settings to apply rules
+      const settings = await storage.getActiveInvestmentSettings();
+      if (!settings) {
+        return res.status(400).json({ error: "No active investment settings found" });
+      }
+
+      // Calculate maturity date (investmentDate + maturityPeriodYears)
+      const maturityDate = new Date();
+      maturityDate.setFullYear(maturityDate.getFullYear() + (validatedData.maturityPeriodYears || settings.maturityPeriodYears));
+
+      // Create investment with settings snapshot
+      const investment = await storage.createInvestment({
+        ...validatedData,
+        maturityDate,
+        rentalYieldRate: validatedData.rentalYieldRate || settings.rentalYieldPercentage,
+        appreciationRate: validatedData.appreciationRate || settings.appreciationRatePercentage,
+        penaltyRate: validatedData.penaltyRate || settings.earlyWithdrawalPenaltyPercentage,
+        maturityPeriodYears: validatedData.maturityPeriodYears || settings.maturityPeriodYears,
+        investmentDurationYears: validatedData.investmentDurationYears || settings.investmentDurationYears
+      });
+
+      res.status(201).json(investment);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid investment data" });
+    }
+  });
+
+  // Withdraw investment endpoint with penalty calculation
+  app.post("/api/investments/:id/withdraw", async (req, res) => {
+    try {
+      const investment = await storage.getInvestment(req.params.id);
+      if (!investment) {
+        return res.status(404).json({ error: "Investment not found" });
+      }
+
+      if (investment.status !== "active") {
+        return res.status(400).json({ error: "Investment is not active" });
+      }
+
+      const now = new Date();
+      const investmentDate = new Date(investment.investmentDate);
+      const maturityDate = investment.maturityDate ? new Date(investment.maturityDate) : null;
+
+      // Check if withdrawal is before maturity
+      const isEarlyWithdrawal = maturityDate && now < maturityDate;
+
+      let withdrawalAmount = parseFloat(investment.currentValue || investment.investmentAmount);
+      let penalty = 0;
+
+      if (isEarlyWithdrawal && investment.penaltyRate) {
+        penalty = withdrawalAmount * (parseFloat(investment.penaltyRate) / 100);
+        withdrawalAmount = withdrawalAmount - penalty;
+      }
+
+      // Update investment status
+      await storage.updateInvestment(req.params.id, {
+        status: "withdrawn",
+        exitDate: now
+      });
+
+      // Create withdrawal transaction
+      const transaction = await storage.createTransaction({
+        investorId: investment.investorId,
+        propertyId: investment.propertyId,
+        type: "withdrawal",
+        amount: withdrawalAmount.toString(),
+        fee: penalty.toString(),
+        description: isEarlyWithdrawal
+          ? `Early withdrawal with ${investment.penaltyRate}% penalty`
+          : "Withdrawal after maturity",
+        status: "pending"
+      });
+
+      res.json({
+        investment,
+        transaction,
+        withdrawalAmount,
+        penalty,
+        isEarlyWithdrawal
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to process withdrawal" });
+    }
+  });
+
+  // Calculate investment returns endpoint
+  app.post("/api/investments/calculate", async (req, res) => {
+    try {
+      const { investmentAmount, propertyId } = req.body;
+
+      if (!investmentAmount) {
+        return res.status(400).json({ error: "Investment amount is required" });
+      }
+
+      const settings = await storage.getActiveInvestmentSettings();
+      if (!settings) {
+        return res.status(400).json({ error: "No active investment settings found" });
+      }
+
+      const amount = parseFloat(investmentAmount);
+      const rentalYield = parseFloat(settings.rentalYieldPercentage);
+      const appreciation = parseFloat(settings.appreciationRatePercentage);
+      const maturityYears = settings.maturityPeriodYears;
+      const totalYears = settings.investmentDurationYears;
+
+      // Calculate rental income (annual)
+      const annualRentalIncome = amount * (rentalYield / 100);
+      const totalRentalIncome = annualRentalIncome * maturityYears;
+
+      // Calculate appreciation (compound)
+      const finalValue = amount * Math.pow(1 + appreciation / 100, maturityYears);
+      const appreciationGain = finalValue - amount;
+
+      // Total returns at maturity
+      const totalReturnsAtMaturity = totalRentalIncome + appreciationGain;
+      const totalValueAtMaturity = amount + totalReturnsAtMaturity;
+
+      // Calculate early withdrawal penalty
+      const penaltyAmount = amount * (parseFloat(settings.earlyWithdrawalPenaltyPercentage) / 100);
+
+      res.json({
+        investmentAmount: amount,
+        settings: {
+          rentalYieldPercentage: rentalYield,
+          appreciationRatePercentage: appreciation,
+          maturityPeriodYears: maturityYears,
+          investmentDurationYears: totalYears,
+          earlyWithdrawalPenaltyPercentage: parseFloat(settings.earlyWithdrawalPenaltyPercentage)
+        },
+        returns: {
+          annualRentalIncome,
+          totalRentalIncome,
+          appreciationGain,
+          totalReturnsAtMaturity,
+          totalValueAtMaturity
+        },
+        earlyWithdrawal: {
+          penaltyAmount,
+          amountAfterPenalty: amount - penaltyAmount
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to calculate investment returns" });
     }
   });
 

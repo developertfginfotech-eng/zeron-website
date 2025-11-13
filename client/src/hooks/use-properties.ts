@@ -85,16 +85,12 @@ export function useProperties(params: UsePropertiesParams = {}) {
       setLoading(true)
       setError(null)
 
-      // Get auth token
+      // Get auth token (optional)
       const token = localStorage.getItem('zaron_token') || localStorage.getItem('authToken')
-      
-      if (!token) {
-        throw new Error('Authentication required')
-      }
 
       // Build query parameters
       const searchParams = new URLSearchParams()
-      
+
       if (params.page) searchParams.append('page', params.page.toString())
       if (params.limit) searchParams.append('limit', params.limit.toString())
       if (params.sort) searchParams.append('sort', params.sort)
@@ -108,12 +104,17 @@ export function useProperties(params: UsePropertiesParams = {}) {
 
       console.log('Fetching properties from:', url)
 
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
       })
 
       const result: PropertiesResponse = await response.json()
