@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useTranslation } from "@/hooks/use-translation"
+import { Link } from "wouter"
 import { 
   Building2, 
   Users, 
@@ -98,14 +99,18 @@ export default function AboutPage() {
               transparent, and profitable for everyone.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700" data-testid="button-our-story">
-                <Heart className="w-5 h-5 mr-2" />
-                Our Story
-              </Button>
-              <Button size="lg" variant="outline" data-testid="button-meet-team">
-                Meet Our Team
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
+              <Link href="/website/invest">
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700" data-testid="button-our-story">
+                  <Heart className="w-5 h-5 mr-2" />
+                  Our Story
+                </Button>
+              </Link>
+              <Link href="#team">
+                <Button size="lg" variant="outline" data-testid="button-meet-team">
+                  Meet Our Team
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -323,12 +328,16 @@ export default function AboutPage() {
             Be part of Saudi Arabia's real estate transformation. Start your investment journey with us today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100" data-testid="button-start-investing">
-              Start Investing
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" data-testid="button-contact-us">
-              {t("contact_us")}
-            </Button>
+            <Link href="/website/properties">
+              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100" data-testid="button-start-investing">
+                Start Investing
+              </Button>
+            </Link>
+            <Link href="/website/contact">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" data-testid="button-contact-us">
+                {t("contact_us")}
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
