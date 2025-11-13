@@ -16,66 +16,16 @@ import {
   CheckCircle,
   Clock3,
   Calendar,
-  Filter
+  Filter,
+  Loader2,
+  AlertCircle
 } from "lucide-react"
 import { StatCard } from "@/components/stat-card"
+import { useWallet } from "@/hooks/use-wallet"
 
 export default function WalletPage() {
   const [activeFilter, setActiveFilter] = useState("all")
-
-  // Sample transaction data
-  const transactions = [
-    {
-      id: 1,
-      type: "deposit",
-      amount: 25000,
-      currency: "SAR",
-      description: "Bank Transfer - Al Rajhi Bank",
-      date: "2024-09-20",
-      status: "completed",
-      icon: Building2
-    },
-    {
-      id: 2,
-      type: "payout",
-      amount: 2150,
-      currency: "SAR",
-      description: "Investment Returns - Riyadh Commercial Plaza",
-      date: "2024-09-15",
-      status: "completed",
-      icon: TrendingUp
-    },
-    {
-      id: 3,
-      type: "withdrawal",
-      amount: -10000,
-      currency: "SAR",
-      description: "Bank Transfer - Al Rajhi Bank",
-      date: "2024-09-10",
-      status: "pending",
-      icon: Building2
-    },
-    {
-      id: 4,
-      type: "investment",
-      amount: -15000,
-      currency: "SAR",
-      description: "Investment - Jeddah Luxury Residences",
-      date: "2024-09-05",
-      status: "completed",
-      icon: CreditCard
-    },
-    {
-      id: 5,
-      type: "payout",
-      amount: 1800,
-      currency: "SAR",
-      description: "Investment Returns - Mecca Shopping Center",
-      date: "2024-09-01",
-      status: "completed",
-      icon: TrendingUp
-    }
-  ]
+  const { balance, transactions, loading, error, addFunds, withdrawFunds } = useWallet()
 
   const filteredTransactions = transactions.filter(transaction => {
     if (activeFilter === "all") return true
@@ -144,47 +94,80 @@ export default function WalletPage() {
 
         {/* Action Buttons */}
         <div className="flex gap-4 mb-8">
-          <Button className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2">
+          <Button
+            className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+            onClick={() => {
+              // TODO: Open withdrawal modal
+              withdrawFunds(1000) // Example
+            }}
+            disabled={loading}
+          >
             <Minus className="h-4 w-4" />
             Withdraw
           </Button>
-          <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
+          <Button
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+            onClick={() => {
+              // TODO: Open add funds modal
+              addFunds(1000, 'bank_transfer') // Example
+            }}
+            disabled={loading}
+          >
             <Plus className="h-4 w-4" />
             Add Funds
           </Button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            title="Available Balance"
-            value="SAR 47,500"
-            change="Ready for investment"
-            changeType="positive"
-            icon={Wallet}
-          />
-          <StatCard
-            title="Pending Withdrawals"
-            value="SAR 5,000"
-            change="Processing 2-3 business days"
-            changeType="neutral"
-            icon={Clock}
-          />
-          <StatCard
-            title="Total Deposits"
-            value="SAR 125,000"
-            change="Lifetime deposits"
-            changeType="positive"
-            icon={ArrowDownLeft}
-          />
-          <StatCard
-            title="Total Withdrawals"
-            value="SAR 72,500"
-            change="Lifetime withdrawals"
-            changeType="neutral"
-            icon={ArrowUpRight}
-          />
-        </div>
+        {/* Error Message */}
+        {error && (
+          <Card className="mb-8 border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800">
+            <CardContent className="pt-6 flex items-center gap-2 text-red-600 dark:text-red-400">
+              <AlertCircle className="h-5 w-5" />
+              <span>{error}</span>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Loading State */}
+        {loading && !balance ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : balance ? (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <StatCard
+                title="Available Balance"
+                value={`${balance.currency} ${balance.availableBalance.toLocaleString()}`}
+                change="Ready for investment"
+                changeType="positive"
+                icon={Wallet}
+              />
+              <StatCard
+                title="Pending Withdrawals"
+                value={`${balance.currency} ${balance.pendingWithdrawals.toLocaleString()}`}
+                change="Processing 2-3 business days"
+                changeType="neutral"
+                icon={Clock}
+              />
+              <StatCard
+                title="Total Deposits"
+                value={`${balance.currency} ${balance.totalDeposits.toLocaleString()}`}
+                change="Lifetime deposits"
+                changeType="positive"
+                icon={ArrowDownLeft}
+              />
+              <StatCard
+                title="Total Withdrawals"
+                value={`${balance.currency} ${balance.totalWithdrawals.toLocaleString()}`}
+                change="Lifetime withdrawals"
+                changeType="neutral"
+                icon={ArrowUpRight}
+              />
+            </div>
+          </>
+        ) : null}
 
         {/* Transactions Section */}
         <Card className="enhanced-card">
@@ -212,53 +195,64 @@ export default function WalletPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="text-sm font-medium text-muted-foreground mb-4">
-                Transaction History
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
+            ) : filteredTransactions.length > 0 ? (
+              <div className="space-y-4">
+                <div className="text-sm font-medium text-muted-foreground mb-4">
+                  Transaction History
+                </div>
 
-              {filteredTransactions.map((transaction) => {
-                const IconComponent = getTransactionIcon(transaction.type)
-                const StatusIcon = transaction.status === "completed" ? CheckCircle : Clock3
+                {filteredTransactions.map((transaction) => {
+                  const IconComponent = getTransactionIcon(transaction.type)
+                  const StatusIcon = transaction.status === "completed" ? CheckCircle : Clock3
 
-                return (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <IconComponent className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{transaction.description}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <p className="text-sm text-muted-foreground">
-                            {formatDate(transaction.date)}
-                          </p>
-                          <Badge
-                            variant="secondary"
-                            className={`text-xs ${getStatusColor(transaction.status)}`}
-                          >
-                            <StatusIcon className="h-3 w-3 mr-1" />
-                            {transaction.status}
-                          </Badge>
+                  return (
+                    <div
+                      key={transaction.id}
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <IconComponent className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{transaction.description}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-sm text-muted-foreground">
+                              {formatDate(transaction.date)}
+                            </p>
+                            <Badge
+                              variant="secondary"
+                              className={`text-xs ${getStatusColor(transaction.status)}`}
+                            >
+                              <StatusIcon className="h-3 w-3 mr-1" />
+                              {transaction.status}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="text-right">
-                      <p className={`font-bold text-lg ${getTransactionColor(transaction.type, transaction.amount)}`}>
-                        {transaction.amount > 0 ? '+' : ''}{transaction.currency} {Math.abs(transaction.amount).toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {transaction.type}
-                      </p>
+                      <div className="text-right">
+                        <p className={`font-bold text-lg ${getTransactionColor(transaction.type, transaction.amount)}`}>
+                          {transaction.amount > 0 ? '+' : ''}{transaction.currency} {Math.abs(transaction.amount).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {transaction.type}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                <p className="text-muted-foreground">No transactions yet</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
