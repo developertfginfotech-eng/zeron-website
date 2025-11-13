@@ -335,15 +335,17 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
             </>
           ) : (
             <>
-              {/* Login prompt for non-authenticated/non-KYC users */}
+              {/* Different prompts for not logged in vs logged in without KYC */}
               <div className="py-8 text-center">
                 <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Lock className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Please Login to View Details</h3>
+                <h3 className="font-semibold text-lg mb-2">
+                  {isLoggedIn ? "Complete KYC Verification" : "Please Login to View Details"}
+                </h3>
                 <p className="text-sm text-muted-foreground mb-6">
                   {isLoggedIn
-                    ? "Complete your identity verification to see full property details and invest."
+                    ? "Verify your identity to unlock full property details and start investing. It only takes a few minutes."
                     : "Sign in to unlock property details and start investing in Saudi Arabia's best real estate opportunities."}
                 </p>
                 <Button
@@ -351,7 +353,7 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
                   className="bg-gradient-to-r from-emerald-600 to-blue-600"
                   onClick={handleKYCRequired}
                 >
-                  {isLoggedIn ? "Complete Verification" : "Login Now"}
+                  {isLoggedIn ? "Verify KYC Now" : "Login Now"}
                 </Button>
               </div>
             </>
