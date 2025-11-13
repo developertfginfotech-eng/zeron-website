@@ -274,54 +274,51 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
         </div>
 
         <CardContent className="p-6">
-          {/* Basic info - always visible but with different presentation for non-KYC */}
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {isKYCCompleted ? `${property.investorCount}+ investors` : 'Multiple investors'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {isKYCCompleted && remainingDays > 0 ? `${remainingDays} days left` : 'Investment Open'}
-              </span>
-            </div>
-          </div>
+          {isKYCCompleted ? (
+            <>
+              {/* Basic info - visible for KYC-approved users */}
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    {property.investorCount}+ investors
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    {remainingDays > 0 ? `${remainingDays} days left` : 'Investment Open'}
+                  </span>
+                </div>
+              </div>
 
-          {/* Funding progress - show for all users */}
-          <div className="space-y-2 mb-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Funding Progress</span>
-              <span className="font-medium">
-                {isKYCCompleted ? `${property.fundingProgress}%` : '●●%'}
-              </span>
-            </div>
-            <Progress value={isKYCCompleted ? property.fundingProgress : 0} className="h-2" />
-          </div>
+              {/* Funding progress */}
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Funding Progress</span>
+                  <span className="font-medium">{property.fundingProgress}%</span>
+                </div>
+                <Progress value={property.fundingProgress} className="h-2" />
+              </div>
 
-          {/* Financial details - masked for non-KYC users */}
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Min. Investment</p>
-              <p className="text-lg font-bold">
-                {isKYCCompleted ? `SAR ${formatCurrency(property.financials.minInvestment)}` : 'SAR ●●●,●●●'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Expected Return</p>
-              <p className="text-lg font-bold text-emerald-600">
-                {isKYCCompleted ? `${property.financials.projectedYield}%` : '●●%'}
-              </p>
-            </div>
-          </div>
+              {/* Financial details */}
+              <div className="grid grid-cols-2 gap-4 py-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Min. Investment</p>
+                  <p className="text-lg font-bold">
+                    SAR {formatCurrency(property.financials.minInvestment)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Expected Return</p>
+                  <p className="text-lg font-bold text-emerald-600">
+                    {property.financials.projectedYield}%
+                  </p>
+                </div>
+              </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-3">
-            {isKYCCompleted ? (
-              // Normal buttons for KYC-approved users
-              <>
+              {/* Action buttons for KYC-approved users */}
+              <div className="flex gap-3">
                 <Button variant="outline" size="sm" className="flex-1">
                   <Eye className="w-4 h-4 mr-2" />
                   View Details
@@ -334,45 +331,30 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
                   <DollarSign className="w-4 h-4 mr-2" />
                   Invest Now
                 </Button>
-              </>
-            ) : (
-              // KYC required buttons
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  onClick={handleKYCRequired}
-                >
-                  <Lock className="w-4 h-4 mr-2" />
-                  {getButtonText()}
-                </Button>
-                <Button
-                  size="sm"
-                  className="flex-1 bg-gradient-to-r from-emerald-600 to-blue-600"
-                  onClick={handleKYCRequired}
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Verify to Invest
-                </Button>
-              </>
-            )}
-          </div>
-
-          {/* KYC Status indicator */}
-          {!isKYCCompleted && (
-            <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
-              <div className="flex items-center gap-2 text-sm">
-                <Shield className="w-4 h-4 text-orange-600" />
-                <span className="text-orange-800 dark:text-orange-200">
-                  {!isLoggedIn
-                    ? "Login and complete KYC to unlock full property details"
-                    : kycStatus === 'submitted' || kycStatus === 'under_review'
-                    ? "Your KYC is under review. Full details will be available once approved."
-                    : "Complete KYC verification to access investment features"}
-                </span>
               </div>
-            </div>
+            </>
+          ) : (
+            <>
+              {/* Login prompt for non-authenticated/non-KYC users */}
+              <div className="py-8 text-center">
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Lock className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Please Login to View Details</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  {isLoggedIn
+                    ? "Complete your identity verification to see full property details and invest."
+                    : "Sign in to unlock property details and start investing in Saudi Arabia's best real estate opportunities."}
+                </p>
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-emerald-600 to-blue-600"
+                  onClick={handleKYCRequired}
+                >
+                  {isLoggedIn ? "Complete Verification" : "Login Now"}
+                </Button>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
