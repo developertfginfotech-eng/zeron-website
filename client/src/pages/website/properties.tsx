@@ -194,7 +194,7 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className="overflow-hidden hover-elevate group cursor-pointer border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+      <Card className="overflow-hidden hover-elevate group cursor-pointer border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm" data-property-id={property._id}>
         <div className="relative">
           {/* Image with KYC Lock */}
           {isKYCCompleted ? (
@@ -317,21 +317,23 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
                 </div>
               </div>
 
-              {/* Action buttons for KYC-approved users */}
-              <div className="flex gap-3">
-                <Button variant="outline" size="sm" className="flex-1">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
-                </Button>
-                <Button
-                  size="sm"
-                  className="flex-1 bg-gradient-to-r from-emerald-600 to-blue-600"
-                  onClick={() => onInvestClick(property)}
-                >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Invest Now
-                </Button>
-              </div>
+              {/* Action button for KYC-approved users */}
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
+                onClick={() => {
+                  // Scroll to top of the property card
+                  const cardElement = document.querySelector('[data-property-id="' + property._id + '"]');
+                  if (cardElement) {
+                    cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                  // Open investment modal
+                  onInvestClick(property);
+                }}
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Invest Now
+              </Button>
             </>
           ) : (
             <>
