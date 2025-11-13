@@ -139,28 +139,28 @@ export default function WalletPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <StatCard
                 title="Available Balance"
-                value={`${balance.currency} ${balance.availableBalance.toLocaleString()}`}
+                value={`${balance?.currency || 'SAR'} ${(balance?.availableBalance || 0).toLocaleString()}`}
                 change="Ready for investment"
                 changeType="positive"
                 icon={Wallet}
               />
               <StatCard
                 title="Pending Withdrawals"
-                value={`${balance.currency} ${balance.pendingWithdrawals.toLocaleString()}`}
+                value={`${balance?.currency || 'SAR'} ${(balance?.pendingWithdrawals || 0).toLocaleString()}`}
                 change="Processing 2-3 business days"
                 changeType="neutral"
                 icon={Clock}
               />
               <StatCard
                 title="Total Deposits"
-                value={`${balance.currency} ${balance.totalDeposits.toLocaleString()}`}
+                value={`${balance?.currency || 'SAR'} ${(balance?.totalDeposits || 0).toLocaleString()}`}
                 change="Lifetime deposits"
                 changeType="positive"
                 icon={ArrowDownLeft}
               />
               <StatCard
                 title="Total Withdrawals"
-                value={`${balance.currency} ${balance.totalWithdrawals.toLocaleString()}`}
+                value={`${balance?.currency || 'SAR'} ${(balance?.totalWithdrawals || 0).toLocaleString()}`}
                 change="Lifetime withdrawals"
                 changeType="neutral"
                 icon={ArrowUpRight}
