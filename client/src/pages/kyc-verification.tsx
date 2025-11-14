@@ -39,6 +39,7 @@ const KYCVerificationPage = () => {
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dataLoading, setDataLoading] = useState(true);
+  const [kycCompletionPercentage, setKycCompletionPercentage] = useState(0);
 
   const fileInputRefs = {
     nationalId: useRef(null),
@@ -87,11 +88,15 @@ const KYCVerificationPage = () => {
             if (response.ok) {
               const kycData = await response.json();
               console.log('KYC data received:', kycData);
-              
+
               if (kycData.success && kycData.data) {
                 const existingData = kycData.data;
-                
-                
+
+                // Store the actual completion percentage from backend
+                if (existingData.completionPercentage !== undefined) {
+                  setKycCompletionPercentage(existingData.completionPercentage);
+                }
+
                 if (existingData.status === 'submitted' || existingData.status === 'under_review' || existingData.status === 'approved') {
                   alert('Your KYC verification is already submitted and under review. Redirecting to dashboard...');
                   window.location.href = '/user-dashboard';
@@ -299,14 +304,21 @@ const KYCVerificationPage = () => {
 
       setUploadProgress(100);
 
-      // Update user KYC status in localStorage
+      // Update user KYC status and completion percentage in localStorage
       if (result.data) {
         user.kycStatus = result.data.kycStatus || "submitted";
+        user.kycCompletionPercentage = result.data.completionPercentage || 0;
         localStorage.setItem("zaron_user", JSON.stringify(user));
+
+        // Update state with completion percentage
+        if (result.data.completionPercentage !== undefined) {
+          setKycCompletionPercentage(result.data.completionPercentage);
+        }
       }
 
+      const completionPercent = result.data?.completionPercentage || 0;
       alert(
-        "KYC verification submitted successfully! Your documents are under review."
+        `KYC verification submitted successfully! Completion: ${completionPercent}%\nYour documents are under review.`
       );
 
       // Redirect to dashboard
@@ -515,10 +527,14 @@ const KYCVerificationPage = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">Complete Your Profile</h2>
             <Badge variant="secondary">
-              Step {currentStep} of {steps.length}
+              {kycCompletionPercentage > 0
+                ? `${kycCompletionPercentage}% Complete`
+                : `Step ${currentStep} of ${steps.length}`
+              }
             </Badge>
           </div>
-          <Progress value={progressPercentage} className="h-2 mb-4" />
+          {/* Show actual KYC completion percentage if available, otherwise show step progress */}
+          <Progress value={kycCompletionPercentage > 0 ? kycCompletionPercentage : progressPercentage} className="h-2 mb-4" />
 
           {/* Upload Progress */}
           {isLoading && uploadProgress > 0 && (
