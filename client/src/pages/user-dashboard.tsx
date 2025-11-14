@@ -62,32 +62,30 @@ const UserDashboard = () => {
                   let completed = 0;
                   const totalSections = 6; // Total sections we're tracking
 
-                  // Check if basic personal info is filled
-                  if (kycData.data.fullNameEnglish || kycData.data.fullNameArabic ||
-                      kycData.data.email || kycData.data.phoneNumber) {
+                  // Check if basic personal info is filled (from personalInfo object)
+                  if (kycData.data.personalInfo?.fullNameEnglish || kycData.data.personalInfo?.fullNameArabic ||
+                      kycData.data.personalInfo?.nationality || kycData.data.personalInfo?.dateOfBirth) {
                     completed++;
                   }
 
-                  // Check identity verification (documents uploaded)
-                  if (kycData.data.nationalIdFront || kycData.data.nationalIdBack ||
-                      kycData.data.passportPhoto || kycData.data.selfiePhoto) {
+                  // Check identity verification (documents.nationalId or documents.selfie)
+                  if (kycData.data.documents?.nationalId?.url || kycData.data.documents?.selfie?.url) {
                     completed++;
                   }
 
-                  // Check investment profile data
-                  if (kycData.data.investmentExperience || kycData.data.riskTolerance ||
-                      kycData.data.investmentGoals) {
+                  // Check address proof (documents.addressProof)
+                  if (kycData.data.documents?.addressProof?.url || kycData.data.address?.street) {
                     completed++;
                   }
 
-                  // Check banking details
-                  if (kycData.data.bankName || kycData.data.iban || kycData.data.accountNumber) {
+                  // Check income verification (documents.proofOfIncome)
+                  if (kycData.data.documents?.proofOfIncome?.url || kycData.data.personalInfo?.monthlyIncome) {
                     completed++;
                   }
 
-                  // Check additional info
-                  if (kycData.data.monthlyIncome || kycData.data.employmentStatus ||
-                      kycData.data.sourceOfFunds) {
+                  // Check if all 4 document types are uploaded
+                  const docsUploaded = Object.values(kycData.data.documents || {}).filter((doc: any) => doc?.url).length;
+                  if (docsUploaded >= 3) {
                     completed++;
                   }
 
@@ -111,10 +109,10 @@ const UserDashboard = () => {
                     totalSections,
                     percentage,
                     status: kycData.data.status,
-                    hasBasicInfo: !!(kycData.data.fullNameEnglish || kycData.data.email),
-                    hasDocuments: !!(kycData.data.nationalIdFront || kycData.data.passportPhoto),
-                    hasInvestmentInfo: !!(kycData.data.investmentExperience),
-                    hasBankingInfo: !!(kycData.data.bankName || kycData.data.iban)
+                    hasBasicInfo: !!(kycData.data.personalInfo?.fullNameEnglish || kycData.data.personalInfo?.fullNameArabic),
+                    hasDocuments: docsUploaded,
+                    documentDetails: kycData.data.documents,
+                    hasAddress: !!(kycData.data.address?.street || kycData.data.address?.city)
                   });
 
                   // Update localStorage with fresh KYC status
