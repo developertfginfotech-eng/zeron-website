@@ -306,7 +306,7 @@ const KYCVerificationPage = () => {
 
       // Fetch updated user profile from backend
       try {
-        const profileResponse = await fetch(`${API_BASE_URL}/users/profile`, {
+        const profileResponse = await fetch(`${apiUrl}/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
