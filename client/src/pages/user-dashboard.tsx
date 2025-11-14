@@ -315,40 +315,45 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-              <User className="h-6 w-6 text-white" />
-            </div>
+      <header className="bg-white border-b shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-5">
+          <div className="flex justify-between items-center">
+            {/* Left Section */}
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-                User Dashboard
+              <h1 className="text-3xl font-bold text-slate-900 mb-1">
+                Dashboard
               </h1>
-              <p className="text-sm text-muted-foreground">
-                Welcome back, {user?.firstName || user?.fullNameEnglish || 'User'}!
+              <p className="text-sm text-slate-500">
+                Welcome back, <span className="font-medium text-slate-700">{user?.firstName || user?.fullNameEnglish || 'User'}</span>
               </p>
             </div>
-          </div>
 
-          <div className="flex items-center gap-4">
-            {/* KYC Status Badge */}
-            <Badge
-              variant={statusDisplay.variant}
-              className="capitalize"
-            >
-              KYC: {statusDisplay.text}
-            </Badge>
+            {/* Right Section */}
+            <div className="flex items-center gap-3">
+              {/* KYC Status Badge */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-200">
+                <Shield className={`h-4 w-4 ${statusDisplay.variant === 'default' ? 'text-green-600' : statusDisplay.variant === 'destructive' ? 'text-red-600' : 'text-yellow-600'}`} />
+                <div className="text-left">
+                  <p className="text-xs text-slate-500 leading-none">KYC Status</p>
+                  <p className={`text-sm font-semibold ${statusDisplay.variant === 'default' ? 'text-green-600' : statusDisplay.variant === 'destructive' ? 'text-red-600' : 'text-yellow-600'}`}>
+                    {statusDisplay.text}
+                  </p>
+                </div>
+              </div>
 
-            <Button variant="ghost" size="sm">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Settings className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4" />
-            </Button>
+              {/* Action Buttons */}
+              <div className="flex items-center gap-1 border-l pl-3 ml-1 border-slate-200">
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Bell className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Settings className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
