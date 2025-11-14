@@ -89,15 +89,14 @@ const UserDashboard = () => {
                     completed++;
                   }
 
-                  // If KYC is submitted/approved, consider it mostly complete
-                  if (kycData.data.status === 'submitted' || kycData.data.status === 'approved' ||
-                      kycData.data.status === 'under_review') {
-                    completed = Math.max(completed, 5); // At least 5/6 sections if submitted
-                  }
-
-                  // If approved, all sections are complete
-                  if (kycData.data.status === 'approved') {
+                  // If all 4 documents uploaded (100% KYC completion), mark profile as 100%
+                  if (docsUploaded === 4) {
                     completed = totalSections;
+                  }
+                  // If KYC is submitted/approved, consider it complete
+                  else if (kycData.data.status === 'submitted' || kycData.data.status === 'approved' ||
+                      kycData.data.status === 'under_review') {
+                    completed = Math.max(completed, totalSections); // All sections complete if submitted
                   }
 
                   const percentage = Math.round((completed / totalSections) * 100);
