@@ -304,16 +304,37 @@ const KYCVerificationPage = () => {
 
       setUploadProgress(100);
 
-      // Update user KYC status and completion percentage in localStorage
-      if (result.data) {
-        user.kycStatus = result.data.kycStatus || "submitted";
-        user.kycCompletionPercentage = result.data.completionPercentage || 0;
-        localStorage.setItem("zaron_user", JSON.stringify(user));
+      // Fetch updated user profile from backend
+      try {
+        const profileResponse = await fetch(`${API_BASE_URL}/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        // Update state with completion percentage
-        if (result.data.completionPercentage !== undefined) {
-          setKycCompletionPercentage(result.data.completionPercentage);
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          const updatedUser = profileData.data || profileData.user || profileData;
+
+          if (updatedUser) {
+            // Update localStorage with fresh user data from backend
+            localStorage.setItem("zaron_user", JSON.stringify(updatedUser));
+            console.log("User profile refreshed after KYC upload:", updatedUser);
+          }
         }
+      } catch (profileError) {
+        console.error("Failed to refresh user profile:", profileError);
+        // Continue anyway - use result data
+        if (result.data) {
+          user.kycStatus = result.data.kycStatus || "submitted";
+          user.kycCompletionPercentage = result.data.completionPercentage || 0;
+          localStorage.setItem("zaron_user", JSON.stringify(user));
+        }
+      }
+
+      // Update state with completion percentage
+      if (result.data?.completionPercentage !== undefined) {
+        setKycCompletionPercentage(result.data.completionPercentage);
       }
 
       const completionPercent = result.data?.completionPercentage || 0;
