@@ -70,6 +70,7 @@ function WebsiteRouter() {
         <Route path="/website/business" component={WebsiteBusiness} />
         <Route path="/website/contact" component={WebsiteContact} />
         <Route path="/kyc-verification" component={KYCVerificationPage} />
+        <Route path="/kyc" component={KYCVerificationPage} />
         <Route path="/user-dashboard" component={InvestorDashboard} />
         <Route path="/investor/dashboard" component={InvestorDashboard} />
         <Route path="/investor/portfolio" component={InvestorPortfolio} />
