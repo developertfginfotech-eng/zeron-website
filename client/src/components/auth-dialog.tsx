@@ -139,8 +139,16 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
         description: `Welcome back, ${userData.firstName || userData.name || 'User'}!`,
       })
       setOpen(false)
-      // Redirect to investor dashboard
-      setLocation('/investor/dashboard')
+
+      // Redirect based on KYC status
+      const kycStatus = userData.kycStatus || 'not_started'
+      if (kycStatus === 'approved') {
+        // If KYC is approved, go to dashboard
+        setLocation('/investor/dashboard')
+      } else {
+        // If KYC is not approved, go to KYC verification page
+        setLocation('/kyc-verification')
+      }
     },
     onError: (error: any) => {
       if (error.message.includes('not found')) {
@@ -199,8 +207,9 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
         description: "Your account has been created. Welcome to Zaron!",
       })
       setOpen(false)
-      // Redirect to investor dashboard for new users
-      setLocation('/investor/dashboard')
+
+      // Redirect new users to KYC verification page
+      setLocation('/kyc-verification')
     },
     onError: (error: any) => {
       console.error('Registration error:', error) // Debug log
