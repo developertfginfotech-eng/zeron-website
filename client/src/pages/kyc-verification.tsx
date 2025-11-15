@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Shield,
   Upload,
@@ -30,9 +31,11 @@ import {
   X,
   Home,
   Loader2,
+  Clock,
 } from "lucide-react";
 
 const KYCVerificationPage = () => {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [showSkipDialog, setShowSkipDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +43,7 @@ const KYCVerificationPage = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dataLoading, setDataLoading] = useState(true);
   const [kycCompletionPercentage, setKycCompletionPercentage] = useState(0);
+  const [kycStatus, setKycStatus] = useState<string>('not_started');
 
   const fileInputRefs = {
     nationalId: useRef(null),
@@ -97,11 +101,13 @@ const KYCVerificationPage = () => {
                   setKycCompletionPercentage(existingData.completionPercentage);
                 }
 
-                if (existingData.status === 'submitted' || existingData.status === 'under_review' || existingData.status === 'approved') {
-                  alert('Your KYC verification is already submitted and under review. Redirecting to dashboard...');
-                  window.location.href = '/user-dashboard';
-                  return;
+                // Set KYC status
+                if (existingData.status) {
+                  setKycStatus(existingData.status);
                 }
+
+                // Don't redirect, just show the status
+                // Users can still see their KYC verification page even if submitted
                 
                
                 setFormData(prev => ({
@@ -590,25 +596,105 @@ const KYCVerificationPage = () => {
           </div>
         </div>
 
-        {/* Content */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {React.createElement(steps[currentStep - 1].icon, {
-                className: "h-5 w-5",
-              })}
-              {steps[currentStep - 1].title}
-            </CardTitle>
-            <CardDescription>
-              {currentStep === 1 &&
-                "Help us verify your identity with basic information"}
-              {currentStep === 2 && "Select your identity document type"}
-              {currentStep === 3 && "Upload clear photos of your documents"}
-              {currentStep === 4 && "Tell us about your financial background"}
-            </CardDescription>
-          </CardHeader>
+        {/* Verification Status Card */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-1 shadow-xl mb-8">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-2xl" />
 
-          <CardContent className="space-y-6">
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-serif font-bold text-gray-900 dark:text-white">
+                    Verification Status
+                  </h3>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-gray-900 dark:text-white">KYC Verification</span>
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    kycStatus === 'approved'
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                      : kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'pending_review'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300'
+                      : 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300'
+                  }`}>
+                    {kycStatus === 'approved' ? 'Approved' :
+                     kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'pending_review' ? 'Completed - Under Review' :
+                     'Pending'}
+                  </div>
+                </div>
+
+                {(kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'pending_review') && (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+                    <Clock className="h-4 w-4" />
+                    <span>Your documents are being reviewed by our team. This usually takes 1-2 business days.</span>
+                  </div>
+                )}
+
+                {kycStatus === 'approved' && (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Your identity has been verified. You now have full access to all platform features.</span>
+                  </div>
+                )}
+              </div>
+
+              {kycStatus === 'not_started' || kycStatus === 'in_progress' ? (
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-semibold"
+                  disabled={isLoading}
+                  onClick={() => {
+                    // Scroll to form
+                    window.scrollTo({ top: 300, behavior: 'smooth' });
+                  }}
+                >
+                  Complete KYC Verification
+                </Button>
+              ) : kycStatus === 'approved' ? (
+                <Button
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 font-semibold"
+                  onClick={() => window.location.href = '/investor/dashboard'}
+                >
+                  Go to Dashboard
+                </Button>
+              ) : (
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-semibold"
+                  disabled
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  Under Review
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Content - Only show if KYC is not submitted or approved */}
+        {(kycStatus === 'not_started' || kycStatus === 'in_progress') && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {React.createElement(steps[currentStep - 1].icon, {
+                  className: "h-5 w-5",
+                })}
+                {steps[currentStep - 1].title}
+              </CardTitle>
+              <CardDescription>
+                {currentStep === 1 &&
+                  "Help us verify your identity with basic information"}
+                {currentStep === 2 && "Select your identity document type"}
+                {currentStep === 3 && "Upload clear photos of your documents"}
+                {currentStep === 4 && "Tell us about your financial background"}
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
             {/* Step 1: Personal Information */}
             {currentStep === 1 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -953,6 +1039,7 @@ const KYCVerificationPage = () => {
             </div>
           </CardContent>
         </Card>
+        )}
 
         {/* Security Notice */}
         <Card className="border-emerald-200 bg-emerald-50">
