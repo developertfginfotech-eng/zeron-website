@@ -6,7 +6,7 @@ interface User {
   lastName: string;
   email: string;
   phone?: string;
-  kycStatus: 'not_started' | 'in_progress' | 'pending_review' | 'approved' | 'rejected';
+  kycStatus: 'not_started' | 'in_progress' | 'submitted' | 'under_review' | 'pending_review' | 'approved' | 'rejected';
   kycCurrentStep?: number;
   kycCompletedSteps?: number[];
   applicationProgress?: number;
