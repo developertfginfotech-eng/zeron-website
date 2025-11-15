@@ -1,18 +1,15 @@
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/components/language-provider"
-import { useAuth } from "@/hooks/use-auth" // Add this import
-import { useNotifications } from "@/hooks/use-notifications"
+import { useAuth } from "@/hooks/use-auth"
 import { AuthDialog } from "@/components/auth-dialog"
-import { Languages, Globe, Flag, User, LogOut, Settings, BarChart3, Bell } from "lucide-react"
+import { Languages, Globe, Flag, User, LogOut, BarChart3, Wallet } from "lucide-react"
 import { Link, useLocation } from "wouter"
 
 const languages = [
@@ -22,34 +19,26 @@ const languages = [
   { code: "hi", name: "हिंदी" },
   { code: "pa", name: "ਪੰਜਾਬੀ" },
   { code: "bn", name: "বাংলা" },
-  { code: "ml", name: "മলയাളം" },
+  { code: "ml", name: "മലയാളം" },
 ] as const
 
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   const { language, setLanguage } = useLanguage()
-  const [location, setLocation] = useLocation()
-  
-  // Use the auth hook instead of local state
-  const { user, isLoading, logout, isAuthenticated } = useAuth()
-  const { unreadCount } = useNotifications()
+  const { user, logout, isAuthenticated } = useAuth()
+  const [location] = useLocation()
 
-  // Navigation items based on authentication status
-  const publicNavigation = [
+  const navigation = [
     { name: "Invest", href: "/website/invest" },
-    { name: "Properties", href: "/website/properties" },
     { name: t("about_us"), href: "/website/about" },
   ]
 
   const authenticatedNavigation = [
-    { name: "Invest", href: "/website/invest" },
-    { name: "Portfolio", href: "/website/portfolio" },
-    { name: "Wallet", href: "/website/wallet" },
-    { name: "Properties", href: "/website/properties" },
-    { name: t("about_us"), href: "/website/about" },
+    { name: "Dashboard", href: "/investor/dashboard", icon: BarChart3 },
+    { name: "Properties", href: "/website/properties", icon: Globe },
+    { name: "Portfolio", href: "/investor/portfolio", icon: BarChart3 },
+    { name: "Wallet", href: "/investor/wallet", icon: Wallet },
   ]
-
-  const navigation = isAuthenticated ? authenticatedNavigation : publicNavigation
 
   const isActive = (href: string, exact = false) => {
     if (exact) {
@@ -58,74 +47,39 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
     return location.startsWith(href)
   }
 
-  const handleLogout = () => {
-    logout()
-    // Optional: redirect to home page with client-side routing
-    window.location.href = '/website/invest'
-  }
-
-  // Show loading state if checking authentication
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-          <div className="container mx-auto px-6">
-            <div className="flex h-18 items-center justify-between">
-              <Link href="/website/invest" className="transition-transform hover:scale-105">
-                <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <Globe className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-                    Zaron
-                  </span>
-                </div>
-              </Link>
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            </div>
-          </div>
-        </header>
-        <main>{children}</main>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-6">
-          <div className="flex h-18 items-center justify-between">
+          <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/website/invest" data-testid="link-home" className="transition-transform hover:scale-105">
-              <div className="flex items-center space-x-3">
-                <div className="h-10 w-10 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Globe className="h-6 w-6 text-white" />
+            <Link href="/website/invest" data-testid="link-home">
+              <div className="flex items-center space-x-2">
+                <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                  <Globe className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
                   Zaron
                 </span>
               </div>
             </Link>
 
             {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-2">
+            <nav className="hidden md:flex items-center space-x-8">
               {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-muted/50 ${
-                    isActive(item.href)
-                      ? "text-primary bg-primary/10 shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                <Link 
+                  key={item.href} 
+                  href={item.href} 
+                  className={`text-lg font-semibold transition-colors hover:text-primary ${
+                    isActive(item.href) 
+                      ? "text-primary" 
+                      : "text-muted-foreground"
                   }`}
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                   aria-current={isActive(item.href) ? "page" : undefined}
                 >
                   {item.name}
-                  {isActive(item.href) && (
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></div>
-                  )}
                 </Link>
               ))}
             </nav>
@@ -157,85 +111,62 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Conditional Auth Buttons or User Menu */}
-              {isAuthenticated && user ? (
-                <div className="flex items-center gap-2">
-                  {/* Notification Bell */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="relative"
-                    onClick={() => setLocation('/user-notifications')}
-                    data-testid="button-notifications"
-                  >
-                    <Bell className="h-5 w-5" />
-                    {unreadCount > 0 && (
-                      <Badge
-                        variant="destructive"
-                        className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0"
-                      >
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </Button>
-
+              {/* Auth Section */}
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  {/* Authenticated Navigation */}
+                  <div className="hidden lg:flex items-center space-x-4">
+                    {authenticatedNavigation.map((item) => {
+                      const Icon = item.icon
+                      return (
+                        <Link 
+                          key={item.href} 
+                          href={item.href} 
+                          className="text-base font-semibold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                          data-testid={`link-${item.name.toLowerCase()}`}
+                        >
+                          <Icon className="h-4 w-4" />
+                          {item.name}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                  
                   {/* User Menu */}
                   <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2" data-testid="button-user-menu">
-                      {user.avatar ? (
-                        <img 
-                          src={user.avatar} 
-                          alt={user.name}
-                          className="h-6 w-6 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
-                          <User className="h-4 w-4 text-primary-foreground" />
-                        </div>
-                      )}
-                      <span className="hidden sm:inline font-medium max-w-24 truncate">
-                        {user.name}
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <div className="px-2 py-1.5">
-                      <p className="text-sm font-medium truncate">{user.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/user-dashboard" data-testid="menu-dashboard">
-                        <BarChart3 className="mr-2 h-4 w-4" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/user-notifications" data-testid="menu-notifications">
-                        <Bell className="mr-2 h-4 w-4" />
-                        Notifications
-                        {unreadCount > 0 && (
-                          <Badge variant="destructive" className="ml-auto">
-                            {unreadCount}
-                          </Badge>
-                        )}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={handleLogout}
-                      className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
-                      data-testid="button-logout"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" data-testid="button-user-menu">
+                        <User className="h-4 w-4" />
+                        <span className="ml-2 hidden sm:inline">
+                          {user?.firstName} {user?.lastName}
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href="/investor/profile" data-testid="link-profile">
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/investor/dashboard" data-testid="link-dashboard">
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={logout}
+                        className="text-red-600 dark:text-red-400"
+                        data-testid="button-logout"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ) : (
-                // User is not logged in - show auth buttons
                 <div className="flex items-center space-x-2">
                   <AuthDialog defaultTab="login">
                     <Button variant="ghost" data-testid="button-login">

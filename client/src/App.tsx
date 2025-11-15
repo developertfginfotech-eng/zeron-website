@@ -9,7 +9,6 @@ import { AuthProvider } from "@/hooks/use-auth"; // Add this import
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { MobileLayout } from "@/components/mobile-layout";
 
 // Admin Pages
 import Dashboard from "@/pages/dashboard";
@@ -23,25 +22,23 @@ import Admin from "@/pages/admin";
 import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
-// Mobile Pages
-import MobileDashboard from "@/pages/mobile/dashboard";
-import MobileProperties from "@/pages/mobile/properties";
-import MobilePortfolio from "@/pages/mobile/portfolio";
-import MobileProfile from "@/pages/mobile/profile";
-
 // Website Pages
-import WebsiteHome from "@/pages/website/home";
 import WebsiteInvest from "@/pages/website/invest";
-import WebsitePortfolio from "@/pages/website/Portfolio";
 import WebsiteProperties from "@/pages/website/properties";
-import WebsiteWallet from "@/pages/website/wallet";
 import WebsiteAbout from "@/pages/website/about";
 import WebsiteBusiness from "@/pages/website/business";
 import WebsiteContact from "@/pages/website/contact";
 import WebsiteLayout from "@/components/website-layout";
 import KYCVerificationPage from "@/pages/kyc-verification";
 import UserDashboard from "@/pages/user-dashboard";
-import UserNotificationPage from "@/pages/user-notifications"; 
+import UserNotificationPage from "@/pages/user-notifications";
+
+// Investor Dashboard Pages
+import InvestorDashboard from "@/pages/investor/dashboard";
+import InvestorPortfolio from "@/pages/investor/portfolio";
+import InvestorProfile from "@/pages/investor/profile";
+import InvestorWallet from "@/pages/investor/wallet";
+import InvestmentGuide from "@/pages/investor/investment-guide"; 
 
 function AdminRouter() {
   return (
@@ -61,17 +58,6 @@ function AdminRouter() {
   );
 }
 
-function MobileRouter() {
-  return (
-    <Switch>
-      <Route path="/mobile" component={MobileDashboard} />
-      <Route path="/mobile/properties" component={MobileProperties} />
-      <Route path="/mobile/portfolio" component={MobilePortfolio} />
-      <Route path="/mobile/profile" component={MobileProfile} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
 
 function WebsiteRouter() {
   return (
@@ -79,15 +65,17 @@ function WebsiteRouter() {
       <Switch>
         <Route path="/website" component={WebsiteInvest} />
         <Route path="/website/invest" component={WebsiteInvest} />
-        <Route path="/website/portfolio" component={WebsitePortfolio} />
-        <Route path="/portfolio" component={WebsitePortfolio} />
-        <Route path="/website/wallet" component={WebsiteWallet} />
         <Route path="/website/properties" component={WebsiteProperties} />
         <Route path="/website/about" component={WebsiteAbout} />
         <Route path="/website/business" component={WebsiteBusiness} />
         <Route path="/website/contact" component={WebsiteContact} />
         <Route path="/kyc-verification" component={KYCVerificationPage} />
-        <Route path="/user-dashboard" component={UserDashboard} />
+        <Route path="/user-dashboard" component={InvestorDashboard} />
+        <Route path="/investor/dashboard" component={InvestorDashboard} />
+        <Route path="/investor/portfolio" component={InvestorPortfolio} />
+        <Route path="/investor/profile" component={InvestorProfile} />
+        <Route path="/investor/wallet" component={InvestorWallet} />
+        <Route path="/investor/guide" component={InvestmentGuide} />
         <Route path="/user-notifications" component={UserNotificationPage} />
         <Route path="/" component={WebsiteInvest} />
         <Route component={NotFound} />
@@ -98,9 +86,7 @@ function WebsiteRouter() {
 
 export default function App() {
   const [location] = useLocation()
-  const isMobile = location.startsWith('/mobile')
-  const isWebsite = location === '/' || location.startsWith('/website') || location.startsWith('/kyc-verification')|| location === '/user-dashboard' || location === '/user-notifications' || location === '/portfolio'
-  const isAdmin = !isMobile && !isWebsite
+  const isWebsite = location === '/' || location.startsWith('/website') || location.startsWith('/kyc-verification')|| location === '/user-dashboard' || location === '/user-notifications' || location === '/portfolio' || location.startsWith('/investor')
 
   // Custom sidebar width for better content display
   const style = {
@@ -114,12 +100,7 @@ export default function App() {
         <LanguageProvider defaultLanguage="en" storageKey="zaron-language">
           <AuthProvider> {/* Add this wrapper */}
             <TooltipProvider>
-            {isMobile ? (
-              // Mobile Layout for Investors
-              <MobileLayout>
-                <MobileRouter />
-              </MobileLayout>
-            ) : isWebsite ? (
+            {isWebsite ? (
               // Website Layout for Public
               <WebsiteRouter />
             ) : (
@@ -130,9 +111,9 @@ export default function App() {
                   <div className="flex flex-col flex-1">
                     <header className="flex items-center justify-between p-4 border-b border-sidebar-border/50 glass-card backdrop-blur-xl">
                       <div className="flex items-center gap-4">
-                        <SidebarTrigger 
-                          className="hover:bg-primary/10 transition-colors duration-300" 
-                          data-testid="button-sidebar-toggle" 
+                        <SidebarTrigger
+                          className="hover:bg-primary/10 transition-colors duration-300"
+                          data-testid="button-sidebar-toggle"
                         />
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -143,11 +124,11 @@ export default function App() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-xs text-muted-foreground/60">
-                          {new Date().toLocaleDateString('en-US', { 
-                            weekday: 'short', 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: 'numeric' 
+                          {new Date().toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
                           })}
                         </div>
                         <ThemeToggle />

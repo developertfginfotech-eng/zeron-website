@@ -2,6 +2,9 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { useMutation } from "@tanstack/react-query"
+import { apiClient, API_ENDPOINTS } from "@/lib/api-client"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -25,32 +28,26 @@ import {
 } from "@/components/ui/form"
 import { useTranslation } from "@/hooks/use-translation"
 import { useAuth } from "@/hooks/use-auth"
-import { Eye, EyeOff, Lock, Mail, User, Phone } from "lucide-react"
+import { Mail, User, Phone, Globe, TrendingUp, Building, Shield, Star } from "lucide-react"
 import { useLocation } from "wouter"
 
-// Zod schemas for form validation
-const createLoginSchema = (t: (key: string) => string) => z.object({
-  email: z.string().min(1, t("email_required")).email(t("email_invalid")),
-  password: z.string().min(6, t("password_min_length")),
-  remember: z.boolean().optional(),
+// Login and registration schemas
+const loginSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  password: z.string().min(1, "Password is required"),
 })
 
-const createRegisterSchema = (t: (key: string) => string) => z.object({
-  firstName: z.string().min(2, t("first_name_min_length")),
-  lastName: z.string().min(2, t("last_name_min_length")),
-  email: z.string().min(1, t("email_required")).email(t("email_invalid")),
-  phone: z.string().min(10, t("phone_min_length")).regex(/^\+?[1-9]\d{1,14}$/, t("phone_invalid")),
-  password: z.string().min(8, t("password_min_length_register")).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, t("password_complexity")),
-  confirmPassword: z.string(),
-  terms: z.boolean().refine(val => val === true, t("terms_required")),
-  shariah: z.boolean().optional(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: t("password_mismatch"),
-  path: ["confirmPassword"],
+const registerSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  preferredLanguage: z.string().optional(),
 })
 
-type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>
-type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>
+type LoginFormData = z.infer<typeof loginSchema>
+type RegisterFormData = z.infer<typeof registerSchema>
 
 interface AuthDialogProps {
   children: React.ReactNode
@@ -59,22 +56,19 @@ interface AuthDialogProps {
 
 export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) {
   const { t } = useTranslation()
-  const { login } = useAuth()
+  const { setUser } = useAuth()
   const [, setLocation] = useLocation()
   const [open, setOpen] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [activeTab, setActiveTab] = useState(defaultTab)
+  const [authStep, setAuthStep] = useState<'login' | 'register' | 'kyc-status'>('login')
+  const { toast } = useToast()
 
-  const loginSchema = createLoginSchema(t)
-  const registerSchema = createRegisterSchema(t)
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      remember: false,
     },
   })
 
@@ -84,505 +78,549 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
       firstName: "",
       lastName: "",
       email: "",
-      phone: "",
       password: "",
-      confirmPassword: "",
-      terms: false,
-      shariah: false,
+      phone: "",
+      preferredLanguage: "en",
     },
   })
 
-  const showToast = (title: string, description: string, variant: "default" | "destructive" = "default") => {
-    // Simple alert fallback - you can replace with your toast implementation
-    if (variant === "destructive") {
-      alert(`${title}: ${description}`)
-    } else {
-      alert(`${title}: ${description}`)
+  // Login mutation
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginFormData) => {
+      return apiClient.post(API_ENDPOINTS.LOGIN, data)
+    },
+    onSuccess: (response: any) => {
+      console.log('Login response:', response) // Debug log
+      console.log('Response keys:', Object.keys(response)) // Show all keys
+
+      // Handle different response structures
+      // Try multiple possible locations for user data
+      const userData = response.user || response.data?.user || response.investor || response.data || response
+      const authToken = response.token || response.accessToken || response.data?.token
+
+      console.log('Parsed userData:', userData)
+      console.log('Parsed token:', authToken)
+
+      // Save token to localStorage
+      if (authToken) {
+        localStorage.setItem('zaron_token', authToken)
+      } else {
+        console.warn('No token found in response!')
+      }
+
+      // Save user data to localStorage
+      const userToSave = {
+        ...userData,
+        token: authToken,
+        // Ensure we have these fields
+        firstName: userData.firstName || userData.name?.split(' ')[0] || 'User',
+        lastName: userData.lastName || userData.name?.split(' ')[1] || '',
+        email: userData.email,
+        _id: userData._id || userData.id
+      }
+
+      localStorage.setItem('zaron_user', JSON.stringify(userToSave))
+      console.log('Saved to localStorage:', userToSave)
+
+      // Set user session
+      setUser({
+        id: userData._id || userData.id,
+        firstName: userData.firstName || userData.name?.split(' ')[0] || 'User',
+        lastName: userData.lastName || userData.name?.split(' ')[1] || '',
+        email: userData.email,
+        kycStatus: userData.kycStatus || 'not_started',
+        kycCurrentStep: userData.kycCurrentStep || 0,
+        kycCompletedSteps: userData.kycCompletedSteps || [],
+        applicationProgress: userData.applicationProgress
+      })
+
+      toast({
+        title: "Welcome back!",
+        description: `Welcome back, ${userData.firstName || userData.name || 'User'}!`,
+      })
+      setOpen(false)
+      // Redirect to investor dashboard
+      setLocation('/investor/dashboard')
+    },
+    onError: (error: any) => {
+      if (error.message.includes('not found')) {
+        // User doesn't exist, switch to registration
+        registerForm.setValue('email', loginForm.getValues('email'))
+        setActiveTab('register')
+        toast({
+          title: "User not found",
+          description: "Please register first to continue.",
+          variant: "destructive"
+        })
+      } else {
+        toast({
+          title: "Login failed",
+          description: error.message,
+          variant: "destructive"
+        })
+      }
     }
+  })
+
+  // Registration mutation
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterFormData) => {
+      return apiClient.post(API_ENDPOINTS.REGISTER, data)
+    },
+    onSuccess: (response) => {
+      console.log('Registration response:', response) // Debug log
+
+      // Handle different response structures
+      const userData = response.user || response.data || response
+      const authToken = response.token || response.accessToken
+
+      // Save token to localStorage
+      if (authToken) {
+        localStorage.setItem('zaron_token', authToken)
+      }
+
+      // Save user data to localStorage
+      localStorage.setItem('zaron_user', JSON.stringify({ ...userData, token: authToken }))
+
+      // Set user session
+      setUser({
+        id: userData._id || userData.id,
+        firstName: userData.firstName || userData.name?.split(' ')[0] || 'User',
+        lastName: userData.lastName || userData.name?.split(' ')[1] || '',
+        email: userData.email,
+        kycStatus: userData.kycStatus || 'not_started',
+        kycCurrentStep: userData.kycCurrentStep || 0,
+        kycCompletedSteps: userData.kycCompletedSteps || [],
+        applicationProgress: userData.applicationProgress
+      })
+
+      toast({
+        title: "Registration successful!",
+        description: "Your account has been created. Welcome to Zaron!",
+      })
+      setOpen(false)
+      // Redirect to investor dashboard for new users
+      setLocation('/investor/dashboard')
+    },
+    onError: (error: any) => {
+      if (error.message.includes('already registered')) {
+        toast({
+          title: "Email already exists",
+          description: "This email is already registered. Please try logging in instead.",
+          variant: "destructive"
+        })
+        loginForm.setValue('email', registerForm.getValues('email'))
+        setActiveTab('login')
+      } else {
+        toast({
+          title: "Registration failed",
+          description: error.message,
+          variant: "destructive"
+        })
+      }
+    }
+  })
+
+  const handleLogin = (data: LoginFormData) => {
+    loginMutation.mutate(data)
   }
 
-  const handleLogin = async (data: LoginFormData) => {
-    console.log("API Login attempt with:", data);
-    
-    try {
-      const response = await fetch('http://13.50.13.193:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password
-        }),
-      });
-
-      const result = await response.json();
-      console.log("Login API Response:", result);
-      
-      if (response.ok && result.success) {
-        // Create user data object for auth context
-        const userData = {
-          id: result.data.user.id || result.data.user._id,
-          name: `${result.data.user.firstName} ${result.data.user.lastName}`,
-          email: result.data.user.email,
-          firstName: result.data.user.firstName,
-          lastName: result.data.user.lastName,
-          kycStatus: result.data.user.kycStatus,
-          avatar: result.data.user.avatar
-        };
-        
-        // Store additional data for KYC
-        localStorage.setItem('zaron_user', JSON.stringify(result.data.user));
-        
-        // Use auth context to update global state
-        login(userData, result.data.token);
-        
-        // Show success message
-        showToast("Welcome back!", `Hello ${result.data.user.firstName}, you've successfully logged in.`);
-        
-        // Close modal
-        setOpen(false);
-        
-        // Navigate based on KYC status without page refresh
-        const kycStatus = result.data.user.kycStatus;
-        console.log("User KYC Status:", kycStatus);
-        
-        if (kycStatus === 'pending' || kycStatus === 'not_started' || !kycStatus) {
-          setLocation('/kyc-verification');
-        } else if (kycStatus === 'approved' || kycStatus === 'completed') {
-          setLocation('/user-dashboard');
-        }
-        
-      } else {
-        throw new Error(result.message || 'Login failed');
-      }
-    } catch (error: any) {
-      console.error("Login error:", error);
-      showToast("Login Failed", error.message, "destructive");
-    }
-  };
-
-  const handleRegister = async (data: RegisterFormData) => {
-    console.log("API Register attempt with:", data);
-    
-    try {
-      const { confirmPassword, terms, shariah, ...registerData } = data;
-      
-      console.log("Data being sent to API:", registerData);
-      
-      const response = await fetch('http://13.50.13.193:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(registerData),
-      });
-
-      const result = await response.json();
-      console.log("Register API Response:", result);
-      
-      if (!response.ok) {
-        console.log("Response status:", response.status);
-        
-        if (result.errors) {
-          console.log("Validation errors:", result.errors);
-          
-          const errorMessages = result.errors.map((error: any) => 
-            `${error.path || error.field || 'Field'}: ${error.message}`
-          ).join(', ');
-          
-          showToast("Registration Failed", `Validation Errors: ${errorMessages}`, "destructive");
-          return;
-        }
-        
-        throw new Error(result.message || 'Registration failed');
-      }
-      
-      if (result.success) {
-        // Create user data object for auth context
-        const userData = {
-          id: result.data.user.id || result.data.user._id,
-          name: `${result.data.user.firstName} ${result.data.user.lastName}`,
-          email: result.data.user.email,
-          firstName: result.data.user.firstName,
-          lastName: result.data.user.lastName,
-          kycStatus: result.data.user.kycStatus,
-          avatar: result.data.user.avatar
-        };
-        
-        // Store additional data for KYC
-        localStorage.setItem('zaron_user', JSON.stringify(result.data.user));
-        
-        // Use auth context to update global state
-        login(userData, result.data.token);
-        
-        // Show success message
-        showToast("Welcome to Zaron!", `Welcome ${result.data.user.firstName}! Please complete your KYC verification.`);
-        
-        // Close modal
-        setOpen(false);
-        
-        // Navigate to KYC without page refresh
-        setLocation('/kyc-verification');
-        
-      } else {
-        throw new Error(result.message || 'Registration failed');
-      }
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      showToast("Registration Failed", error.message, "destructive");
-    }
-  };
+  const handleRegister = (data: RegisterFormData) => {
+    registerMutation.mutate(data)
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-            {t("welcome_to_zaron")}
-          </DialogTitle>
-          <DialogDescription className="text-center">
-            {t("join_thousands_investors")}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-5xl lg:max-w-7xl p-0 overflow-hidden bg-transparent border-none shadow-none">
+        <div className="relative w-full min-h-[700px] bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 rounded-3xl overflow-hidden shadow-2xl">
+          {/* Animated background effects */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute top-1/3 right-0 w-72 h-72 bg-blue-500/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
+          
+          {/* Floating particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-20 w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+            <div className="absolute top-40 right-32 w-1 h-1 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }}></div>
+            <div className="absolute bottom-32 left-40 w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '2.5s' }}></div>
+            <div className="absolute bottom-20 right-20 w-1 h-1 bg-emerald-300 rounded-full animate-bounce" style={{ animationDelay: '3s' }}></div>
+          </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login" data-testid="tab-login">{t("login")}</TabsTrigger>
-            <TabsTrigger value="register" data-testid="tab-register">{t("register")}</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="login" className="space-y-4">
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
-                <FormField
-                  control={loginForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("email")}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            {...field}
-                            type="email"
-                            placeholder="investor@example.com"
-                            className="pl-10"
-                            data-testid="input-login-email"
-                            disabled={loginForm.formState.isSubmitting}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={loginForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("password")}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            {...field}
-                            type={showPassword ? "text" : "password"}
-                            placeholder={t("enter_password")}
-                            className="pl-10 pr-10"
-                            data-testid="input-login-password"
-                            disabled={loginForm.formState.isSubmitting}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                            onClick={() => setShowPassword(!showPassword)}
-                            data-testid="button-toggle-password"
-                            disabled={loginForm.formState.isSubmitting}
-                          >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex items-center justify-between">
-                  <FormField
-                    control={loginForm.control}
-                    name="remember"
-                    render={({ field }) => (
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="remember"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          data-testid="checkbox-remember"
-                          disabled={loginForm.formState.isSubmitting}
-                        />
-                        <Label htmlFor="remember" className="text-sm">
-                          {t("remember_me")}
-                        </Label>
-                      </div>
-                    )}
-                  />
-                  <Button variant="ghost" className="p-0 h-auto text-sm" data-testid="link-forgot-password">
-                    {t("forgot_password")}
-                  </Button>
+          <div className="relative z-10 grid lg:grid-cols-2 min-h-[700px]">
+            {/* Left Side - Impressive Hero */}
+            <div className="relative overflow-hidden p-8 lg:p-12 flex flex-col justify-between text-white">
+              {/* Glassmorphism overlay */}
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+              
+              {/* Hero content */}
+              <div className="relative z-10 space-y-8">
+                <div className="transform transition-all duration-1000 animate-in slide-in-from-left-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center shadow-2xl animate-pulse">
+                      <Building className="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="font-display text-5xl font-bold bg-gradient-to-r from-emerald-300 via-blue-200 to-purple-300 bg-clip-text text-transparent">
+                        ZARON
+                      </h1>
+                      <p className="font-sans text-blue-200 text-lg">Investment Portal</p>
+                    </div>
+                  </div>
+                  
+                  <h2 className="font-sans text-4xl font-bold mb-6 leading-tight">
+                    {t("welcome_to_zaron")}
+                  </h2>
+                  <p className="font-sans text-blue-100 text-xl leading-relaxed">
+                    {t("join_thousands_investors")}
+                  </p>
                 </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
-                  disabled={loginForm.formState.isSubmitting}
-                  data-testid="button-login-submit"
-                >
-                  {loginForm.formState.isSubmitting ? t("logging_in") + "..." : t("login")}
-                </Button>
-              </form>
-            </Form>
-          </TabsContent>
-
-          <TabsContent value="register" className="space-y-4">
-            <Form {...registerForm}>
-              <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={registerForm.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              {...field}
-                              placeholder={t("first_name")}
-                              className="pl-10"
-                              data-testid="input-first-name"
-                              disabled={registerForm.formState.isSubmitting}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={registerForm.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              {...field}
-                              placeholder={t("last_name")}
-                              className="pl-10"
-                              data-testid="input-last-name"
-                              disabled={registerForm.formState.isSubmitting}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              
+                {/* Impressive features with animations */}
+                <div className="space-y-4 transform transition-all duration-1000 animate-in slide-in-from-left-10" style={{ animationDelay: '0.2s' }}>
+                  <div className="flex items-center gap-4 text-white group hover:scale-105 transition-all duration-300">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-blue-500/20 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                      <TrendingUp className="w-6 h-6 text-emerald-300" />
+                    </div>
+                    <div>
+                      <p className="font-sans font-bold text-lg">20%+ Average Returns</p>
+                      <p className="font-sans text-blue-200">Proven track record</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 text-white group hover:scale-105 transition-all duration-300">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400/20 to-purple-500/20 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                      <Building className="w-6 h-6 text-blue-300" />
+                    </div>
+                    <div>
+                      <p className="font-sans font-bold text-lg">Premium Properties</p>
+                      <p className="font-sans text-blue-200">Handpicked real estate</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 text-white group hover:scale-105 transition-all duration-300">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400/20 to-emerald-500/20 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                      <Shield className="w-6 h-6 text-purple-300" />
+                    </div>
+                    <div>
+                      <p className="font-sans font-bold text-lg">Secure Platform</p>
+                      <p className="font-sans text-blue-200">Bank-level security standards</p>
+                    </div>
+                  </div>
                 </div>
-
-                <FormField
-                  control={registerForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("email")}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            {...field}
-                            type="email"
-                            placeholder="investor@example.com"
-                            className="pl-10"
-                            data-testid="input-register-email"
-                            disabled={registerForm.formState.isSubmitting}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={registerForm.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("phone_number")}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            {...field}
-                            type="tel"
-                            placeholder="+966 50 123 4567"
-                            className="pl-10"
-                            data-testid="input-phone"
-                            disabled={registerForm.formState.isSubmitting}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={registerForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("password")}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            {...field}
-                            type={showPassword ? "text" : "password"}
-                            placeholder={t("create_password")}
-                            className="pl-10 pr-10"
-                            data-testid="input-register-password"
-                            disabled={registerForm.formState.isSubmitting}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                            onClick={() => setShowPassword(!showPassword)}
-                            data-testid="button-toggle-register-password"
-                            disabled={registerForm.formState.isSubmitting}
-                          >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={registerForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("confirm_password")}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            {...field}
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder={t("confirm_password")}
-                            className="pl-10 pr-10"
-                            data-testid="input-confirm-password"
-                            disabled={registerForm.formState.isSubmitting}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            data-testid="button-toggle-confirm-password"
-                            disabled={registerForm.formState.isSubmitting}
-                          >
-                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="space-y-3">
-                  <FormField
-                    control={registerForm.control}
-                    name="terms"
-                    render={({ field }) => (
-                      <div className="flex items-start space-x-2">
-                        <Checkbox
-                          id="terms"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          data-testid="checkbox-terms"
-                          className="mt-0.5"
-                          disabled={registerForm.formState.isSubmitting}
-                        />
-                        <Label htmlFor="terms" className="text-sm leading-5">
-                          {t("agree_to")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-terms">{t("terms_conditions")}</Button> {t("and")} <Button variant="ghost" className="p-0 h-auto text-sm underline" data-testid="link-privacy">{t("privacy_policy")}</Button>
-                        </Label>
-                      </div>
-                    )}
-                  />
-                  <FormField
-                    control={registerForm.control}
-                    name="shariah"
-                    render={({ field }) => (
-                      <div className="flex items-start space-x-2">
-                        <Checkbox
-                          id="shariah"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          data-testid="checkbox-shariah"
-                          className="mt-0.5"
-                          disabled={registerForm.formState.isSubmitting}
-                        />
-                        <Label htmlFor="shariah" className="text-sm leading-5">
-                          {t("confirm_shariah_compliant")}
-                        </Label>
-                      </div>
-                    )}
-                  />
+              </div>
+              
+              {/* Bottom section with testimonial */}
+              <div className="relative z-10 space-y-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-2xl transform transition-all duration-500 hover:scale-105">
+                  <div className="flex items-center gap-2 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                    ))}
+                  </div>
+                  <p className="font-sans text-white text-lg leading-relaxed mb-4">
+                    "Outstanding platform for real estate investment. Professional service and excellent returns."
+                  </p>
+                  <p className="font-sans text-blue-200">- Ahmed Al-Rashid, Verified Investor</p>
                 </div>
+                
+                <div className="flex items-center gap-3 justify-center">
+                  <span className="bg-emerald-500/20 backdrop-blur-sm text-emerald-200 px-4 py-2 rounded-full font-sans font-semibold animate-pulse">
+                    {t("shariah_compliant")}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right Side - Modern Authentication Form */}
+            <div className="relative overflow-hidden p-8 lg:p-12 flex flex-col justify-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm">
+              {/* Form glassmorphism overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-blue-50/50 dark:from-slate-800/50 dark:to-blue-900/50"></div>
+              
+              <div className="relative z-10 space-y-8">
+                {/* Header with animation */}
+                <div className="text-center space-y-4 transform transition-all duration-1000 animate-in slide-in-from-right-10">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center mx-auto shadow-2xl animate-pulse">
+                    <User className="w-8 h-8 text-white" />
+                  </div>
+                  <h2 className="font-display text-3xl font-bold text-gray-900 dark:text-white">
+                    START YOUR JOURNEY
+                  </h2>
+                  <p className="font-sans text-gray-600 dark:text-gray-300 text-lg">
+                    Join thousands building wealth through real estate
+                  </p>
+                </div>
+              
+              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="login" data-testid="tab-login" className="text-base py-3">{t("login")}</TabsTrigger>
+                  <TabsTrigger value="register" data-testid="tab-register" className="text-base py-3">{t("register")}</TabsTrigger>
+                </TabsList>
 
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600"
-                  disabled={registerForm.formState.isSubmitting}
-                  data-testid="button-register-submit"
-                >
-                  {registerForm.formState.isSubmitting ? t("creating_account") + "..." : t("create_account")}
-                </Button>
-              </form>
-            </Form>
-          </TabsContent>
-        </Tabs>
+                <TabsContent value="login" className="space-y-6">
+                  <Form {...loginForm}>
+                    <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-6">
+                      <FormField
+                        control={loginForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">{t("email")}</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Mail className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                  {...field}
+                                  type="email"
+                                  placeholder="investor@example.com"
+                                  className="pl-12 h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
+                                  data-testid="input-login-email"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-        <div className="text-center text-sm text-muted-foreground">
-          <div className="flex items-center gap-2 justify-center">
-            <span className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded text-xs">
-              {t("shariah_compliant")}
-            </span>
-            <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded text-xs">
-              {t("sama_regulated")}
-            </span>
+                      <FormField
+                        control={loginForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  {...field}
+                                  type="password"
+                                  placeholder="Enter your password"
+                                  className="h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
+                                  data-testid="input-login-password"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-4">
+                        <Button
+                          type="submit"
+                          className="w-full h-12 text-base font-medium bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-200"
+                          disabled={loginMutation.isPending}
+                          data-testid="button-login-submit"
+                        >
+                          {loginMutation.isPending ? "Checking account..." : "Continue to Dashboard"}
+                        </Button>
+                        
+                        <div className="text-center text-sm text-gray-500">
+                          New to Zaron? Switch to{" "}
+                          <button 
+                            type="button" 
+                            onClick={() => setActiveTab('register')}
+                            className="text-emerald-600 hover:text-emerald-700 font-medium"
+                          >
+                            Register
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </Form>
+                </TabsContent>
+
+                <TabsContent value="register" className="space-y-6">
+                  <Form {...registerForm}>
+                    <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={registerForm.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-base font-medium">{t("first_name")}</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <User className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
+                                  <Input
+                                    {...field}
+                                    placeholder={t("first_name")}
+                                    className="pl-12 h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
+                                    data-testid="input-first-name"
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={registerForm.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-base font-medium">{t("last_name")}</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <User className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
+                                  <Input
+                                    {...field}
+                                    placeholder={t("last_name")}
+                                    className="pl-12 h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
+                                    data-testid="input-last-name"
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <FormField
+                        control={registerForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">{t("email")}</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Mail className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                  {...field}
+                                  type="email"
+                                  placeholder="investor@example.com"
+                                  className="pl-12 h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
+                                  data-testid="input-register-email"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={registerForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  {...field}
+                                  type="password"
+                                  placeholder="Create a strong password"
+                                  className="h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
+                                  data-testid="input-register-password"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={registerForm.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">{t("phone_number")}</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Phone className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                  {...field}
+                                  type="tel"
+                                  placeholder="+966 50 123 4567"
+                                  className="pl-12 h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
+                                  data-testid="input-phone"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={registerForm.control}
+                        name="preferredLanguage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">Preferred Language</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Globe className="absolute left-4 top-4 h-5 w-5 text-muted-foreground z-10" />
+                                <select
+                                  {...field}
+                                  className="w-full pl-12 pr-4 py-4 h-12 text-base bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                  data-testid="select-language"
+                                >
+                                  <option value="en">English</option>
+                                  <option value="ar">العربية</option>
+                                  <option value="hi">हिन्दी</option>
+                                  <option value="ur">اردو</option>
+                                  <option value="bn">বাংলা</option>
+                                  <option value="ta">தமிழ்</option>
+                                  <option value="te">తెలుగు</option>
+                                </select>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="space-y-4">
+                        <Button
+                          type="submit"
+                          className="w-full h-12 text-base font-medium bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-200"
+                          disabled={registerMutation.isPending}
+                          data-testid="button-register-submit"
+                        >
+                          {registerMutation.isPending ? t("creating_account") + "..." : "Create Account & Start Investing"}
+                        </Button>
+                        
+                        <div className="text-center text-sm text-gray-500">
+                          Already have an account?{" "}
+                          <button 
+                            type="button" 
+                            onClick={() => setActiveTab('login')}
+                            className="text-emerald-600 hover:text-emerald-700 font-medium"
+                          >
+                            Sign in
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </Form>
+                </TabsContent>
+              </Tabs>
+              
+              <div className="text-center text-sm text-gray-500 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <p className="mb-3">By continuing, you agree to our Terms of Service and Privacy Policy</p>
+                <div className="flex items-center gap-3 justify-center">
+                  <div className="flex items-center gap-1">
+                    <Shield className="w-4 h-4 text-green-600" />
+                    <span className="text-green-600 font-medium">Bank-Level Security</span>
+                  </div>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <div className="flex items-center gap-1">
+                    <Building className="w-4 h-4 text-blue-600" />
+                    <span className="text-blue-600 font-medium">Fully Licensed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
           </div>
         </div>
       </DialogContent>

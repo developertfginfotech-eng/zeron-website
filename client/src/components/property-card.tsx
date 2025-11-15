@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button"
 import { MapPin, TrendingUp, Users, Edit, Trash2, DollarSign, BarChart3, Activity, Shield } from "lucide-react"
 import { Property } from "@shared/schema"
 
+// Professional placeholder image with gradient and building icon
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMzYjgyZjY7c3RvcC1vcGFjaXR5OjEiIC8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMTBiOTgxO3N0b3Atb3BhY2l0eToxIiAvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSJ1cmwoI2dyYWQpIi8+PGcgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMzAwIDI1MGgxMDB2MjAwSDMwMHoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDAwIDI1MGgxMDB2MjAwSDQwMHoiIGZpbGw9IiNmZmYiLz48cmVjdCB4PSIzMjAiIHk9IjI4MCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iMzYwIiB5PSIyODAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjQyMCIgeT0iMjgwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSI0NjAiIHk9IjI4MCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iMzIwIiB5PSIzMjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjM2MCIgeT0iMzIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSI0MjAiIHk9IjMyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iNDYwIiB5PSIzMjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjMyMCIgeT0iMzYwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSIzNjAiIHk9IjM2MCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iNDIwIiB5PSIzNjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjQ2MCIgeT0iMzYwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiMwMDAiLz48L2c+PHRleHQgeD0iNDAwIiB5PSIzMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiPklOVkVTVE1FTlQgUFJPUEVSVFk8L3RleHQ+PC9zdmc+'
+
 interface PropertyCardProps {
   property: Property
   onEdit?: (id: string) => void
@@ -48,22 +51,26 @@ export function PropertyCard({ property, onEdit, onDelete, onDeactivate }: Prope
 
   return (
     <Card className="enhanced-card animate-scale-up group overflow-hidden" data-testid={`card-property-${property.id}`}>
-      {property.images && property.images.length > 0 && (
-        <div className="aspect-video relative overflow-hidden rounded-t-lg">
-          <img
-            src={property.images[0]}
-            alt={property.title}
-            className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-            data-testid={`img-property-${property.id}`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Badge className={`${statusColors[property.status as keyof typeof statusColors]} backdrop-blur-sm`}>
-              {property.status}
-            </Badge>
-          </div>
+      <div className="aspect-video relative overflow-hidden rounded-t-lg">
+        <img
+          src={property.images && property.images.length > 0 ? property.images[0] : PLACEHOLDER_IMAGE}
+          alt={property.title}
+          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+          data-testid={`img-property-${property.id}`}
+          onError={(e) => {
+            if (e.currentTarget.dataset.errorHandled !== 'true') {
+              e.currentTarget.dataset.errorHandled = 'true';
+              e.currentTarget.src = PLACEHOLDER_IMAGE;
+            }
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <Badge className={`${statusColors[property.status as keyof typeof statusColors]} backdrop-blur-sm`}>
+            {property.status}
+          </Badge>
         </div>
-      )}
+      </div>
       
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">

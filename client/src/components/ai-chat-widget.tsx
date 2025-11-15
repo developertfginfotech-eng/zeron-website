@@ -80,19 +80,19 @@ export function AiChatWidget() {
 
   const connectWebSocket = () => {
     try {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      // Determine WebSocket protocol and host
+      let wsUrl: string;
 
-      // Handle different environments properly
-      let wsUrl: string
-      if (window.location.port && window.location.port !== '80' && window.location.port !== '443') {
-        // Development environment with specific port
-        wsUrl = `${protocol}//${window.location.hostname}:${window.location.port}/ws`
-      } else {
-        // Production environment or default ports
+      if (typeof window !== 'undefined' && window.location && window.location.host) {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
         wsUrl = `${protocol}//${window.location.host}/ws`
+      } else {
+        // Fallback: Use production server URL if window.location is not available
+        const protocol = 'ws:'
+        wsUrl = `${protocol}//13.50.13.193:5002/ws`
       }
 
-      console.log('Attempting WebSocket connection to:', wsUrl)
+      console.log('Connecting to WebSocket:', wsUrl)
       wsRef.current = new WebSocket(wsUrl)
       
       wsRef.current.onopen = () => {
@@ -436,7 +436,7 @@ export function AiChatWidget() {
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder={language === 'ar' ? 'اكتب رسالتك...' : 'Type your message...'}
                       className="flex-1"
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                       disabled={!isConnected}
                       data-testid="input-chat-message"
                     />
