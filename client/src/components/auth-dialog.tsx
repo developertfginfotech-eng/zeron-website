@@ -203,6 +203,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
       setLocation('/investor/dashboard')
     },
     onError: (error: any) => {
+      console.error('Registration error:', error) // Debug log
+
       if (error.message.includes('already registered')) {
         toast({
           title: "Email already exists",
@@ -211,10 +213,24 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
         })
         loginForm.setValue('email', registerForm.getValues('email'))
         setActiveTab('login')
+      } else if (error.response?.data?.errors) {
+        // Show validation errors from backend
+        const errorMessages = Object.values(error.response.data.errors).join(', ')
+        toast({
+          title: "Registration failed",
+          description: errorMessages,
+          variant: "destructive"
+        })
+      } else if (error.response?.data?.message) {
+        toast({
+          title: "Registration failed",
+          description: error.response.data.message,
+          variant: "destructive"
+        })
       } else {
         toast({
           title: "Registration failed",
-          description: error.message,
+          description: error.message || "Please check your information and try again.",
           variant: "destructive"
         })
       }
@@ -234,8 +250,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-5xl lg:max-w-7xl p-0 overflow-hidden bg-transparent border-none shadow-none">
-        <div className="relative w-full min-h-[700px] bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 rounded-3xl overflow-hidden shadow-2xl">
+      <DialogContent className="sm:max-w-5xl lg:max-w-7xl p-0 overflow-y-auto max-h-[90vh] bg-transparent border-none shadow-none">
+        <div className="relative w-full min-h-[700px] bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 rounded-3xl shadow-2xl">
           {/* Animated background effects */}
           <div className="absolute inset-0">
             <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
@@ -337,7 +353,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
             </div>
             
             {/* Right Side - Modern Authentication Form */}
-            <div className="relative overflow-hidden p-8 lg:p-12 flex flex-col justify-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm">
+            <div className="relative overflow-y-auto p-8 lg:p-12 flex flex-col justify-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm">
               {/* Form glassmorphism overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-blue-50/50 dark:from-slate-800/50 dark:to-blue-900/50"></div>
               
