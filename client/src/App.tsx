@@ -87,7 +87,7 @@ function WebsiteRouter() {
 
 export default function App() {
   const [location] = useLocation()
-  const isWebsite = location === '/' || location.startsWith('/website') || location.startsWith('/kyc-verification')|| location === '/user-dashboard' || location === '/user-notifications' || location === '/portfolio' || location.startsWith('/investor')
+  const isWebsite = location === '/' || location.startsWith('/website') || location.startsWith('/kyc-verification') || location.startsWith('/kyc') || location === '/user-dashboard' || location === '/user-notifications' || location === '/portfolio' || location.startsWith('/investor')
 
   // Custom sidebar width for better content display
   const style = {
