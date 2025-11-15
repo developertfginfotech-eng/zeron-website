@@ -393,22 +393,43 @@ export default function InvestorDashboard() {
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-900 dark:text-white">KYC Verification</span>
                     <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      user?.kycStatus === 'approved' 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' 
+                      user?.kycStatus === 'approved'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                        : user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review'
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300'
                         : 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300'
                     }`}>
-                      {user?.kycStatus === 'approved' ? 'Verified' : 'Pending'}
+                      {user?.kycStatus === 'approved' ? 'Verified' :
+                       user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review' ? 'Completed - Under Review' :
+                       'Pending'}
                     </div>
                   </div>
+
+                  {(user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review') && (
+                    <div className="mt-3 flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+                      <Clock className="h-4 w-4" />
+                      <span>Your documents are being reviewed. This usually takes 1-2 business days.</span>
+                    </div>
+                  )}
                 </div>
-                
-                {user?.kycStatus !== 'approved' && (
-                  <Button 
+
+                {user?.kycStatus !== 'approved' && user?.kycStatus !== 'submitted' && user?.kycStatus !== 'under_review' && user?.kycStatus !== 'pending_review' && (
+                  <Button
                     className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-semibold"
                     onClick={() => setLocation('/kyc')}
                     data-testid="button-complete-kyc"
                   >
                     Complete KYC Verification
+                  </Button>
+                )}
+
+                {(user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review') && (
+                  <Button
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-semibold"
+                    onClick={() => setLocation('/kyc')}
+                    data-testid="button-view-kyc"
+                  >
+                    View Verification Status
                   </Button>
                 )}
               </div>
