@@ -173,7 +173,10 @@ export default function InvestorProfile() {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold tracking-tight" data-testid="text-profile-name">
-              {kycData?.personalInfo?.fullNameEnglish || `${userProfile?.firstName} ${userProfile?.lastName}`}
+              {kycData?.personalInfo?.fullNameEnglish ||
+               (userProfile?.firstName && userProfile?.lastName ? `${userProfile.firstName} ${userProfile.lastName}` :
+                user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` :
+                'Guest User')}
             </h1>
             <Button variant="outline" size="sm" data-testid="button-edit-profile">
               <Edit className="w-4 h-4 mr-2" />
