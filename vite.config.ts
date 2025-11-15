@@ -33,5 +33,18 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    // Disable all caching in development
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
+    hmr: {
+      overlay: true,
+    },
+  },
+  // Optimize dependency caching
+  optimizeDeps: {
+    force: true, // Force dep pre-bundling on server start
   },
 });

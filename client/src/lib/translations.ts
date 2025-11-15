@@ -32,6 +32,7 @@ export const translations = {
     invested: "Invested",
     current_value: "Current Value",
     return: "Return",
+    total_invested: "Total Invested",
     roi: "ROI",
     
     // Performance Labels
@@ -72,6 +73,7 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "Saudi Real Estate Market",
+    vision_2030: "Vision 2030 Aligned",
     neom_projects: "NEOM Projects",
     red_sea_developments: "Red Sea Developments",
     shariah_compliant: "Shariah Compliant",
@@ -120,7 +122,90 @@ export const translations = {
     privacy_policy: "Privacy Policy",
     confirm_shariah_compliant: "I confirm this investment aligns with Shariah principles",
     create_account: "Create Account",
-    sama_regulated: "SAMA Regulated",
+    
+    // Investment Guide
+    investment_guide: "Investment Guide",
+    master_real_estate_crowdfunding: "Master Real Estate Crowdfunding",
+    learn_build_wealth_through_fractional: "Learn how to build wealth through fractional real estate investment in Saudi Arabia's growing market",
+    start_learning_now: "Start Learning Now",
+    quick_calculator: "Quick Calculator",
+    what_is_real_estate_crowdfunding: "What is Real Estate Crowdfunding",
+    discover_how_fractional_property: "Discover how fractional property investment is revolutionizing the way people build wealth",
+    traditional_vs_crowdfunding: "Traditional vs. Crowdfunding",
+    high_capital_required: "High capital required",
+    single_property_risk: "Single property risk",
+    management_burden: "Management burden",
+    low_minimum_investment: "Low minimum investment",
+    diversified_portfolio: "Diversified portfolio",
+    professional_management: "Professional management",
+    how_it_works: "How It Works",
+    choose_your_investment: "Choose Your Investment",
+    browse_verified_properties: "Browse verified properties with detailed analytics",
+    invest_your_amount: "Invest Your Amount",
+    start_with_minimum: "Start with as little as 1,000 SAR",
+    earn_returns: "Earn Returns",
+    receive_rental_income: "Receive rental income and capital appreciation",
+    average_returns: "Average Returns",
+    annual_roi: "Annual ROI",
+    happy_investors: "Happy Investors",
+    sar_invested: "SAR Invested",
+    calculate_potential_returns: "Calculate Your Potential Returns",
+    use_interactive_tools: "Use our interactive tools to estimate your investment growth and plan your portfolio",
+    simple_calculator: "Simple Calculator",
+    advanced_calculator: "Advanced Calculator",
+    quick_return_estimator: "Quick Return Estimator",
+    see_how_money_grow: "See how your money can grow",
+    sar_initial_investment: "SAR Initial Investment",
+    annual_return: "Annual Return",
+    years: "Years",
+    projected_value_after: "Projected Value After 5 Years",
+    profit: "profit",
+    advanced_portfolio_calculator: "Advanced Portfolio Calculator",
+    detailed_analysis_scenarios: "Detailed analysis with multiple scenarios",
+    advanced_calculator_coming_soon: "Advanced Calculator Coming Soon",
+    include_compound_growth: "Include compound growth, tax implications, and portfolio diversification",
+    understanding_risks_protections: "Understanding Risks & Protections",
+    learn_minimize_risks: "Learn how to minimize risks and protect your investments with smart strategies",
+    regulatory_protection: "Regulatory Protection",
+    licensed_operators_only: "Licensed operators only",
+    regular_audits: "Regular audits",
+    investor_protections: "Investor protections",
+    diversification: "Diversification",
+    spread_risk_across_properties: "Spread risk across properties",
+    multiple_locations: "Multiple locations",
+    different_property_types: "Different property types",
+    varied_investment_sizes: "Varied investment sizes",
+    due_diligence: "Due Diligence",
+    thorough_property_vetting: "Thorough property vetting",
+    market_analysis: "Market analysis",
+    financial_projections: "Financial projections",
+    legal_verification: "Legal verification",
+    building_investment_portfolio: "Building Your Investment Portfolio",
+    step_by_step_guide: "Step-by-step guide to creating a balanced and profitable real estate portfolio",
+    define_your_goals: "Define Your Goals",
+    set_clear_investment_objectives: "Set clear investment objectives and timeline",
+    assess_your_budget: "Assess Your Budget",
+    determine_available_capital: "Determine available capital and risk tolerance",
+    research_properties: "Research Properties",
+    analyze_market_trends: "Analyze market trends and property performance",
+    diversify_investments: "Diversify Investments",
+    spread_across_different_properties: "Spread across different properties and locations",
+    monitor_adjust: "Monitor & Adjust",
+    track_performance_rebalance: "Track performance and rebalance as needed",
+    ready_to_start_investing: "Ready to Start Investing?",
+    join_thousands_building_wealth: "Join thousands of investors who are building wealth through real estate crowdfunding",
+    start_investing_today: "Start Investing Today",
+    
+    // Investment Guide UI Elements
+    investment_education_center: "Investment Education Center",
+    chapter_1: "Chapter 1",
+    chapter_2: "Chapter 2", 
+    chapter_3: "Chapter 3",
+    chapter_4: "Chapter 4",
+    learn_the_basics: "Learn the Basics",
+    calculate_returns: "Calculate Returns",
+    risk_management: "Risk Management",
+    build_portfolio: "Build Portfolio",
     
     // Hero Section - Crowdfunding
     hero_title: "Invest in Saudi Arabia's Future",
@@ -167,8 +252,6 @@ export const translations = {
     // Security & Compliance
     security_compliance: "Security & Compliance",
     security_subtitle: "Your investments are protected by industry-leading security measures and regulatory compliance",
-    sama_regulated_title: "SAMA Regulated",
-    sama_desc: "Licensed by Saudi Arabian Monetary Authority",
     shariah_compliant_title: "Shariah Compliant", 
     shariah_compliant_desc: "All investments certified by Shariah board",
     bank_grade_security: "Bank-Grade Security",
@@ -224,7 +307,6 @@ export const translations = {
     properties_funded: "Properties Funded",
     shariah_certified: "Shariah Certified",
     rating_display: "4.9/5 Rating",
-    sama_licensed: "SAMA Licensed",
     
     // Property Tags
     vision_2030: "Vision 2030",
@@ -269,6 +351,7 @@ export const translations = {
     invested: "المستثمر",
     current_value: "القيمة الحالية",
     return: "العائد",
+    total_invested: "إجمالي المستثمر",
     roi: "عائد الاستثمار",
     
     // Performance Labels
@@ -309,6 +392,7 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "سوق العقارات السعودي",
+    vision_2030: "متوافق مع رؤية 2030",
     neom_projects: "مشاريع نيوم",
     red_sea_developments: "تطوير البحر الأحمر",
     shariah_compliant: "متوافق مع الشريعة",
@@ -357,7 +441,6 @@ export const translations = {
     privacy_policy: "سياسة الخصوصية",
     confirm_shariah_compliant: "أؤكد أن هذا الاستثمار متوافق مع مبادئ الشريعة الإسلامية",
     create_account: "إنشاء حساب",
-    sama_regulated: "مرخص من ساما",
     
     // Hero Section - Crowdfunding
     hero_title: "استثمر في مستقبل المملكة العربية السعودية",
@@ -404,8 +487,6 @@ export const translations = {
     // Security & Compliance
     security_compliance: "الأمان والامتثال",
     security_subtitle: "استثماراتك محمية بتدابير أمنية رائدة في الصناعة والامتثال التنظيمي",
-    sama_regulated_title: "مرخص من ساما",
-    sama_desc: "مرخص من مؤسسة النقد العربي السعودي",
     shariah_compliant_title: "متوافق مع الشريعة", 
     shariah_compliant_desc: "جميع الاستثمارات معتمدة من هيئة الشريعة",
     bank_grade_security: "أمان مصرفي",
@@ -461,7 +542,6 @@ export const translations = {
     properties_funded: "العقارات الممولة", 
     shariah_certified: "معتمد شرعياً",
     rating_display: "تقييم 4.9/5",
-    sama_licensed: "مرخص من ساما",
     
     // Property Tags
     vision_2030: "رؤية 2030",
@@ -506,6 +586,7 @@ export const translations = {
     invested: "سرمایہ کاری",
     current_value: "موجودہ ویلیو",
     return: "واپسی",
+    total_invested: "کل سرمایہ کاری",
     roi: "ROI",
     
     // Performance Labels
@@ -546,6 +627,7 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "سعودی ریئل اسٹیٹ مارکیٹ",
+    vision_2030: "ویژن 2030 سے ہم آہنگ",
     neom_projects: "نیوم پروجیکٹس",
     red_sea_developments: "بحیرہ احمر ڈیولپمنٹ",
     shariah_compliant: "شریعت کے مطابق",
@@ -619,8 +701,6 @@ export const translations = {
     // Security & Compliance
     security_compliance: "سیکیورٹی اور تعمیل",
     security_subtitle: "آپ کی سرمایہ کاری صنعت کی بہترین سیکیورٹی اقدامات اور ریگولیٹری تعمیل سے محفوظ ہے",
-    sama_regulated_title: "SAMA منظور شدہ",
-    sama_desc: "سعودی عرب کی مانیٹری اتھارٹی سے لائسنس یافتہ",
     shariah_compliant_title: "شریعت کے مطابق",
     shariah_compliant_desc: "تمام سرمایہ کاری شریعہ بورڈ سے تصدیق شدہ",
     bank_grade_security: "بینک درجے کی سیکیورٹی",
@@ -676,7 +756,6 @@ export const translations = {
     properties_funded: "فنڈ شدہ پراپرٹیز",
     shariah_certified: "شرعی تصدیق شدہ",
     rating_display: "4.9/5 ریٹنگ",
-    sama_licensed: "ساما لائسنس یافتہ",
     
     // Property Tags
     vision_2030: "ویژن 2030",
@@ -729,6 +808,7 @@ export const translations = {
     invested: "निवेशित",
     current_value: "वर्तमान मूल्य",
     return: "रिटर्न",
+    total_invested: "कुल निवेशित",
     roi: "ROI",
     
     // Performance Labels
@@ -769,6 +849,7 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "सऊदी रियल एस्टेट बाजार",
+    vision_2030: "विज़न 2030 संरेखित",
     neom_projects: "NEOM परियोजनाएं",
     red_sea_developments: "रेड सी डेवलपमेंट",
     shariah_compliant: "शरिया अनुपालन",
@@ -819,7 +900,6 @@ export const translations = {
     success_rate: "सफलता दर",
     avg_payout: "औसत भुगतान",
     support_available: "सहायता",
-    sama_regulated_title: "SAMA विनियमित",
     shariah_compliant_title: "शरिया अनुपालित",
     bank_grade_security: "बैंक-ग्रेड सुरक्षा",
     legal_protection: "कानूनी सुरक्षा",
@@ -847,7 +927,6 @@ export const translations = {
     properties_funded: "फंडेड संपत्तियां",
     shariah_certified: "शरिया प्रमाणित",
     rating_display: "4.9/5 रेटिंग",
-    sama_licensed: "SAMA लाइसेंसशुदा",
     
     // Property Tags  
     vision_2030: "विज़न 2030",
@@ -900,6 +979,7 @@ export const translations = {
     invested: "ਨਿਵੇਸ਼ਿਤ",
     current_value: "ਮੌਜੂਦਾ ਮੁੱਲ",
     return: "ਰਿਟਰਨ",
+    total_invested: "ਕੁੱਲ ਨਿਵੇਸ਼ਿਤ",
     roi: "ROI",
     
     // Performance Labels
@@ -940,6 +1020,7 @@ export const translations = {
     
     // Saudi-specific
     saudi_market: "ਸਾਊਦੀ ਰੀਅਲ ਅਸਟੇਟ ਮਾਰਕੀਟ",
+    vision_2030: "ਵਿਜ਼ਨ 2030 ਨਾਲ ਮੇਲ",
     neom_projects: "ਨਿਓਮ ਪ੍ਰੋਜੈਕਟ",
     red_sea_developments: "ਲਾਲ ਸਾਗਰ ਵਿਕਾਸ",
     shariah_compliant: "ਸ਼ਰੀਆ ਅਨੁਕੂਲ",
@@ -1000,7 +1081,6 @@ export const translations = {
     properties_funded: "ਫੰਡ ਕੀਤੀਆਂ ਸੰਪਤੀਆਂ",
     shariah_certified: "ਸ਼ਰੀਆ ਪ੍ਰਮਾਣਿਤ",
     rating_display: "4.9/5 ਰੇਟਿੰਗ",
-    sama_licensed: "SAMA ਲਾਇਸੈਂਸਸ਼ੁਦਾ",
     
     // Property Tags
     vision_2030: "ਵਿਜ਼ਨ 2030",
@@ -1053,6 +1133,7 @@ export const translations = {
     invested: "বিনিয়োগকৃত",
     current_value: "বর্তমান মূল্য",
     return: "রিটার্ন",
+    total_invested: "মোট বিনিয়োগকৃত",
     roi: "ROI",
     
     // Performance Labels
@@ -1154,7 +1235,6 @@ export const translations = {
     properties_funded: "অর্থায়নকৃত সম্পত্তি",
     shariah_certified: "শরিয়া সার্টিফাইড",
     rating_display: "4.9/5 রেটিং",
-    sama_licensed: "SAMA লাইসেন্সপ্রাপ্ত",
     
     // Property Tags
     vision_2030: "ভিশন 2030",
@@ -1308,7 +1388,6 @@ export const translations = {
     creating_account: "അക്കൗണ്ട് സൃഷ്ടിക്കുന്നു",
     shariah_certified: "ശരീഅത്ത് സാക്ഷ്യപ്പെടുത്തിയത്",
     rating_display: "4.9/5 റേറ്റിംഗ്",
-    sama_licensed: "SAMA ലൈസൻസുള്ള",
     
     // Property Tags
     shariah_compliant_tag: "ശരീഅത്ത് അനുസൃത",

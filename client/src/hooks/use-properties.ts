@@ -1,172 +1,72 @@
-import { useState, useEffect } from 'react'
+import { useQuery } from "@tanstack/react-query";
+import { apiClient, API_ENDPOINTS } from "@/lib/api-client";
 
 interface Property {
-  _id: string
-  id: string
-  title: string
-  description?: string
+  _id: string;
+  title: string;
+  titleAr?: string;
+  description?: string;
+  propertyType: string;
   location: {
-    address?: string
-    city?: string
-    state?: string
-    country?: string
+    city: string;
+    address: string;
     coordinates?: {
-      lat: number
-      lng: number
-    }
-  }
+      lat: number;
+      lng: number;
+    };
+  };
   financials: {
-    totalValue: number
-    expectedReturn: number
-    minimumInvestment: number
-  }
-  propertyType: string
-  status: 'active' | 'live' | 'upcoming' | 'closed'
-  images?: Array<{
-    url: string
-    alt: string
-    isPrimary: boolean
-    _id: string
-  }>
-  timeline?: {
-    launchDate: Date
-    fundingDeadline: Date
-  }
-  createdBy: string
-  createdAt: Date
-  updatedAt: Date
-  // Additional fields from aggregation
-  investorCount?: number
-  totalInvested?: number
-  fundingProgress?: number
-  // Legacy fields for compatibility
-  yield?: number
-  ownershipCap?: number
-  price?: number
-  totalInvestment?: number
-  occupancyRate?: number
-  performance?: 'excellent' | 'good' | 'stable' | 'declining'
+    totalValue: number;
+    pricePerShare: number;
+    minInvestment: number;
+    projectedYield: number;
+    availableShares: number;
+  };
+  images: string[];
+  status: 'active' | 'upcoming' | 'fully_funded' | 'completed';
+  fundingProgress: number;
+  investorCount: number;
 }
 
-interface PropertiesResponse {
-  success: boolean
-  data: {
-    properties: Property[]
-    pagination: {
-      page: number
-      pages: number
-      total: number
-      limit: number
-      hasNext: boolean
-      hasPrev: boolean
-    }
-  }
-  message?: string
+// Get all properties
+export function useProperties() {
+  return useQuery<Property[]>({
+    queryKey: ["properties"],
+    queryFn: async () => {
+      const response: any = await apiClient.get(API_ENDPOINTS.PROPERTIES);
+
+      // Handle different response structures
+      // Backend returns: { success: true, data: { properties: [...], pagination: {...} } }
+      if (response.data && response.data.properties) {
+        return response.data.properties;
+      }
+
+      // Fallback if properties are at data level
+      if (response.data && Array.isArray(response.data)) {
+        return response.data;
+      }
+
+      // Fallback if response is direct array
+      if (Array.isArray(response)) {
+        return response;
+      }
+
+      return [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1, // Retry once on failure
+  });
 }
 
-interface UsePropertiesParams {
-  page?: number
-  limit?: number
-  sort?: string
-  status?: string
-  propertyType?: string
-  search?: string
-  city?: string
-}
-
-export function useProperties(params: UsePropertiesParams = {}) {
-  const [properties, setProperties] = useState<Property[]>([])
-  const [pagination, setPagination] = useState<PropertiesResponse['data']['pagination'] | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchProperties = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // Get auth token (optional)
-      const token = localStorage.getItem('zaron_token') || localStorage.getItem('authToken')
-
-      // Build query parameters
-      const searchParams = new URLSearchParams()
-
-      if (params.page) searchParams.append('page', params.page.toString())
-      if (params.limit) searchParams.append('limit', params.limit.toString())
-      if (params.sort) searchParams.append('sort', params.sort)
-      if (params.status) searchParams.append('status', params.status)
-      if (params.propertyType) searchParams.append('propertyType', params.propertyType)
-      if (params.search) searchParams.append('search', params.search)
-      if (params.city) searchParams.append('city', params.city)
-
-      const queryString = searchParams.toString()
-      const url = `http://13.50.13.193:5000/api/admin/properties${queryString ? `?${queryString}` : ''}`
-
-      console.log('Fetching properties from:', url)
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      }
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-      })
-
-      const result: PropertiesResponse = await response.json()
-      console.log('Properties API Response:', result)
-
-      if (!response.ok) {
-        throw new Error(result.message || `HTTP error! status: ${response.status}`)
-      }
-
-      if (result.success) {
-        // Transform properties to match PropertyCard expectations
-        const transformedProperties: Property[] = result.data.properties.map((property: any) => ({
-          ...property,
-          id: property._id, // Ensure id field exists
-          // Map backend fields to component expectations
-          yield: property.financials?.expectedReturn || 0,
-          ownershipCap: 100, // Default ownership cap
-          price: property.financials?.totalValue || 0,
-          totalInvestment: property.totalInvested || 0,
-          location: typeof property.location === 'string' ? property.location : 
-                   `${property.location?.address || ''} ${property.location?.city || ''}`.trim() ||
-                   'Location not specified',
-          occupancyRate: Math.floor(Math.random() * 40) + 60, // Mock occupancy rate
-          performance: ['excellent', 'good', 'stable', 'declining'][Math.floor(Math.random() * 4)] as any,
-        }))
-
-        setProperties(transformedProperties)
-        setPagination(result.data.pagination)
-      } else {
-        throw new Error(result.message || 'Failed to fetch properties')
-      }
-    } catch (error: any) {
-      console.error('Error fetching properties:', error)
-      setError(error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchProperties()
-  }, [params.page, params.limit, params.sort, params.status, params.propertyType, params.search, params.city])
-
-  const refetch = () => {
-    fetchProperties()
-  }
-
-  return {
-    properties,
-    pagination,
-    loading,
-    error,
-    refetch
-  }
+// Get single property by ID
+export function useProperty(propertyId: string | undefined) {
+  return useQuery<Property>({
+    queryKey: ["property", propertyId],
+    queryFn: async () => {
+      if (!propertyId) throw new Error("Property ID is required");
+      return apiClient.get<Property>(API_ENDPOINTS.PROPERTY_BY_ID(propertyId));
+    },
+    enabled: !!propertyId,
+    staleTime: 5 * 60 * 1000,
+  });
 }

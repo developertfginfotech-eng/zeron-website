@@ -1,104 +1,93 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  kycStatus?: string;
-  avatar?: string;
+  phone?: string;
+  kycStatus: 'not_started' | 'in_progress' | 'pending_review' | 'approved' | 'rejected';
+  kycCurrentStep?: number;
+  kycCompletedSteps?: number[];
+  applicationProgress?: number;
 }
 
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
-  login: (userData: User, token: string) => void;
+  setUser: (user: User | null) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(() => {
+    // Check for stored user session
+    const storedUser = localStorage.getItem('zaron_user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
+  // Listen for user data updates
   useEffect(() => {
-    let isMounted = true
-    
-    const initializeAuth = async () => {
-      try {
-        const token = localStorage.getItem('zaron_token') 
-        const userData = localStorage.getItem('zaron_user')
-        
-        if (token && userData && isMounted) {
-          const parsedUser = JSON.parse(userData)
-          const formattedUser = {
-            id: parsedUser.id || parsedUser._id,
-            name: `${parsedUser.firstName} ${parsedUser.lastName}`,
-            email: parsedUser.email,
-            firstName: parsedUser.firstName,
-            lastName: parsedUser.lastName,
-            kycStatus: parsedUser.kycStatus,
-            avatar: parsedUser.avatar
-          }
-          setUser(formattedUser)
-        }
-      } catch (error) {
-        console.error('Error parsing auth data:', error)
-        localStorage.removeItem('zaron_token')
-        localStorage.removeItem('zaron_user')
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
+    const handleUserDataUpdate = (event: any) => {
+      const updatedUser = event.detail;
+      if (updatedUser) {
+        setUser(updatedUser);
       }
-    }
+    };
 
-    initializeAuth()
+    const handleStorageChange = () => {
+      const storedUser = localStorage.getItem('zaron_user');
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
+
+    // Listen to custom user data update events
+    window.addEventListener('userDataUpdated', handleUserDataUpdate);
+    // Listen to storage events (from other tabs)
+    window.addEventListener('storage', handleStorageChange);
 
     return () => {
-      isMounted = false
-    }
-  }, [])
-
-  const login = (userData: User, token: string) => {
-    localStorage.setItem('zaron_token', token)
-    localStorage.setItem('authToken', token) 
-    const userWithToken = { ...userData, token };
-    localStorage.setItem('zaron_user', JSON.stringify(userWithToken))
-    localStorage.setItem('userData', JSON.stringify(userData))
-    setUser(userData)
-  }
+      window.removeEventListener('userDataUpdated', handleUserDataUpdate);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   const logout = () => {
-    localStorage.removeItem('zaron_token')
-    localStorage.removeItem('zaron_user')
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('userData')
-    setUser(null)
-  }
+    setUser(null);
+    localStorage.removeItem('zaron_user');
+    localStorage.removeItem('zaron_token');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
+  };
 
-  const value = {
-    user,
-    isLoading,
-    login,
-    logout,
-    isAuthenticated: !!user
-  }
+  const setUserAndStore = (newUser: User | null) => {
+    setUser(newUser);
+    if (newUser) {
+      localStorage.setItem('zaron_user', JSON.stringify(newUser));
+    } else {
+      localStorage.removeItem('zaron_user');
+    }
+  };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser: setUserAndStore,
+        logout,
+        isAuthenticated: !!user
+      }}
+    >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context
+  return context;
 }
