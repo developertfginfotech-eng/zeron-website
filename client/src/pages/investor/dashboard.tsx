@@ -2,14 +2,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useAuth } from "@/hooks/use-auth"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { DashboardChart } from "@/components/dashboard-chart"
 import { StatCard } from "@/components/stat-card"
 import { useLocation } from "wouter"
 import { usePortfolio } from "@/hooks/use-portfolio"
 import { useMyInvestments } from "@/hooks/use-investments"
 import { useKYCStatus } from "@/hooks/use-kyc"
+import { useToast } from "@/hooks/use-toast"
+import { apiClient, API_ENDPOINTS } from "@/lib/api-client"
+import { useState } from "react"
 import {
   TrendingUp,
   Wallet,
@@ -21,12 +42,22 @@ import {
   Target,
   Clock,
   CheckCircle,
-  Loader2
+  Loader2,
+  LogOut,
+  AlertTriangle,
+  AlertCircle
 } from "lucide-react"
 
 export default function InvestorDashboard() {
   const { user } = useAuth()
   const [, setLocation] = useLocation()
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
+
+  // State for withdrawal dialog
+  const [selectedInvestment, setSelectedInvestment] = useState<any>(null)
+  const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false)
+  const [isWithdrawing, setIsWithdrawing] = useState(false)
 
   // Fetch real data from backend API
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio()
@@ -52,6 +83,11 @@ export default function InvestorDashboard() {
   const activeInvestments = portfolio?.propertyCount || 0
   const pendingReturns = portfolio?.monthlyIncome || 0
   const nextPayout = "Oct 15, 2024" // TODO: Calculate from backend
+
+  // Get real percentages from API
+  const portfolioGrowthPercentage = portfolio?.portfolioGrowthPercentage || 0
+  const totalReturnsPercentage = portfolio?.totalReturnsPercentage || 0
+  const totalReturnPercentage = portfolio?.totalReturnPercentage || 0
 
   // Profile completion calculation
   const profileFields = {
@@ -80,12 +116,75 @@ export default function InvestorDashboard() {
   // Get recent investments from backend (last 3)
   const recentInvestments = Array.isArray(myInvestments)
     ? myInvestments.slice(0, 3).map((inv: any) => ({
+        id: inv._id || inv.id,
         property: inv.propertyName || inv.property || "Unknown Property",
         amount: inv.amount || 0,
+        currentValue: inv.currentValue || inv.amount,
+        returns: inv.returns || 0,
+        rentalYieldEarned: inv.rentalYieldEarned || 0,
+        appreciationGain: inv.appreciationGain || 0,
+        penaltyRate: inv.penaltyRate || 0,
+        isAfterMaturity: inv.isAfterMaturity || false,
+        maturityDate: inv.maturityDate,
         date: inv.investedAt ? new Date(inv.investedAt).toISOString().split('T')[0] : inv.date || new Date().toISOString().split('T')[0],
         status: inv.status?.toLowerCase() || "pending",
       }))
     : []
+
+  // Handle investment withdrawal
+  const handleWithdrawInvestment = async () => {
+    if (!selectedInvestment) return
+
+    setIsWithdrawing(true)
+    try {
+      const response = await apiClient.post(
+        API_ENDPOINTS.WITHDRAW_INVESTMENT(selectedInvestment.id),
+        {}
+      ) as any
+
+      if (response.success) {
+        toast({
+          title: "Investment Withdrawn",
+          description: response.message || `Successfully withdrew SAR ${response.data?.withdrawalDetails?.totalWithdrawalAmount?.toFixed(2)}`,
+        })
+
+        // Refresh all related data
+        queryClient.invalidateQueries({ queryKey: ["my-investments"] })
+        queryClient.invalidateQueries({ queryKey: ["portfolio"] })
+        queryClient.invalidateQueries({ queryKey: ["wallet-balance"] })
+        queryClient.invalidateQueries({ queryKey: ["wallet-transactions"] })
+
+        setIsWithdrawDialogOpen(false)
+        setSelectedInvestment(null)
+      }
+    } catch (error: any) {
+      toast({
+        title: "Withdrawal Failed",
+        description: error.response?.data?.message || "Failed to process withdrawal",
+        variant: "destructive",
+      })
+    } finally {
+      setIsWithdrawing(false)
+    }
+  }
+
+  // Open withdrawal dialog
+  const openWithdrawDialog = (investment: any) => {
+    setSelectedInvestment(investment)
+    setIsWithdrawDialogOpen(true)
+  }
+
+  // Calculate penalty if early withdrawal
+  const calculatePenalty = () => {
+    if (!selectedInvestment) return 0
+    if (selectedInvestment.isAfterMaturity) return 0
+    return selectedInvestment.amount * (selectedInvestment.penaltyRate / 100)
+  }
+
+  const penalty = calculatePenalty()
+  const estimatedWithdrawal = selectedInvestment
+    ? selectedInvestment.amount + selectedInvestment.returns - penalty
+    : 0
 
   return (
     <div className="space-y-8 relative" data-testid="investor-dashboard">
@@ -129,7 +228,9 @@ export default function InvestorDashboard() {
               <p className="text-3xl font-mono font-bold">SAR {portfolioValue.toLocaleString()}</p>
               <div className="flex items-center gap-2 mt-2">
                 <ArrowUpRight className="w-4 h-4 text-green-300" />
-                <span className="text-green-300 font-semibold">+12.5% this month</span>
+                <span className="text-green-300 font-semibold">
+                  {portfolioGrowthPercentage >= 0 ? '+' : ''}{portfolioGrowthPercentage.toFixed(1)}%
+                </span>
               </div>
             </div>
             
@@ -210,7 +311,9 @@ export default function InvestorDashboard() {
                 </div>
                 <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
                   <ArrowUpRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs font-semibold text-green-600">+12.5%</span>
+                  <span className="text-xs font-semibold text-green-600">
+                    {portfolioGrowthPercentage >= 0 ? '+' : ''}{portfolioGrowthPercentage.toFixed(1)}%
+                  </span>
                 </div>
               </div>
               <div>
@@ -231,10 +334,6 @@ export default function InvestorDashboard() {
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <Target className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900/20 px-2 py-1 rounded-full">
-                  <ArrowUpRight className="w-3 h-3 text-blue-600" />
-                  <span className="text-xs font-semibold text-blue-600">+8.2%</span>
                 </div>
               </div>
               <div>
@@ -258,7 +357,9 @@ export default function InvestorDashboard() {
                 </div>
                 <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
                   <ArrowUpRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs font-semibold text-green-600">+25.0%</span>
+                  <span className="text-xs font-semibold text-green-600">
+                    {totalReturnsPercentage >= 0 ? '+' : ''}{totalReturnsPercentage.toFixed(1)}%
+                  </span>
                 </div>
               </div>
               <div>
@@ -316,7 +417,9 @@ export default function InvestorDashboard() {
               </div>
               <div className="text-right">
                 <p className="text-sm text-gray-500">ROI</p>
-                <p className="text-2xl font-mono font-bold text-emerald-600">+25%</p>
+                <p className="text-2xl font-mono font-bold text-emerald-600">
+                  {totalReturnPercentage >= 0 ? '+' : ''}{totalReturnPercentage.toFixed(1)}%
+                </p>
               </div>
             </div>
             
@@ -468,13 +571,13 @@ export default function InvestorDashboard() {
           
           <div className="space-y-3">
             {recentInvestments.map((investment, index) => (
-              <div 
-                key={index} 
-                className="relative overflow-hidden rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-sm p-4 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-lg transition-all duration-300 group" 
+              <div
+                key={index}
+                className="relative overflow-hidden rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-sm p-4 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-lg transition-all duration-300 group"
                 data-testid={`investment-${index}`}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                
+
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center shadow-md">
@@ -489,7 +592,7 @@ export default function InvestorDashboard() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="text-right flex items-center gap-4">
                     <div>
                       <p className="text-xl font-mono font-bold text-gray-900 dark:text-white">
@@ -497,15 +600,26 @@ export default function InvestorDashboard() {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <div className={`w-2 h-2 rounded-full ${
-                          investment.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-orange-500'
+                          investment.status === 'confirmed' ? 'bg-green-500 animate-pulse' : 'bg-orange-500'
                         }`} />
                         <span className={`text-sm font-medium capitalize ${
-                          investment.status === 'active' ? 'text-green-600' : 'text-orange-600'
+                          investment.status === 'confirmed' ? 'text-green-600' : 'text-orange-600'
                         }`}>
-                          {investment.status}
+                          {investment.status === 'confirmed' ? 'Active' : investment.status}
                         </span>
                       </div>
                     </div>
+                    {investment.status === 'confirmed' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openWithdrawDialog(investment)}
+                        className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Exit
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -526,6 +640,96 @@ export default function InvestorDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Withdrawal Confirmation Dialog */}
+      <AlertDialog open={isWithdrawDialogOpen} onOpenChange={setIsWithdrawDialogOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-serif">
+              {selectedInvestment?.isAfterMaturity
+                ? "Confirm Withdrawal"
+                : "Early Withdrawal Warning"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-4 text-base">
+              {!selectedInvestment?.isAfterMaturity && penalty > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-red-900">Early Withdrawal Penalty</p>
+                      <p className="text-sm text-red-700 mt-1">
+                        You are withdrawing before the maturity date. A penalty of {selectedInvestment?.penaltyRate}% will be applied.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Property:</span>
+                  <span className="font-semibold text-gray-900">{selectedInvestment?.property}</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Principal Amount:</span>
+                  <span className="font-mono font-semibold text-gray-900">
+                    SAR {selectedInvestment?.amount?.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Rental Yield Earned:</span>
+                  <span className="font-mono font-semibold text-green-600">
+                    +SAR {selectedInvestment?.returns?.toLocaleString() || 0}
+                  </span>
+                </div>
+
+                {!selectedInvestment?.isAfterMaturity && penalty > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Early Withdrawal Penalty ({selectedInvestment?.penaltyRate}%):</span>
+                    <span className="font-mono font-semibold text-red-600">
+                      -SAR {penalty.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+
+                <div className="pt-3 border-t border-gray-300">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-900">You will receive:</span>
+                    <span className="font-mono font-bold text-emerald-600 text-lg">
+                      SAR {estimatedWithdrawal.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {selectedInvestment?.isAfterMaturity ? (
+                <p className="text-sm text-gray-600">
+                  This investment has reached maturity. No penalty will be applied.
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  <strong>Note:</strong> Maturity date is {new Date(selectedInvestment?.maturityDate).toLocaleDateString()}.
+                  Withdrawing now means you will not receive appreciation gains.
+                </p>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isWithdrawing}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleWithdrawInvestment}
+              disabled={isWithdrawing}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isWithdrawing ? "Processing..." : "Confirm Withdrawal"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -92,7 +92,7 @@ export function useUploadDocuments() {
       const token = localStorage.getItem('zaron_token') ||
                    JSON.parse(localStorage.getItem('zaron_user') || '{}').token;
 
-      const response = await fetch(`${apiClient['baseUrl'] || 'http://13.50.13.193:5000/api'}/kyc/upload`, {
+      const response = await fetch(`${apiClient['baseUrl'] || 'https://zeron-backend-z5o1.onrender.com/api'}/kyc/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -117,7 +117,7 @@ export function useUploadDocuments() {
         const token = localStorage.getItem('zaron_token') ||
                      JSON.parse(localStorage.getItem('zaron_user') || '{}').token;
 
-        const userResponse = await fetch(`${apiClient['baseUrl'] || 'http://13.50.13.193:5000/api'}/users/profile`, {
+        const userResponse = await fetch(`${apiClient['baseUrl'] || 'https://zeron-backend-z5o1.onrender.com/api'}/users/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

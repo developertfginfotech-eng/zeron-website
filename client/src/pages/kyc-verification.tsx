@@ -82,7 +82,7 @@ const KYCVerificationPage = () => {
           
           if (token) {
             console.log('Fetching existing KYC data...');
-            const response = await fetch('http://13.50.13.193:5000/api/kyc', {
+            const response = await fetch('https://zeron-backend-z5o1.onrender.com/api/kyc', {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -271,7 +271,7 @@ const KYCVerificationPage = () => {
       setUploadProgress(50);
 
       // Use the correct API URL
-      const apiUrl = "http://13.50.13.193:5000/api";
+      const apiUrl = "https://zeron-backend-z5o1.onrender.com/api";
       const fullUrl = `${apiUrl}/kyc/upload`;
       
       console.log("Making request to:", fullUrl);

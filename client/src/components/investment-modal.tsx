@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,12 +11,10 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { useInvestmentSettings } from "@/hooks/use-investment-settings"
+import { API_BASE_URL, API_ENDPOINTS, getAuthToken } from "@/lib/api-client"
 import {
-  DollarSign,
   TrendingUp,
   Calendar,
   Shield,
@@ -44,6 +43,13 @@ interface BackendProperty {
     pricePerShare: number;
     availableShares: number;
   };
+  investmentTerms?: {
+    rentalYieldRate?: number | null;
+    appreciationRate?: number | null;
+    lockingPeriodYears?: number | null;
+    investmentDurationYears?: number | null;
+    earlyWithdrawalPenaltyPercentage?: number | null;
+  };
   propertyType: 'residential' | 'commercial' | 'retail';
   status: 'active' | 'upcoming' | 'fully_funded' | 'completed' | 'cancelled' | 'closed';
   investorCount: number;
@@ -59,13 +65,27 @@ interface InvestmentModalProps {
 
 export function InvestmentModal({ property, isOpen, onClose, onSuccess }: InvestmentModalProps) {
   const [units, setUnits] = useState<string>('');
+  const [investmentType, setInvestmentType] = useState<'simple_annual' | 'bond'>('bond'); // Default to bond
   const [loading, setLoading] = useState(false);
   const [investmentSuccess, setInvestmentSuccess] = useState(false);
   const [investmentData, setInvestmentData] = useState<any>(null);
   const { toast } = useToast();
-  const { data: investmentSettings, isLoading: settingsLoading } = useInvestmentSettings();
+  const { data: globalSettings } = useInvestmentSettings();
+  const queryClient = useQueryClient();
 
   if (!property) return null;
+
+  // Use property-specific investment terms if available, otherwise fall back to global settings
+  const investmentSettings = property.investmentTerms?.rentalYieldRate !== null &&
+                              property.investmentTerms?.rentalYieldRate !== undefined
+    ? {
+        rentalYieldPercentage: property.investmentTerms.rentalYieldRate,
+        appreciationRatePercentage: property.investmentTerms.appreciationRate || 0,
+        maturityPeriodYears: property.investmentTerms.lockingPeriodYears || 5,
+        investmentDurationYears: property.investmentTerms.investmentDurationYears || 5,
+        earlyWithdrawalPenaltyPercentage: property.investmentTerms.earlyWithdrawalPenaltyPercentage || 0
+      }
+    : globalSettings;
 
   // Helper functions
   const formatCurrency = (value: number): string => {
@@ -73,7 +93,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
       style: 'currency',
       currency: 'SAR',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 2,
     }).format(value);
   };
 
@@ -121,9 +141,8 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
     setLoading(true);
 
     try {
-      // Get auth token
-      const userData = localStorage.getItem('zaron_user');
-      const token = userData ? JSON.parse(userData).token : localStorage.getItem('zaron_token');
+      // Get auth token using centralized function
+      const token = getAuthToken();
 
       if (!token) {
         throw new Error('Authentication required. Please login again.');
@@ -132,16 +151,17 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
       const numUnits = parseInt(units);
       const totalAmount = calculateTotalAmount(numUnits);
 
-      // Make investment API call
-      const response = await fetch(`http://13.50.13.193:5000/api/properties/${property._id}/invest`, {
+      // Make investment API call to backend - send shares (units) and investment type
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.INVEST}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          units: numUnits,
-          shares: numUnits
+          propertyId: property._id,
+          shares: numUnits,
+          investmentType: investmentType
         }),
       });
 
@@ -154,6 +174,12 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
       if (result.success) {
         setInvestmentSuccess(true);
         setInvestmentData(result.data);
+
+        // Invalidate queries to refresh data across the app
+        queryClient.invalidateQueries({ queryKey: ["my-investments"] });
+        queryClient.invalidateQueries({ queryKey: ["portfolio"] });
+        queryClient.invalidateQueries({ queryKey: ["wallet-balance"] });
+        queryClient.invalidateQueries({ queryKey: ["properties"] });
 
         toast({
           title: "Investment Successful! 🎉",
@@ -182,6 +208,18 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
   const totalAmount = calculateTotalAmount(numUnits);
   const projectedReturn = calculateProjectedReturn(totalAmount);
   const minUnits = getMinUnitsRequired();
+
+  // Calculate maturity date
+  const calculateMaturityDate = (): string => {
+    if (!investmentSettings) return 'N/A';
+    const maturityYears = investmentSettings.maturityPeriodYears || 5;
+    const maturityDate = new Date();
+    maturityDate.setFullYear(maturityDate.getFullYear() + maturityYears);
+    const day = maturityDate.getDate().toString().padStart(2, '0');
+    const month = (maturityDate.getMonth() + 1).toString().padStart(2, '0');
+    const year = maturityDate.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
   const handleClose = () => {
     setUnits('');
@@ -283,10 +321,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
           // Investment Form Screen
           <>
             <DialogHeader className="space-y-3">
-              <DialogTitle className="flex items-center gap-3 text-xl">
-                <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-xl flex items-center justify-center">
-                  <DollarSign className="w-5 h-5 text-white" />
-                </div>
+              <DialogTitle className="text-xl">
                 Invest in {property.title}
               </DialogTitle>
               <DialogDescription className="text-base">
@@ -307,6 +342,62 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
             <div className="text-center">
               <div className="text-sm text-muted-foreground">Expected Yield</div>
               <div className="font-semibold text-emerald-600">{property.financials.projectedYield}%</div>
+            </div>
+          </div>
+
+          {/* Investment Type Selection */}
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Choose Your Investment Plan</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setInvestmentType('bond')}
+                className={`relative p-4 rounded-lg border-2 transition-all ${
+                  investmentType === 'bond'
+                    ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                }`}
+              >
+                {/* Recommended Badge */}
+                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold shadow-lg">
+                  RECOMMENDED
+                </div>
+                <div className="text-left space-y-1">
+                  <div className="font-bold text-base flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                    Bond Investment
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Maximum returns with property appreciation
+                  </div>
+                  <div className="text-xs font-bold text-blue-600 mt-2">
+                    🚀 Higher Returns • 📈 Appreciation Benefits
+                  </div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setInvestmentType('simple_annual')}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  investmentType === 'simple_annual'
+                    ? 'border-gray-400 bg-gray-50 dark:bg-gray-950/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="text-left space-y-1">
+                  <div className="font-semibold flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Annual Plan
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Short-term, 1 year commitment
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    Standard returns
+                  </div>
+                </div>
+              </button>
             </div>
           </div>
 
@@ -407,49 +498,80 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
             </div>
           )}
 
-          {/* Investment Terms */}
+          {/* Investment Terms - Different for Annual vs Bond */}
           {investmentSettings && (
             <div className="space-y-3 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
               <h4 className="font-semibold text-purple-900 dark:text-purple-100 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
                 Investment Terms
               </h4>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
-                    <Percent className="w-3 h-3" />
-                    Rental Yield
+
+              {investmentType === 'simple_annual' ? (
+                // Annual Investment Terms - Simpler, less emphasis
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                        <Percent className="w-3 h-3" />
+                        Rental Yield
+                      </div>
+                      <div className="font-bold text-sm">{investmentSettings.rentalYieldPercentage}% annually</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                        <Calendar className="w-3 h-3" />
+                        Duration
+                      </div>
+                      <div className="font-bold text-sm">1 year</div>
+                    </div>
                   </div>
-                  <div className="font-bold text-sm">{investmentSettings.rentalYieldPercentage}% annually</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
-                    <TrendingUp className="w-3 h-3" />
-                    Appreciation
+                  <div className="pt-2 border-t border-purple-200 dark:border-purple-800">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                      <span>Flexible short-term investment option</span>
+                    </div>
                   </div>
-                  <div className="font-bold text-sm">{investmentSettings.appreciationRatePercentage}% annually</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
-                    <Clock className="w-3 h-3" />
-                    Maturity Period
+                </>
+              ) : (
+                // Bond Investment Terms - Full Details
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                        <Percent className="w-3 h-3" />
+                        Rental Yield
+                      </div>
+                      <div className="font-bold text-sm">{investmentSettings.rentalYieldPercentage}% annually</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                        <TrendingUp className="w-3 h-3" />
+                        Appreciation
+                      </div>
+                      <div className="font-bold text-sm">{investmentSettings.appreciationRatePercentage}% annually</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                        <Clock className="w-3 h-3" />
+                        Maturity Period
+                      </div>
+                      <div className="font-bold text-sm">{investmentSettings.maturityPeriodYears} years</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+                        <Calendar className="w-3 h-3" />
+                        Maturity Date
+                      </div>
+                      <div className="font-bold text-sm">{calculateMaturityDate()}</div>
+                    </div>
                   </div>
-                  <div className="font-bold text-sm">{investmentSettings.maturityPeriodYears} years</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
-                    <Calendar className="w-3 h-3" />
-                    Total Duration
+                  <div className="pt-2 border-t border-purple-200 dark:border-purple-800">
+                    <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
+                      <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+                      <span>Early withdrawal (before {investmentSettings.maturityPeriodYears} years): {investmentSettings.earlyWithdrawalPenaltyPercentage}% penalty</span>
+                    </div>
                   </div>
-                  <div className="font-bold text-sm">{investmentSettings.investmentDurationYears} years</div>
-                </div>
-              </div>
-              <div className="pt-2 border-t border-purple-200 dark:border-purple-800">
-                <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
-                  <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-                  <span>Early withdrawal (before {investmentSettings.maturityPeriodYears} years): {investmentSettings.earlyWithdrawalPenaltyPercentage}% penalty</span>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           )}
 

@@ -7,24 +7,23 @@ import { useAuth } from "@/hooks/use-auth"
 import { DashboardChart } from "@/components/dashboard-chart"
 import { usePortfolio } from "@/hooks/use-portfolio"
 import { useMyInvestments } from "@/hooks/use-investments"
+import { useLocation } from "wouter"
 import {
   Building,
   TrendingUp,
-  Calendar,
-  DollarSign,
   ArrowUpRight,
-  ArrowDownRight,
-  MoreHorizontal,
   MapPin,
-  Percent,
-  Loader2
+  Loader2,
+  Wallet,
+  PieChart,
+  Target
 } from "lucide-react"
 
 export default function InvestorPortfolio() {
-  const { user } = useAuth()
+  const [, setLocation] = useLocation()
 
   // Fetch real data from backend API
-  const { data: portfolio, isLoading: portfolioLoading } = usePortfolio()
+  const { data: portfolioData, isLoading: portfolioLoading } = usePortfolio()
   const { data: backendInvestments = [], isLoading: investmentsLoading } = useMyInvestments()
 
   // Show loading state
@@ -32,222 +31,525 @@ export default function InvestorPortfolio() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600" />
           <p className="text-muted-foreground">Loading your portfolio...</p>
         </div>
       </div>
     )
   }
 
-  // Use real portfolio data from backend
-  const portfolioSummary = {
-    totalValue: portfolio?.totalCurrentValue || 0,
-    totalInvested: portfolio?.totalInvestments || 0,
-    totalReturns: portfolio?.totalReturns || 0,
-    returnRate: portfolio?.totalInvestments > 0
-      ? ((portfolio?.totalReturns || 0) / (portfolio?.totalInvestments || 1)) * 100
-      : 0,
-    activeInvestments: portfolio?.propertyCount || 0
+  // Extract portfolio data
+  const portfolio = portfolioData || {}
+  const portfolioValue = portfolio.totalCurrentValue || 0
+  const totalInvested = portfolio.totalInvestments || 0
+  const totalReturns = portfolio.totalReturns || 0
+  const unrealizedGains = portfolio.unrealizedGains || 0
+  const realizedGains = portfolio.realizedGains || 0
+  const activeInvestments = portfolio.propertyCount || 0
+  const portfolioGrowthPercentage = portfolio.portfolioGrowthPercentage || 0
+  const totalReturnsPercentage = portfolio.totalReturnsPercentage || 0
+
+  // Helper function to format dates properly
+  const formatDate = (dateString: string | null | undefined): string => {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
   }
 
-  // Map real investments from backend - safely handle array
+  // Map real investments from backend
   const investments = Array.isArray(backendInvestments) ? backendInvestments.map((inv: any) => {
-    const currentValue = inv.amount + (inv.amount * ((inv.rentalYieldRate || 0) / 100))
-    const returns = currentValue - inv.amount
+    const currentValue = inv.currentValue || inv.amount
+    const returns = inv.returns || (currentValue - inv.amount)
     const returnRate = inv.amount > 0 ? (returns / inv.amount) * 100 : 0
-
-    // Safely convert dates with fallback
-    let investmentDate = 'N/A'
-    if (inv.createdAt) {
-      try {
-        const dateObj = new Date(inv.createdAt)
-        if (!isNaN(dateObj.getTime())) {
-          investmentDate = dateObj.toISOString().split('T')[0]
-        }
-      } catch (error) {
-        investmentDate = 'N/A'
-      }
-    }
-
-    let nextPayoutDate = 'N/A'
-    if (inv.maturityDate) {
-      try {
-        const dateObj = new Date(inv.maturityDate)
-        if (!isNaN(dateObj.getTime())) {
-          nextPayoutDate = dateObj.toISOString().split('T')[0]
-        }
-      } catch (error) {
-        nextPayoutDate = 'N/A'
-      }
-    }
 
     return {
       id: inv._id,
-      property: inv.property?.title || 'Property',
-      type: inv.property?.propertyType || 'Property',
-      location: `${inv.property?.location?.address || ''}, ${inv.property?.location?.city || ''}`,
+      propertyId: inv.property?._id || inv.property,
+      property: inv.property?.title || inv.propertyName || 'Property',
+      propertyType: inv.property?.propertyType || 'Property',
+      location: inv.property?.location
+        ? `${inv.property.location.address || ''}, ${inv.property.location.city || ''}`.trim()
+        : 'Location not available',
+      investmentType: inv.investmentType || 'simple_annual', // Bond or Simple Annual
       investedAmount: inv.amount || 0,
+      netInvestment: inv.managementFee?.netInvestment || inv.amount || 0,
+      managementFee: inv.managementFee?.feeAmount || 0,
       currentValue: currentValue,
       returns: returns,
       returnRate: returnRate,
-      status: inv.status === 'completed' ? 'Completed' : 'Active',
-      investmentDate: investmentDate,
-      nextPayout: nextPayoutDate,
-      payoutAmount: inv.status === 'completed' ? 0 : (inv.amount * ((inv.rentalYieldRate || 0) / 100) / 12)
+      rentalYield: inv.rentalYieldRate || 0,
+      units: inv.shares || inv.units || 0,
+      status: inv.status === 'confirmed' ? 'Active' : inv.status === 'completed' ? 'Completed' : 'Pending',
+      investmentDate: formatDate(inv.createdAt),
+      bondMaturityDate: formatDate(inv.bondMaturityDate),
+      lockInEndDate: formatDate(inv.lockInEndDate),
+      isInLockInPeriod: inv.isInLockInPeriod || false,
+      hasMatured: inv.hasMatured || false,
     }
   }) : []
 
-  // Performance chart data - TODO: Get historical data from backend
-  const performanceData = [
-    { name: 'Jan', value: portfolioSummary.totalInvested * 0.85 },
-    { name: 'Feb', value: portfolioSummary.totalInvested * 0.92 },
-    { name: 'Mar', value: portfolioSummary.totalInvested * 0.98 },
-    { name: 'Apr', value: portfolioSummary.totalInvested * 1.05 },
-    { name: 'May', value: portfolioSummary.totalInvested * 1.15 },
-    { name: 'Jun', value: portfolioSummary.totalInvested * 1.20 },
-    { name: 'Jul', value: portfolioSummary.totalValue },
-  ]
+  // Group investments by property
+  const investmentsByProperty = investments.reduce((acc: any, inv: any) => {
+    const propertyId = inv.propertyId || inv.property
+    if (!acc[propertyId]) {
+      acc[propertyId] = {
+        propertyId,
+        propertyName: inv.property,
+        propertyType: inv.propertyType,
+        location: inv.location,
+        investments: []
+      }
+    }
+    acc[propertyId].investments.push(inv)
+    return acc
+  }, {})
 
-  // Calculate asset allocation from real investments
+  const propertyGroups = Object.values(investmentsByProperty)
+
+  // Calculate asset allocation
   const assetAllocation = investments.reduce((acc: any, inv: any) => {
-    const type = inv.type || 'Unknown'
-    const existing = acc.find((a: any) => a.type === type) || { type, amount: 0 }
-    const updated = { ...existing, amount: existing.amount + inv.investedAmount }
-    return acc.some((a: any) => a.type === type)
-      ? acc.map((a: any) => (a.type === type ? updated : a))
-      : [...acc, updated]
+    const type = inv.propertyType || 'Unknown'
+    const existing = acc.find((a: any) => a.type === type)
+    if (existing) {
+      existing.amount += inv.netInvestment
+    } else {
+      acc.push({ type, amount: inv.netInvestment })
+    }
+    return acc
   }, []).map((alloc: any) => ({
     ...alloc,
-    percentage: portfolioSummary.totalInvested > 0
-      ? Math.round((alloc.amount / portfolioSummary.totalInvested) * 100)
-      : 0
+    percentage: totalInvested > 0 ? Math.round((alloc.amount / totalInvested) * 100) : 0
   }))
 
-  // Calculate next payout from real data
-  const upcomingPayouts = backendInvestments
-    .filter((inv: any) => inv.status !== 'completed')
-    .map((inv: any) => {
-      const monthlyPayout = (inv.amount || 0) * ((inv.rentalYieldRate || 0) / 100) / 12
-      return {
-        amount: monthlyPayout,
-        date: inv.maturityDate || new Date()
-      }
-    })
-
-  const nextPayoutDate = upcomingPayouts.length > 0
-    ? new Date(upcomingPayouts[0].date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    : 'N/A'
-
-  const nextPayoutAmount = upcomingPayouts.length > 0
-    ? upcomingPayouts.reduce((sum: number, p: any) => sum + p.amount, 0)
-    : 0
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Active": return "bg-green-100 text-green-800"
-      case "Completed": return "bg-blue-100 text-blue-800"
-      case "Pending": return "bg-yellow-100 text-yellow-800"
-      default: return "bg-gray-100 text-gray-800"
-    }
-  }
+  // Mock performance data (replace with real data when available from backend)
+  const performanceData = [
+    { name: 'Jan', value: totalInvested * 0.85 },
+    { name: 'Feb', value: totalInvested * 0.92 },
+    { name: 'Mar', value: totalInvested * 0.98 },
+    { name: 'Apr', value: totalInvested * 1.05 },
+    { name: 'May', value: totalInvested * 1.15 },
+    { name: 'Jun', value: totalInvested * 1.20 },
+    { name: 'Jul', value: portfolioValue },
+  ]
 
   return (
-    <div className="space-y-8" data-testid="investor-portfolio">
-      {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Investment Portfolio</h1>
-          <p className="text-muted-foreground">
-            Track your real estate investments and returns
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="gap-2">
-            <Building className="w-4 h-4" />
-            {portfolioSummary.activeInvestments} Active Investments
-          </Badge>
+    <div className="space-y-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-blue-600 to-purple-600 p-8 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-24 translate-x-24" />
+
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-4xl font-serif font-bold mb-2">Investment Portfolio</h1>
+              <p className="text-emerald-100 text-lg">Track your real estate investments and returns</p>
+            </div>
+            <Button
+              onClick={() => setLocation('/investor/properties')}
+              className="bg-white text-emerald-700 hover:bg-white/90 font-semibold px-6 h-auto"
+            >
+              <Building className="w-4 h-4 mr-2" />
+              Explore Properties
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <p className="text-emerald-100 text-sm mb-1">Total Value</p>
+              <p className="text-3xl font-mono font-bold">SAR {portfolioValue.toLocaleString()}</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <p className="text-emerald-100 text-sm mb-1">Total Returns</p>
+              <p className="text-3xl font-mono font-bold text-green-300">+SAR {totalReturns.toLocaleString()}</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <p className="text-emerald-100 text-sm mb-1">Active Investments</p>
+              <p className="text-3xl font-mono font-bold">{activeInvestments}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Portfolio Summary */}
+      {/* Portfolio Summary Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card data-testid="card-total-value">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Portfolio Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">SAR {portfolioSummary.totalValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <ArrowUpRight className="w-3 h-3 text-green-500" />
-              +{portfolioSummary.returnRate}% from invested
-            </p>
-          </CardContent>
-        </Card>
+        {/* Portfolio Value */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-blue-600 p-1 shadow-lg hover:shadow-2xl transition-all">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 rounded-2xl" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
+                  <Wallet className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
+                  <ArrowUpRight className="w-3 h-3 text-green-600" />
+                  <span className="text-xs font-semibold text-green-600">
+                    {portfolioGrowthPercentage >= 0 ? '+' : ''}{portfolioGrowthPercentage.toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Portfolio Value</p>
+                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
+                  SAR {portfolioValue.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card data-testid="card-total-invested">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Invested</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">SAR {portfolioSummary.totalInvested.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Across {portfolioSummary.activeInvestments} properties
-            </p>
-          </CardContent>
-        </Card>
+        {/* Total Invested */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-lg hover:shadow-2xl transition-all">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-2xl" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Invested</p>
+                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
+                  SAR {totalInvested.toLocaleString()}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">Across {activeInvestments} properties</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card data-testid="card-total-returns">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Returns</CardTitle>
-            <Percent className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">SAR {portfolioSummary.totalReturns.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              {portfolioSummary.returnRate}% average return
-            </p>
-          </CardContent>
-        </Card>
+        {/* Total Returns */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-lg hover:shadow-2xl transition-all">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
+                  <ArrowUpRight className="w-3 h-3 text-green-600" />
+                  <span className="text-xs font-semibold text-green-600">
+                    {totalReturnsPercentage >= 0 ? '+' : ''}{totalReturnsPercentage.toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Returns</p>
+                <p className="text-2xl font-mono font-bold text-green-600">
+                  SAR {totalReturns.toLocaleString()}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-emerald-600">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
+                  <span className="text-xs text-blue-600">Realized: SAR {realizedGains.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card data-testid="card-next-payout">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Next Payout</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">SAR {nextPayoutAmount.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-            <p className="text-xs text-muted-foreground">
-              {nextPayoutDate !== 'N/A' ? `Expected ${nextPayoutDate}` : 'No upcoming payouts'}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Active Properties */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-pink-600 p-1 shadow-lg hover:shadow-2xl transition-all">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-pink-50 dark:from-orange-900/10 dark:to-pink-900/10 rounded-2xl" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-pink-600 flex items-center justify-center">
+                  <Building className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Properties</p>
+                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
+                  {activeInvestments}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">Diversified portfolio</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
+      {/* Tabs */}
+      <Tabs defaultValue="investments" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
-          <TabsTrigger value="investments" data-testid="tab-investments">Investments</TabsTrigger>
-          <TabsTrigger value="performance" data-testid="tab-performance">Performance</TabsTrigger>
+          <TabsTrigger value="investments">My Investments</TabsTrigger>
+          <TabsTrigger value="returns">Return Breakdown</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
+        {/* Investments Tab */}
+        <TabsContent value="investments" className="space-y-6">
+          <div className="space-y-6">
+            {investments.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-16">
+                  <Building className="w-16 h-16 text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">No investments yet</h3>
+                  <p className="text-muted-foreground mb-6">Start investing in real estate properties</p>
+                  <Button onClick={() => setLocation('/investor/properties')}>
+                    Explore Properties
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              propertyGroups.map((propertyGroup: any) => {
+                const totalInvestedInProperty = propertyGroup.investments.reduce((sum: number, inv: any) => sum + inv.netInvestment, 0)
+                const totalUnitsInProperty = propertyGroup.investments.reduce((sum: number, inv: any) => sum + inv.units, 0)
+                const totalReturnsInProperty = propertyGroup.investments.reduce((sum: number, inv: any) => sum + inv.returns, 0)
+                const currentValueInProperty = propertyGroup.investments.reduce((sum: number, inv: any) => sum + inv.currentValue, 0)
+
+                return (
+                  <Card key={propertyGroup.propertyId} className="overflow-hidden border-2">
+                    {/* Property Header */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-blue-600 to-purple-600 p-6 text-white">
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-16 translate-x-16" />
+
+                      <div className="relative z-10">
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                          <div className="flex items-start gap-4">
+                            <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                              <Building className="w-7 h-7 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-2xl font-serif font-bold mb-1">{propertyGroup.propertyName}</h3>
+                              <div className="flex items-center gap-2 text-sm text-emerald-100">
+                                <MapPin className="w-4 h-4" />
+                                <span>{propertyGroup.location}</span>
+                              </div>
+                              <Badge variant="outline" className="mt-2 bg-white/20 border-white/30 text-white">
+                                {propertyGroup.propertyType}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-emerald-100 mb-1">Total Investments</p>
+                            <p className="text-2xl font-mono font-bold">{propertyGroup.investments.length}</p>
+                          </div>
+                        </div>
+
+                        {/* Property Summary Stats */}
+                        <div className="grid grid-cols-4 gap-3 mt-4">
+                          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                            <p className="text-xs text-emerald-100 mb-1">Total Units</p>
+                            <p className="text-lg font-mono font-bold">{totalUnitsInProperty}</p>
+                          </div>
+                          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                            <p className="text-xs text-emerald-100 mb-1">Total Invested</p>
+                            <p className="text-lg font-mono font-bold">SAR {totalInvestedInProperty.toLocaleString()}</p>
+                          </div>
+                          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                            <p className="text-xs text-emerald-100 mb-1">Current Value</p>
+                            <p className="text-lg font-mono font-bold">SAR {currentValueInProperty.toLocaleString()}</p>
+                          </div>
+                          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                            <p className="text-xs text-emerald-100 mb-1">Total Returns</p>
+                            <p className="text-lg font-mono font-bold text-green-300">+SAR {totalReturnsInProperty.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Individual Investments List */}
+                    <CardContent className="p-0">
+                      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                        {propertyGroup.investments.map((investment: any, idx: number) => (
+                          <div key={investment.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                            {/* Investment Type Badge */}
+                            <div className="flex flex-col gap-3 mb-4">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge className={`text-xs font-semibold ${
+                                  investment.investmentType === 'bond'
+                                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-700'
+                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+                                }`}>
+                                  {investment.investmentType === 'bond' ? '🏆 Bond Investment' : '📅 Annual Plan'}
+                                </Badge>
+                                <Badge className={`text-xs ${
+                                  investment.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/20' :
+                                  investment.status === 'Completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20' :
+                                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20'
+                                }`}>
+                                  {investment.status}
+                                </Badge>
+                                {investment.investmentType === 'bond' && investment.isInLockInPeriod && (
+                                  <Badge variant="outline" className="text-xs text-orange-700 border-orange-300">
+                                    🔒 Lock-in Period
+                                  </Badge>
+                                )}
+                                {investment.hasMatured && (
+                                  <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                                    ✓ Matured
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Investment #{idx + 1} • Rental Yield: {investment.rentalYield}%
+                              </div>
+                            </div>
+
+                            {/* Investment Details Grid - Responsive */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+                                {/* Units */}
+                                <div className="text-center">
+                                  <p className="text-xs text-muted-foreground mb-1">Units</p>
+                                  <p className="font-mono font-semibold text-sm text-gray-900 dark:text-white">{investment.units}</p>
+                                </div>
+
+                                {/* Invested Amount */}
+                                <div className="text-center">
+                                  <p className="text-xs text-muted-foreground mb-1">Invested</p>
+                                  <p className="font-mono font-semibold text-sm text-gray-900 dark:text-white">SAR {investment.investedAmount.toLocaleString()}</p>
+                                  {investment.managementFee > 0 && (
+                                    <p className="text-xs text-red-600">-SAR {investment.managementFee.toLocaleString()} fee</p>
+                                  )}
+                                </div>
+
+                                {/* Net Investment */}
+                                <div className="text-center">
+                                  <p className="text-xs text-muted-foreground mb-1">Net Amount</p>
+                                  <p className="font-mono font-semibold text-sm text-emerald-700 dark:text-emerald-400">SAR {investment.netInvestment.toLocaleString()}</p>
+                                </div>
+
+                                {/* Current Value */}
+                                <div className="text-center">
+                                  <p className="text-xs text-muted-foreground mb-1">Current</p>
+                                  <p className="font-mono font-semibold text-sm text-gray-900 dark:text-white">SAR {investment.currentValue.toLocaleString()}</p>
+                                </div>
+
+                                {/* Returns */}
+                                <div className="text-center">
+                                  <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>Returns</p>
+                                  <p className={`font-mono font-bold text-sm ${investment.returns >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {investment.returns >= 0 ? '+' : ''}SAR {investment.returns.toLocaleString()}
+                                  </p>
+                                  <p className={`text-xs font-medium ${investment.returnRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    {investment.returnRate >= 0 ? '+' : ''}{investment.returnRate.toFixed(1)}%
+                                  </p>
+                                </div>
+
+                                {/* Investment Date */}
+                                <div className="text-center">
+                                  <p className="text-xs text-muted-foreground mb-1">Invested On</p>
+                                  <p className="font-mono text-sm text-gray-900 dark:text-white">{investment.investmentDate}</p>
+                                </div>
+
+                                {/* Maturity/Lock-in Date */}
+                                <div className="text-center">
+                                  <p className="text-xs text-muted-foreground mb-1">
+                                    {investment.investmentType === 'bond' && investment.isInLockInPeriod ? 'Lock-in Ends' : 'Matures On'}
+                                  </p>
+                                  <p className="font-mono text-sm text-gray-900 dark:text-white">
+                                    {investment.investmentType === 'bond' && investment.isInLockInPeriod
+                                      ? investment.lockInEndDate
+                                      : investment.bondMaturityDate}
+                                  </p>
+                                </div>
+                              </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Return Breakdown Tab */}
+        <TabsContent value="returns" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Portfolio Performance Chart */}
-            <Card data-testid="card-performance-chart">
+            {/* Property-wise Returns */}
+            <Card className="col-span-2">
               <CardHeader>
-                <CardTitle>Portfolio Growth</CardTitle>
-                <CardDescription>
-                  Your investment value over the last 7 months
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-emerald-600" />
+                  Property-wise Return Breakdown
+                </CardTitle>
+                <CardDescription>Detailed returns from each property investment</CardDescription>
               </CardHeader>
               <CardContent>
-                <DashboardChart 
+                <div className="space-y-4">
+                  {investments.map((investment) => (
+                    <div key={investment.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 border border-emerald-200 dark:border-emerald-800">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
+                          <Building className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">{investment.property}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Invested: SAR {investment.investedAmount.toLocaleString()} • Yield: {investment.rentalYield}%
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-xl font-mono font-bold ${investment.returns >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {investment.returns >= 0 ? '+' : ''}SAR {investment.returns.toLocaleString()}
+                        </p>
+                        <p className={`text-sm font-medium ${investment.returnRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {investment.returnRate >= 0 ? '+' : ''}{investment.returnRate.toFixed(2)}% return
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+
+                  {investments.length === 0 && (
+                    <div className="text-center py-8">
+                      <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-muted-foreground">No return data available yet</p>
+                      <p className="text-sm text-muted-foreground">Start investing to see returns</p>
+                    </div>
+                  )}
+                </div>
+
+                {investments.length > 0 && (
+                  <div className="mt-6 pt-6 border-t">
+                    <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Portfolio Returns</p>
+                        <div className="flex items-center gap-4 mt-1">
+                          <span className="text-xs text-emerald-600">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
+                          <span className="text-xs text-blue-600">Realized: SAR {realizedGains.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-mono font-bold text-green-600">
+                          +SAR {totalReturns.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-green-500 font-medium">
+                          +{totalReturnsPercentage.toFixed(2)}% average
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Portfolio Growth Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PieChart className="w-5 h-5 text-emerald-600" />
+                  Portfolio Growth
+                </CardTitle>
+                <CardDescription>Investment value over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DashboardChart
                   title="Portfolio Value"
                   type="line"
                   data={performanceData}
@@ -256,12 +558,13 @@ export default function InvestorPortfolio() {
             </Card>
 
             {/* Asset Allocation */}
-            <Card data-testid="card-allocation">
+            <Card>
               <CardHeader>
-                <CardTitle>Asset Allocation</CardTitle>
-                <CardDescription>
-                  Distribution by property type
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-emerald-600" />
+                  Asset Allocation
+                </CardTitle>
+                <CardDescription>Distribution by property type</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {assetAllocation.length > 0 ? (
@@ -269,7 +572,7 @@ export default function InvestorPortfolio() {
                     <div key={allocation.type} className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="font-medium">{allocation.type}</span>
-                        <span>SAR {allocation.amount.toLocaleString()}</span>
+                        <span className="font-mono">SAR {allocation.amount.toLocaleString()}</span>
                       </div>
                       <Progress value={allocation.percentage} className="h-2" />
                       <div className="text-xs text-muted-foreground">
@@ -279,125 +582,11 @@ export default function InvestorPortfolio() {
                   ))
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    <p>No investments yet</p>
-                    <p className="text-sm">Start investing to see asset allocation</p>
+                    <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No allocation data yet</p>
+                    <p className="text-sm">Start investing to see distribution</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="investments" className="space-y-6">
-          <div className="grid gap-6">
-            {investments.map((investment) => (
-              <Card key={investment.id} className="hover-elevate" data-testid={`investment-${investment.id}`}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{investment.property}</CardTitle>
-                      <CardDescription className="flex items-center gap-4 mt-1">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {investment.location}
-                        </span>
-                        <Badge variant="outline">{investment.type}</Badge>
-                        <Badge className={getStatusColor(investment.status)}>
-                          {investment.status}
-                        </Badge>
-                      </CardDescription>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Invested</p>
-                      <p className="font-semibold">SAR {investment.investedAmount.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Current Value</p>
-                      <p className="font-semibold">SAR {investment.currentValue.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Returns</p>
-                      <p className="font-semibold text-green-600">SAR {investment.returns.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Return Rate</p>
-                      <p className="font-semibold text-green-600">+{investment.returnRate}%</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Next Payout</p>
-                      <p className="font-semibold">
-                        {investment.status === "Completed" ? "N/A" : `SAR ${investment.payoutAmount.toLocaleString()}`}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card data-testid="card-monthly-returns">
-              <CardHeader>
-                <CardTitle>Monthly Returns</CardTitle>
-                <CardDescription>
-                  Returns received each month
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <DashboardChart 
-                  title="Monthly Returns"
-                  type="bar"
-                  data={[
-                    { name: 'Jan', value: 2100 },
-                    { name: 'Feb', value: 2400 },
-                    { name: 'Mar', value: 2650 },
-                    { name: 'Apr', value: 2800 },
-                    { name: 'May', value: 3200 },
-                    { name: 'Jun', value: 3100 },
-                    { name: 'Jul', value: 3750 },
-                  ]}
-                />
-              </CardContent>
-            </Card>
-
-            <Card data-testid="card-roi-analysis">
-              <CardHeader>
-                <CardTitle>ROI Analysis</CardTitle>
-                <CardDescription>
-                  Return on investment by property type
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {[
-                  { type: "Industrial", roi: 30.0, trend: "up" },
-                  { type: "Commercial", roi: 25.0, trend: "up" },
-                  { type: "Residential", roi: 20.0, trend: "stable" },
-                  { type: "Retail", roi: 18.0, trend: "down" }
-                ].map((analysis) => (
-                  <div key={analysis.type} className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{analysis.type}</p>
-                      <p className="text-sm text-muted-foreground">Average ROI</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-600">{analysis.roi}%</p>
-                      <div className="flex items-center gap-1">
-                        {analysis.trend === "up" && <ArrowUpRight className="w-3 h-3 text-green-500" />}
-                        {analysis.trend === "down" && <ArrowDownRight className="w-3 h-3 text-red-500" />}
-                        <span className="text-xs text-muted-foreground capitalize">{analysis.trend}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </CardContent>
             </Card>
           </div>

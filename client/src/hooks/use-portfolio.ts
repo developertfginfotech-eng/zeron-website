@@ -9,6 +9,9 @@ interface PortfolioSummary {
   unrealizedGains: number;
   realizedGains: number;
   monthlyIncome: number;
+  portfolioGrowthPercentage: number;
+  totalReturnsPercentage: number;
+  totalReturnPercentage: number;
 }
 
 // Get user's portfolio summary

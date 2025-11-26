@@ -1,0 +1,659 @@
+{
+  "info": {
+    "name": "Zeron API Collection",
+    "description": "Complete API endpoints for Zeron Real Estate Investment Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "investor_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "property_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "investment_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "settings_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Investors",
+      "item": [
+        {
+          "name": "Get All Investors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/investors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investors"]
+            }
+          }
+        },
+        {
+          "name": "Get Investor by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/investors/{{investor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investors", "{{investor_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Investor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('investor_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahmed Ali\",\n  \"email\": \"ahmed@example.com\",\n  \"phone\": \"+966501234567\",\n  \"nationality\": \"SA\",\n  \"firstName\": \"Ahmed\",\n  \"lastName\": \"Ali\",\n  \"city\": \"Riyadh\",\n  \"country\": \"Saudi Arabia\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investors"]
+            }
+          }
+        },
+        {
+          "name": "Update Investor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kycStatus\": \"approved\",\n  \"totalInvested\": \"50000.00\",\n  \"activeProperties\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investors/{{investor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investors", "{{investor_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Properties",
+      "item": [
+        {
+          "name": "Get All Properties",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/properties",
+              "host": ["{{base_url}}"],
+              "path": ["api", "properties"]
+            }
+          }
+        },
+        {
+          "name": "Get Property by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/properties/{{property_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "properties", "{{property_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Property",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('property_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Luxury Villa in Riyadh\",\n  \"description\": \"Beautiful modern villa with 5 bedrooms, swimming pool, and garden\",\n  \"location\": \"Riyadh, Al Narjis District\",\n  \"price\": \"2000000.00\",\n  \"propertyType\": \"residential\",\n  \"yield\": \"8.50\",\n  \"ownershipCap\": 100,\n  \"status\": \"upcoming\",\n  \"images\": [\"villa1.jpg\", \"villa2.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/properties",
+              "host": ["{{base_url}}"],
+              "path": ["api", "properties"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Investment Settings",
+      "item": [
+        {
+          "name": "Get Active Investment Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/investment-settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investment-settings"]
+            }
+          }
+        },
+        {
+          "name": "Create Investment Settings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('settings_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rentalYieldPercentage\": \"8.00\",\n  \"appreciationRatePercentage\": \"5.00\",\n  \"maturityPeriodYears\": 3,\n  \"investmentDurationYears\": 5,\n  \"earlyWithdrawalPenaltyPercentage\": \"15.00\",\n  \"platformFeePercentage\": \"2.00\",\n  \"minInvestmentAmount\": \"1000.00\",\n  \"maxInvestmentAmount\": \"1000000.00\",\n  \"isActive\": true,\n  \"description\": \"Default investment settings for 2025\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investment-settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investment-settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Investment Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rentalYieldPercentage\": \"9.00\",\n  \"appreciationRatePercentage\": \"6.00\",\n  \"earlyWithdrawalPenaltyPercentage\": \"12.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investment-settings/{{settings_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investment-settings", "{{settings_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Investments",
+      "item": [
+        {
+          "name": "Get Investments by Investor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/investments/investor/{{investor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments", "investor", "{{investor_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Investment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/investments/{{investment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments", "{{investment_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Calculate Investment Returns",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"investmentAmount\": 100000,\n  \"propertyId\": \"{{property_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investments/calculate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments", "calculate"]
+            }
+          }
+        },
+        {
+          "name": "Create Investment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('investment_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"investorId\": \"{{investor_id}}\",\n  \"propertyId\": \"{{property_id}}\",\n  \"investmentAmount\": \"100000.00\",\n  \"ownershipPercentage\": \"5.00\",\n  \"expectedReturn\": \"8.50\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments"]
+            }
+          }
+        },
+        {
+          "name": "Withdraw Investment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Need funds for emergency\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investments/{{investment_id}}/withdraw",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments", "{{investment_id}}", "withdraw"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transactions"]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by Investor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/transactions/investor/{{investor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transactions", "investor", "{{investor_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"investorId\": \"{{investor_id}}\",\n  \"propertyId\": \"{{property_id}}\",\n  \"type\": \"investment\",\n  \"amount\": \"100000.00\",\n  \"fee\": \"2000.00\",\n  \"description\": \"Initial investment in property\",\n  \"status\": \"pending\",\n  \"paymentMethod\": \"bank_transfer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transactions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat & AI",
+      "item": [
+        {
+          "name": "Get Chat Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/chat/messages?userId={{investor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chat", "messages"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{investor_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Chat Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{investor_id}}\",\n  \"message\": \"Hello, I need help with my investment\",\n  \"sender\": \"user\",\n  \"aiContext\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chat/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chat", "messages"]
+            }
+          }
+        },
+        {
+          "name": "AI Chat Completion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What are my current investment options?\",\n  \"userId\": \"{{investor_id}}\",\n  \"language\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/chat",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "chat"]
+            }
+          }
+        },
+        {
+          "name": "Get AI Insights",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/ai/insights?type=market",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "insights"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "market",
+                  "description": "Options: market, customer, property, risk, portfolio"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create AI Insight",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"property\",\n  \"title\": \"High Return Potential\",\n  \"content\": \"This property shows strong rental yield indicators based on location and market trends\",\n  \"confidence\": \"0.92\",\n  \"entityId\": \"{{property_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/insights",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "insights"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Complete Investment Flow Example",
+      "item": [
+        {
+          "name": "1. Create Settings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rentalYieldPercentage\": \"8.00\",\n  \"appreciationRatePercentage\": \"5.00\",\n  \"maturityPeriodYears\": 3,\n  \"investmentDurationYears\": 5,\n  \"earlyWithdrawalPenaltyPercentage\": \"15.00\",\n  \"platformFeePercentage\": \"2.00\",\n  \"minInvestmentAmount\": \"1000.00\",\n  \"maxInvestmentAmount\": \"1000000.00\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investment-settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investment-settings"]
+            }
+          }
+        },
+        {
+          "name": "2. Create Investor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mohammed Abdullah\",\n  \"email\": \"mohammed@example.com\",\n  \"phone\": \"+966505555555\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investors"]
+            }
+          }
+        },
+        {
+          "name": "3. Create Property",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Commercial Building in Jeddah\",\n  \"location\": \"Jeddah\",\n  \"price\": \"5000000.00\",\n  \"propertyType\": \"commercial\",\n  \"yield\": \"9.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/properties",
+              "host": ["{{base_url}}"],
+              "path": ["api", "properties"]
+            }
+          }
+        },
+        {
+          "name": "4. Calculate Returns",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"investmentAmount\": 100000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investments/calculate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments", "calculate"]
+            }
+          }
+        },
+        {
+          "name": "5. Create Investment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"investorId\": \"{{investor_id}}\",\n  \"propertyId\": \"{{property_id}}\",\n  \"investmentAmount\": \"100000.00\",\n  \"ownershipPercentage\": \"2.00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments"]
+            }
+          }
+        },
+        {
+          "name": "6. Get Investor Investments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/investments/investor/{{investor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments", "investor", "{{investor_id}}"]
+            }
+          }
+        },
+        {
+          "name": "7. Withdraw Investment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/investments/{{investment_id}}/withdraw",
+              "host": ["{{base_url}}"],
+              "path": ["api", "investments", "{{investment_id}}", "withdraw"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

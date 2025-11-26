@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Upload, Plus, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -25,13 +26,16 @@ export function PropertyForm({ onSubmit, onCancel, initialData }: PropertyFormPr
     yield: initialData?.yield || '',
     ownershipCap: initialData?.ownershipCap || '100',
     status: initialData?.status || 'upcoming',
-    images: initialData?.images || []
+    images: initialData?.images || [],
+    managementFeesEnabled: initialData?.managementFees?.isActive || false,
+    managementFeePercentage: initialData?.managementFees?.percentage || '0',
+    managementFeeDeductionType: initialData?.managementFees?.deductionType || 'upfront'
   })
 
   const [imageUpload, setImageUpload] = useState('')
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: field === 'managementFeesEnabled' ? value === 'true' || value === true : value }))
   }
 
   const handleAddImage = () => {
@@ -178,6 +182,58 @@ export function PropertyForm({ onSubmit, onCancel, initialData }: PropertyFormPr
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-4 border-t pt-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="managementFeesEnabled">Management Fees</Label>
+                <p className="text-sm text-muted-foreground">Enable management fees for this property</p>
+              </div>
+              <Switch
+                id="managementFeesEnabled"
+                checked={formData.managementFeesEnabled}
+                onCheckedChange={(checked) => handleInputChange('managementFeesEnabled', String(checked))}
+                data-testid="switch-management-fees"
+              />
+            </div>
+
+            {formData.managementFeesEnabled && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4 border-l-2">
+                <div className="space-y-2">
+                  <Label htmlFor="managementFeePercentage">Fee Percentage (%)</Label>
+                  <Input
+                    id="managementFeePercentage"
+                    type="number"
+                    step="0.01"
+                    value={formData.managementFeePercentage}
+                    onChange={(e) => handleInputChange('managementFeePercentage', e.target.value)}
+                    placeholder="1.80"
+                    data-testid="input-management-fee-percentage"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    E.g., 1.80% or 2.60%
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="managementFeeDeductionType">Deduction Type</Label>
+                  <Select
+                    value={formData.managementFeeDeductionType}
+                    onValueChange={(value) => handleInputChange('managementFeeDeductionType', value)}
+                  >
+                    <SelectTrigger data-testid="select-deduction-type">
+                      <SelectValue placeholder="Select deduction type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="upfront">Upfront (One-time)</SelectItem>
+                      <SelectItem value="annual">Annual</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">

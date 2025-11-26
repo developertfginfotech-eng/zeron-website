@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 const UserDashboard = () => {
   useEffect(() => {
     // Redirect to zeron-investor dashboard
-    window.location.href = "http://13.50.13.193:5002/"
+    window.location.href = "https://zeron-investor-dashboard.onrender.com/" // TODO: Update with correct investor dashboard URL
   }, []);
 
   return (
