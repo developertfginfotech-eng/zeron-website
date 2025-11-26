@@ -40,7 +40,7 @@ export function PropertiesList() {
     try {
       const token = localStorage.getItem('zaron_token') || localStorage.getItem('authToken')
       
-      const response = await fetch(`http://13.53.177.188:5000/api/admin/properties/${id}`, {
+      const response = await fetch(`https://zeron-backend-z5o1.onrender.com/api/admin/properties/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -69,7 +69,7 @@ export function PropertiesList() {
       const token = localStorage.getItem('zaron_token') || localStorage.getItem('authToken')
       
       // Update property status to inactive
-      const response = await fetch(`http://13.50.13.193:5000/api/admin/properties/${id}`, {
+      const response = await fetch(`https://zeron-backend-z5o1.onrender.com/api/admin/properties/${id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

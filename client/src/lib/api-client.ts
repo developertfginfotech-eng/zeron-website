@@ -4,11 +4,11 @@
  */
 
 // Backend API Base URL
-// Use environment variable if available, otherwise use production URL
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://13.50.13.193:5000/api';
+// Use environment variable if available, otherwise use localhost for testing
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-// For local development, you can create .env file with:
-// VITE_API_URL=http://localhost:5001/api
+// For production deployment, update this to:
+// export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://13.50.13.193:5000/api';
 
 // Get auth token from localStorage
 export const getAuthToken = (): string | null => {

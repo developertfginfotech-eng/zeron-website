@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import type { InvestmentSettings } from "@shared/schema";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-client";
 
 export function useInvestmentSettings() {
   return useQuery<InvestmentSettings>({
     queryKey: ["investment-settings"],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE}/investment-settings`);
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.INVESTMENT_SETTINGS}`);
       if (!response.ok) {
         throw new Error("Failed to fetch investment settings");
       }
@@ -21,7 +20,7 @@ export function useInvestmentCalculation(investmentAmount: number) {
   return useQuery({
     queryKey: ["investment-calculation", investmentAmount],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE}/investments/calculate`, {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CALCULATE_RETURNS}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

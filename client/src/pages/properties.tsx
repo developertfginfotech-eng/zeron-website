@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Search, Filter, MapPin, TrendingUp, Users, Calendar, Loader2, AlertTriangle, Lock, Eye, Shield, CheckCircle } from "lucide-react"
 
 // CORRECTED API configuration
-const API_BASE_URL = 'http://13.50.13.193:5000'
+const API_BASE_URL = 'https://zeron-backend-z5o1.onrender.com'
 
 // Helper function to get KYC status
 const getKYCStatus = (): {

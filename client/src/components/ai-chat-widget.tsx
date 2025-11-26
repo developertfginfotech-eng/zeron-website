@@ -80,17 +80,15 @@ export function AiChatWidget() {
 
   const connectWebSocket = () => {
     try {
-      // Determine WebSocket protocol and host
-      let wsUrl: string;
+      // Get API URL from environment variable
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://zeron-backend-z5o1.onrender.com/api';
 
-      if (typeof window !== 'undefined' && window.location && window.location.host) {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-        wsUrl = `${protocol}//${window.location.host}/ws`
-      } else {
-        // Fallback: Use production server URL if window.location is not available
-        const protocol = 'ws:'
-        wsUrl = `${protocol}//13.50.13.193:5002/ws`
-      }
+      // Extract base URL without /api suffix and determine protocol
+      const baseUrl = apiUrl.replace('/api', '');
+      const protocol = baseUrl.startsWith('https') ? 'wss:' : 'ws:';
+      const host = baseUrl.replace('https://', '').replace('http://', '');
+
+      const wsUrl = `${protocol}//${host}/ws`;
 
       console.log('Connecting to WebSocket:', wsUrl)
       wsRef.current = new WebSocket(wsUrl)

@@ -7,6 +7,7 @@ import { useTranslation } from "@/hooks/use-translation"
 import { useAuth } from "@/hooks/use-auth"
 import { AuthDialog } from "@/components/auth-dialog"
 import { InvestmentModal } from "@/components/investment-modal"
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-client"
 import { motion } from "framer-motion"
 import { useLocation } from 'wouter';
 import { useToast } from "@/hooks/use-toast"
@@ -209,9 +210,9 @@ export default function InvestPage() {
       setError(null)
       
       const token = getAuthToken();
-      
+
       // Fetch only 6 featured properties for home page
-      const endpoint = 'http://13.50.13.193:5000/api/admin/properties?limit=6&sort=-createdAt';
+      const endpoint = `${API_BASE_URL}${API_ENDPOINTS.PROPERTIES}?limit=6&sort=-createdAt`;
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -271,7 +272,9 @@ export default function InvestPage() {
     if (property.images && property.images.length > 0) {
       const primaryImage = property.images.find(img => img.isPrimary) || property.images[0]
       if (primaryImage.url.startsWith('/uploads/')) {
-        return `http://13.50.13.193:5000${primaryImage.url}`
+        // Remove /api from API_BASE_URL for image serving
+        const baseUrl = API_BASE_URL.replace('/api', '')
+        return `${baseUrl}${primaryImage.url}`
       }
       if (primaryImage.url.startsWith('http')) {
         return primaryImage.url

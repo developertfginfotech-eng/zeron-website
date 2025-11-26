@@ -141,10 +141,34 @@ export function ProfileCompletionWizard({ onClose }: ProfileCompletionWizardProp
     }, 300)
   }
 
-  const handleComplete = () => {
-    // In a real app, this would save to backend
-    console.log("Profile completion data:", formData)
-    onClose()
+  const handleComplete = async () => {
+    try {
+      const token = localStorage.getItem('zaron_token') ||
+                   JSON.parse(localStorage.getItem('zaron_user') || '{}').token;
+
+      const response = await fetch('https://zeron-backend-z5o1.onrender.com/api/users/profile/complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save profile');
+      }
+
+      const data = await response.json();
+      console.log("Profile saved successfully:", data);
+
+      // Refresh the page to show updated status
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      // Refresh anyway to show current state
+      window.location.reload();
+    }
   }
 
   const updateFormData = (field: string, value: any) => {

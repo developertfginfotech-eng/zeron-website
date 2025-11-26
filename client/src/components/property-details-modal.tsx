@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, DollarSign, TrendingUp, Clock, X } from "lucide-react"
+import { InvestmentCalculator } from "@/components/investment-calculator"
 
 interface PropertyDetailsModalProps {
   isOpen: boolean
@@ -13,7 +14,7 @@ interface PropertyDetailsModalProps {
 
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2UyZThmMCIvPjxwYXRoIGQ9Ik0xNTAgMTAwaDEwMHYxMDBIMTUweiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjE3MCIgeT0iMTIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiM2NDc0OGIiLz48cmVjdCB4PSIyMTAiIHk9IjEyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjNjQ3NDhiIi8+PHJlY3QgeD0iMTcwIiB5PSIxNjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzY0NzQ4YiIvPjxyZWN0IHg9IjIxMCIgeT0iMTYwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiM2NDc0OGIiLz48dGV4dCB4PSIyMDAiIHk9IjEzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjQ3NDhiIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='
 
-const BACKEND_BASE = 'http://13.50.13.193:5000'
+const BACKEND_BASE = 'https://zeron-backend-z5o1.onrender.com'
 
 export function PropertyDetailsModal({
   isOpen,
@@ -49,8 +50,12 @@ export function PropertyDetailsModal({
 
   // Get target return from financials
   const targetReturn = `${property.financials?.projectedYield || 0}%`
-  const minInvestment = property.financials?.minInvestment != null ? Number(property.financials.minInvestment) : 1000
   const funded = property.fundingProgress != null ? Number(property.fundingProgress) : 0
+
+  // Get share/unit information (all dynamic from admin)
+  const pricePerShare = property.financials?.pricePerShare != null ? Number(property.financials.pricePerShare) : 0
+  const availableShares = property.financials?.availableShares != null ? Number(property.financials.availableShares) : 0
+  const totalShares = property.financials?.totalShares != null ? Number(property.financials.totalShares) : 0
 
   const investmentTerms = property.investmentTerms || {}
 
@@ -121,20 +126,20 @@ export function PropertyDetailsModal({
             </Card>
             <Card>
               <CardContent className="pt-6">
-                <p className="text-xs text-muted-foreground mb-1">Min Investment</p>
-                <p className="text-lg font-bold">SAR {minInvestment.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mb-1">Price per Unit</p>
+                <p className="text-lg font-bold">SAR {pricePerShare.toLocaleString()}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-xs text-muted-foreground mb-1">Available Units</p>
+                <p className="text-lg font-bold">{availableShares} / {totalShares}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <p className="text-xs text-muted-foreground mb-1">Funded</p>
                 <p className="text-lg font-bold">{funded.toFixed(1)}%</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-xs text-muted-foreground mb-1">Time Left</p>
-                <p className="text-lg font-bold">-- days</p>
               </CardContent>
             </Card>
           </div>
@@ -209,6 +214,13 @@ export function PropertyDetailsModal({
               </div>
             </CardContent>
           </Card>
+
+          {/* Investment Calculator */}
+          <InvestmentCalculator
+            pricePerShare={pricePerShare}
+            availableShares={availableShares}
+            minShares={1}
+          />
 
           {/* Action Buttons */}
           <div className="flex gap-3">

@@ -17,6 +17,17 @@ interface Investment {
   maturityPeriodYears?: number;
   investmentDurationYears?: number;
   createdAt: Date;
+  // Bond investment fields
+  investmentType?: 'bond' | 'simple_annual';
+  bondMaturityDate?: Date;
+  lockInEndDate?: Date;
+  isInLockInPeriod?: boolean;
+  hasMatured?: boolean;
+  managementFee?: {
+    feePercentage: number;
+    feeAmount: number;
+    netInvestment: number;
+  };
 }
 
 interface InvestmentSettings {
@@ -97,7 +108,7 @@ export function useWithdrawInvestment() {
 
   return useMutation({
     mutationFn: async (investmentId: string) => {
-      return apiClient.post(API_ENDPOINTS.WITHDRAW(investmentId));
+      return apiClient.post(API_ENDPOINTS.WITHDRAW_INVESTMENT(investmentId));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-investments"] });

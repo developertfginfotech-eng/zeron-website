@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useTranslation } from "@/hooks/use-translation"
 import { AuthDialog } from "@/components/auth-dialog"
 import { InvestmentModal } from "@/components/investment-modal"
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-client"
 import { motion } from "framer-motion"
 
 import {
@@ -160,7 +161,9 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
     if (property.images && property.images.length > 0) {
       const primaryImage = property.images.find(img => img.isPrimary) || property.images[0]
       if (primaryImage.url.startsWith('/uploads/')) {
-        return `http://13.50.13.193:5000${primaryImage.url}`
+        // Remove /api from API_BASE_URL for image serving
+        const baseUrl = API_BASE_URL.replace('/api', '')
+        return `${baseUrl}${primaryImage.url}`
       }
       return primaryImage.url
     }
@@ -433,7 +436,7 @@ export default function WebsitePropertiesPage() {
       setError(null);
 
       const token = getAuthToken();
-      const endpoint = 'http://13.50.13.193:5000/api/admin/properties';
+      const endpoint = `${API_BASE_URL}${API_ENDPOINTS.PROPERTIES}`;
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',

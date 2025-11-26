@@ -76,7 +76,7 @@ export default function InvestorProfile() {
       title: 'Investment Profile',
       description: 'Investment experience and risk preferences',
       icon: <Wallet className="w-5 h-5" />,
-      completed: false, // TODO: Get from backend
+      completed: userProfile?.profileData?.investmentProfile?.completed || false,
       items: [
         'Investment Experience',
         'Risk Tolerance',
@@ -89,7 +89,7 @@ export default function InvestorProfile() {
       title: 'Banking Details',
       description: 'Bank account verification for payouts',
       icon: <Wallet className="w-5 h-5" />,
-      completed: false, // TODO: Get from backend
+      completed: userProfile?.profileData?.bankingDetails?.completed || false,
       items: [
         'Bank Account',
         'IBAN Verification',
@@ -102,7 +102,7 @@ export default function InvestorProfile() {
       title: 'Communication Preferences',
       description: 'Notification and communication settings',
       icon: <Bell className="w-5 h-5" />,
-      completed: false, // TODO: Get from backend
+      completed: userProfile?.profileData?.communicationPreferences?.completed || false,
       items: [
         'Email Notifications',
         'SMS Alerts',
@@ -115,7 +115,7 @@ export default function InvestorProfile() {
       title: 'Additional Documents',
       description: 'Optional supporting documentation',
       icon: <FileText className="w-5 h-5" />,
-      completed: false, // TODO: Get from backend
+      completed: userProfile?.profileData?.employmentPortfolio?.completed || false,
       items: [
         'Employment Letter',
         'Salary Certificate',
@@ -258,7 +258,12 @@ export default function InvestorProfile() {
         
         <div className="grid gap-4">
           {profileSections.map((section) => (
-            <Card key={section.id} className="hover-elevate transition-all duration-200" data-testid={`section-${section.id}`}>
+            <Card
+              key={section.id}
+              className="hover-elevate transition-all duration-200 cursor-pointer hover:shadow-md"
+              data-testid={`section-${section.id}`}
+              onClick={() => setShowWizard(true)}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
