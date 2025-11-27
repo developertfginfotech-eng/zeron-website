@@ -3,9 +3,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { useAuth } from "@/hooks/use-auth"
 import { DashboardChart } from "@/components/dashboard-chart"
-import { usePortfolio } from "@/hooks/use-portfolio"
+import { usePortfolio, type PortfolioSummary } from "@/hooks/use-portfolio"
 import { useMyInvestments } from "@/hooks/use-investments"
 import { useLocation } from "wouter"
 import {
@@ -39,7 +38,18 @@ export default function InvestorPortfolio() {
   }
 
   // Extract portfolio data
-  const portfolio = portfolioData || {}
+  const portfolio: PortfolioSummary = portfolioData || {
+    totalCurrentValue: 0,
+    totalInvestments: 0,
+    totalReturns: 0,
+    propertyCount: 0,
+    unrealizedGains: 0,
+    realizedGains: 0,
+    monthlyIncome: 0,
+    portfolioGrowthPercentage: 0,
+    totalReturnsPercentage: 0,
+    totalReturnPercentage: 0,
+  }
   const portfolioValue = portfolio.totalCurrentValue || 0
   const totalInvested = portfolio.totalInvestments || 0
   const totalReturns = portfolio.totalReturns || 0
@@ -448,7 +458,9 @@ export default function InvestorPortfolio() {
                                   <p className="font-mono text-sm text-gray-900 dark:text-white">
                                     {investment.investmentType === 'bond' && investment.isInLockInPeriod
                                       ? investment.lockInEndDate
-                                      : investment.bondMaturityDate}
+                                      : investment.investmentType === 'bond'
+                                      ? investment.bondMaturityDate
+                                      : investment.lockInEndDate}
                                   </p>
                                 </div>
                               </div>
