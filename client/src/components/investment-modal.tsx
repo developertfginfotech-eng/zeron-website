@@ -65,7 +65,7 @@ interface InvestmentModalProps {
 
 export function InvestmentModal({ property, isOpen, onClose, onSuccess }: InvestmentModalProps) {
   const [units, setUnits] = useState<string>('');
-  const [investmentType, setInvestmentType] = useState<'simple_annual' | 'bond'>('bond'); // Default to bond
+  const [investmentType, setInvestmentType] = useState<'simple_annual' | 'bond'>('simple_annual'); // Default to annual plan
   const [loading, setLoading] = useState(false);
   const [investmentSuccess, setInvestmentSuccess] = useState(false);
   const [investmentData, setInvestmentData] = useState<any>(null);
