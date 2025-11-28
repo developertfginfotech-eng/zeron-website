@@ -59,6 +59,8 @@ export default function InvestorDashboard() {
   const [selectedInvestment, setSelectedInvestment] = useState<any>(null)
   const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const [withdrawalDetails, setWithdrawalDetails] = useState<any>(null)
+  const [isLoadingWithdrawalDetails, setIsLoadingWithdrawalDetails] = useState(false)
 
   // Fetch real data from backend API
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio()
@@ -145,6 +147,8 @@ export default function InvestorDashboard() {
         rentalYieldEarned: inv.rentalYieldEarned || 0,
         appreciationGain: inv.appreciationGain || 0,
         penaltyRate: inv.penaltyRate || 0,
+        graduatedPenalties: inv.graduatedPenalties || [],
+        investedAt: inv.investedAt || inv.createdAt,
         isAfterMaturity: inv.isAfterMaturity || false,
         maturityDate: inv.maturityDate,
         date: inv.investedAt ? new Date(inv.investedAt).toISOString().split('T')[0] : inv.date || new Date().toISOString().split('T')[0],
@@ -189,22 +193,109 @@ export default function InvestorDashboard() {
     }
   }
 
+  // Fetch withdrawal details from backend
+  const fetchWithdrawalDetails = async (investmentId: string) => {
+    setIsLoadingWithdrawalDetails(true)
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.GET_INVESTMENT_RETURNS(investmentId)
+      ) as any
+
+      if (response.success && response.data) {
+        setWithdrawalDetails(response.data)
+      }
+    } catch (error) {
+      console.error('Error fetching withdrawal details:', error)
+    } finally {
+      setIsLoadingWithdrawalDetails(false)
+    }
+  }
+
   // Open withdrawal dialog
   const openWithdrawDialog = (investment: any) => {
     setSelectedInvestment(investment)
+    setWithdrawalDetails(null)
+    fetchWithdrawalDetails(investment.id)
     setIsWithdrawDialogOpen(true)
   }
 
-  // Calculate penalty if early withdrawal
+  // Calculate penalty if early withdrawal - use graduated penalties if available
   const calculatePenalty = () => {
     if (!selectedInvestment) return 0
     if (selectedInvestment.isAfterMaturity) return 0
-    return selectedInvestment.amount * (selectedInvestment.penaltyRate / 100)
+
+    let penaltyPercentage = selectedInvestment.penaltyRate || 0
+
+    // Use graduated penalties if available
+    if (selectedInvestment.graduatedPenalties && selectedInvestment.graduatedPenalties.length > 0) {
+      // Calculate years since investment
+      const investedDate = new Date(selectedInvestment.investedAt)
+      const now = new Date()
+      const yearsHeld = (now.getTime() - investedDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      const currentYear = Math.floor(yearsHeld) + 1
+
+      // Find penalty for current year
+      const penaltyTier = selectedInvestment.graduatedPenalties.find((p: any) => p.year === currentYear)
+      if (penaltyTier) {
+        penaltyPercentage = penaltyTier.penaltyPercentage
+      }
+    }
+
+    return selectedInvestment.amount * (penaltyPercentage / 100)
+  }
+
+  // Get actual penalty rate (graduated or flat)
+  const getActualPenaltyRate = () => {
+    if (!selectedInvestment) return 0
+    if (selectedInvestment.isAfterMaturity) return 0
+
+    let penaltyPercentage = selectedInvestment.penaltyRate || 0
+
+    // Use graduated penalties if available
+    if (selectedInvestment.graduatedPenalties && selectedInvestment.graduatedPenalties.length > 0) {
+      const investedDate = new Date(selectedInvestment.investedAt)
+      const now = new Date()
+      const yearsHeld = (now.getTime() - investedDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      const currentYear = Math.floor(yearsHeld) + 1
+
+      const penaltyTier = selectedInvestment.graduatedPenalties.find((p: any) => p.year === currentYear)
+      if (penaltyTier) {
+        penaltyPercentage = penaltyTier.penaltyPercentage
+      }
+    }
+
+    return penaltyPercentage
   }
 
   const penalty = calculatePenalty()
+
+  // Calculate management fees
+  const calculateManagementFee = () => {
+    if (!selectedInvestment) return 0
+
+    const investmentAmount = selectedInvestment.amount
+    const investmentDate = new Date(selectedInvestment.investmentDate || selectedInvestment.createdAt)
+    const now = new Date()
+    const yearsPassed = (now.getTime() - investmentDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+
+    // Get management fee percentage from property (should be in selectedInvestment)
+    const managementFeePercentage = selectedInvestment.managementFeePercentage || 0
+    const managementFeeDeductionType = selectedInvestment.managementFeeDeductionType || 'upfront'
+
+    // Only calculate if deduction type is annual or monthly
+    if (managementFeeDeductionType === 'annual') {
+      return (investmentAmount * managementFeePercentage * yearsPassed) / 100
+    } else if (managementFeeDeductionType === 'monthly') {
+      const monthsPassed = yearsPassed * 12
+      return (investmentAmount * managementFeePercentage * monthsPassed) / 100
+    }
+    // For 'upfront', fee was already deducted at investment time
+    return 0
+  }
+
+  const managementFee = calculateManagementFee()
   const estimatedWithdrawal = selectedInvestment
-    ? selectedInvestment.amount + selectedInvestment.returns - penalty
+    ? selectedInvestment.amount + selectedInvestment.returns - penalty - managementFee
     : 0
 
   return (
@@ -614,16 +705,29 @@ export default function InvestorDashboard() {
                     </div>
                   </div>
 
-                  <div className="text-right flex items-center gap-4">
+                  <div className="text-right flex items-center gap-6">
                     <div>
-                      <p className="text-xl font-mono font-bold text-gray-900 dark:text-white">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Invested</p>
+                      <p className="text-lg font-mono font-semibold text-gray-900 dark:text-white">
                         SAR {investment.amount.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Current Value</p>
+                      <p className="text-lg font-mono font-bold text-emerald-600">
+                        SAR {investment.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Returns</p>
+                      <p className={`text-lg font-mono font-bold ${investment.returns >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        +SAR {investment.returns.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <div className={`w-2 h-2 rounded-full ${
                           investment.status === 'confirmed' ? 'bg-green-500 animate-pulse' : 'bg-orange-500'
                         }`} />
-                        <span className={`text-sm font-medium capitalize ${
+                        <span className={`text-xs font-medium capitalize ${
                           investment.status === 'confirmed' ? 'text-green-600' : 'text-orange-600'
                         }`}>
                           {investment.status === 'confirmed' ? 'Active' : investment.status}
@@ -679,7 +783,7 @@ export default function InvestorDashboard() {
                     <div>
                       <p className="font-semibold text-red-900">Early Withdrawal Penalty</p>
                       <p className="text-sm text-red-700 mt-1">
-                        You are withdrawing before the maturity date. A penalty of {selectedInvestment?.penaltyRate}% will be applied.
+                        You are withdrawing before the maturity date. A penalty of {getActualPenaltyRate()}% will be applied.
                       </p>
                     </div>
                   </div>
@@ -706,11 +810,20 @@ export default function InvestorDashboard() {
                   </span>
                 </div>
 
-                {!selectedInvestment?.isAfterMaturity && penalty > 0 && (
+                {withdrawalDetails?.penalty?.isInLockInPeriod && withdrawalDetails?.penalty?.penaltyAmount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Early Withdrawal Penalty ({selectedInvestment?.penaltyRate}%):</span>
+                    <span className="text-gray-600">Early Withdrawal Penalty ({withdrawalDetails?.penalty?.penaltyPercentage}%):</span>
                     <span className="font-mono font-semibold text-red-600">
-                      -SAR {penalty.toLocaleString()}
+                      -SAR {withdrawalDetails?.penalty?.penaltyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                )}
+
+                {withdrawalDetails?.managementFee?.accumulatedAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Management Fee ({withdrawalDetails?.managementFee?.deductionType}):</span>
+                    <span className="font-mono font-semibold text-amber-600">
+                      -SAR {withdrawalDetails?.managementFee?.accumulatedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 )}
@@ -719,7 +832,7 @@ export default function InvestorDashboard() {
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-900">You will receive:</span>
                     <span className="font-mono font-bold text-emerald-600 text-lg">
-                      SAR {estimatedWithdrawal.toLocaleString()}
+                      SAR {(withdrawalDetails?.netWithdrawalAmount || estimatedWithdrawal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>

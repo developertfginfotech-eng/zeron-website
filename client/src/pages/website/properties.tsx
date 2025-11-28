@@ -811,6 +811,22 @@ export default function WebsitePropertiesPage() {
         }}
         onSuccess={handleInvestmentSuccess}
       />
+
+      {/* Property Details Modal */}
+      <PropertyDetailsModal
+        isOpen={isDetailsModalOpen}
+        property={selectedPropertyDetails}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedPropertyDetails(null);
+        }}
+        onInvest={() => {
+          setIsDetailsModalOpen(false);
+          if (selectedPropertyDetails) {
+            handleInvestClick(selectedPropertyDetails);
+          }
+        }}
+      />
     </div>
   );
 }

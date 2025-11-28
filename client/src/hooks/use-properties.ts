@@ -22,6 +22,25 @@ interface Property {
     projectedYield: number;
     availableShares: number;
   };
+  investmentTerms?: {
+    targetReturn?: number;
+    rentalYieldRate?: number;
+    appreciationRate?: number;
+    lockingPeriodYears?: number;
+    bondMaturityYears?: number;
+    investmentDurationYears?: number;
+    earlyWithdrawalPenaltyPercentage?: number;
+    graduatedPenalties?: Array<{
+      year: number;
+      penaltyPercentage: number;
+    }>;
+  };
+  managementFees?: {
+    percentage: number;
+    isActive: boolean;
+    deductionType: 'upfront' | 'annual' | 'monthly';
+    totalFeesCollected: number;
+  };
   images: string[];
   status: 'active' | 'upcoming' | 'fully_funded' | 'completed';
   fundingProgress: number;

@@ -52,7 +52,9 @@ export function useWalletBalance() {
     queryKey: ["wallet-balance"],
     queryFn: async () => {
       const response = await apiClient.get<WalletResponse>(API_ENDPOINTS.WALLET_BALANCE);
-      return response.data;
+      // Backend response is { success: true, data: { availableBalance, ... } }
+      // so we need to extract the nested data object
+      return response.data.data || response.data;
     },
     staleTime: 1 * 60 * 1000, // 1 minute
     enabled: hasAuth,
@@ -68,7 +70,9 @@ export function useWalletTransactions() {
     queryKey: ["wallet-transactions"],
     queryFn: async () => {
       const response = await apiClient.get<TransactionsResponse>(API_ENDPOINTS.WALLET_TRANSACTIONS);
-      return response.data;
+      // Backend response is { success: true, data: [...transactions...] }
+      // so we need to extract the nested data array
+      return response.data.data || response.data;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: hasAuth,
