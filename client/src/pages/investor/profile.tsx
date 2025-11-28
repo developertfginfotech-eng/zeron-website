@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useLocation } from "wouter"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -24,10 +25,20 @@ import {
 import { ProfileCompletionWizard } from "@/components/profile-completion-wizard"
 
 export default function InvestorProfile() {
+  const [, navigate] = useLocation()
   const { user } = useAuth()
   const { data: userProfile, isLoading: userProfileLoading } = useUserProfile()
   const { data: kycData, isLoading: kycLoading } = useKYC()
   const [showWizard, setShowWizard] = useState(false)
+
+  // Handle section click - KYC goes to verification page, others show wizard
+  const handleSectionClick = (sectionId: string) => {
+    if (sectionId === 'kyc') {
+      navigate('/kyc-verification')
+    } else {
+      setShowWizard(true)
+    }
+  }
 
   // Check document upload status
   const getDocumentStatus = (doc: any) => {
@@ -281,7 +292,7 @@ export default function InvestorProfile() {
               key={section.id}
               className="hover-elevate transition-all duration-200 cursor-pointer hover:shadow-md"
               data-testid={`section-${section.id}`}
-              onClick={() => setShowWizard(true)}
+              onClick={() => handleSectionClick(section.id)}
             >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">

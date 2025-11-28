@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useTranslation } from "@/hooks/use-translation"
 import { AuthDialog } from "@/components/auth-dialog"
 import { InvestmentModal } from "@/components/investment-modal"
+import { PropertyDetailsModal } from "@/components/property-details-modal"
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-client"
 import { motion } from "framer-motion"
 
@@ -142,7 +143,7 @@ const getPropertyTags = (property: BackendProperty) => {
 };
 
 // Property Card Component with KYC Lock
-const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; onInvestClick: (property: BackendProperty) => void }) => {
+const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: BackendProperty; onInvestClick: (property: BackendProperty) => void; onDetailsClick: (property: BackendProperty) => void }) => {
   const { isAuthenticated } = useAuth();
   const remainingDays = getRemainingDays(property.timeline?.fundingDeadline);
   const tags = getPropertyTags(property);
@@ -198,14 +199,14 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
       transition={{ duration: 0.6 }}
     >
       <Card className="overflow-hidden hover-elevate group cursor-pointer border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm" data-property-id={property._id}>
-        <div className="relative">
+        <div className="relative cursor-pointer" onClick={() => onDetailsClick(property)}>
           {/* Image with KYC Lock */}
           {isKYCCompleted ? (
             // Show normal image for KYC-approved users
             <img
               src={getImageUrl(property)}
               alt={property.title}
-              className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop'
               }}
@@ -328,22 +329,32 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
               </div>
 
               {/* Action button for KYC-approved users */}
-              <Button
-                size="sm"
-                className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
-                onClick={() => {
-                  // Scroll to top of the property card
-                  const cardElement = document.querySelector('[data-property-id="' + property._id + '"]');
-                  if (cardElement) {
-                    cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                  // Open investment modal
-                  onInvestClick(property);
-                }}
-              >
-                <DollarSign className="w-4 h-4 mr-2" />
-                Invest Now
-              </Button>
+              {property.status === 'active' ? (
+                <Button
+                  size="sm"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
+                  onClick={() => {
+                    // Scroll to top of the property card
+                    const cardElement = document.querySelector('[data-property-id="' + property._id + '"]');
+                    if (cardElement) {
+                      cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                    // Open investment modal
+                    onInvestClick(property);
+                  }}
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Invest Now
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  disabled
+                  className="w-full bg-gray-400 cursor-not-allowed"
+                >
+                  Coming Soon
+                </Button>
+              )}
             </>
           ) : (
             <>
@@ -391,9 +402,17 @@ export default function WebsitePropertiesPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedProperty, setSelectedProperty] = useState<BackendProperty | null>(null);
   const [isInvestmentModalOpen, setIsInvestmentModalOpen] = useState(false);
+  const [selectedPropertyDetails, setSelectedPropertyDetails] = useState<BackendProperty | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   // Get KYC status for page-level features
   const { isKYCCompleted, kycStatus, isLoggedIn } = getKYCStatus();
+
+  // Handle details click
+  const handleDetailsClick = (property: BackendProperty) => {
+    setSelectedPropertyDetails(property);
+    setIsDetailsModalOpen(true);
+  };
 
   // Handle investment click
   const handleInvestClick = (property: BackendProperty) => {
@@ -701,6 +720,7 @@ export default function WebsitePropertiesPage() {
                 key={property._id}
                 property={property}
                 onInvestClick={handleInvestClick}
+                onDetailsClick={handleDetailsClick}
               />
             ))}
           </div>
