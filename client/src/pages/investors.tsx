@@ -8,8 +8,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Filter, Eye, TrendingUp, TrendingDown, Building, Wallet, ArrowUpRight, ArrowDownRight, Calendar, MapPin, Phone, Mail, User, FileText, CreditCard, Banknote, PieChart, Shield, CheckCircle, XCircle, Clock, AlertTriangle, Download, ExternalLink } from "lucide-react"
+import { Search, Filter, Eye, TrendingUp, TrendingDown, Building, Wallet, ArrowUpRight, ArrowDownRight, Calendar, MapPin, Phone, Mail, User, FileText, CreditCard, Banknote, PieChart, Shield, CheckCircle, XCircle, Clock, AlertTriangle, Download, ExternalLink, Loader2 } from "lucide-react"
 import { Investor, Investment, Transaction, PortfolioSummary, KycDocument } from "@shared/schema"
+import { useInvestors } from "@/hooks/use-investors"
 
 // Safe helper functions for nullable values
 const safeParseNumber = (value: string | number | null | undefined, defaultValue: number = 0): number => {
@@ -41,8 +42,11 @@ export default function Investors() {
   const [selectedInvestor, setSelectedInvestor] = useState<InvestorWithPortfolio | null>(null)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
-  // Comprehensive mock investors data - only KYC approved customers
-  const mockInvestors: InvestorWithPortfolio[] = [
+  // Fetch real investor data from backend
+  const { investors: realInvestors, loading, error, refetch } = useInvestors()
+
+  // Use real data if available, otherwise empty array
+  const mockInvestors: InvestorWithPortfolio[] = realInvestors.length > 0 ? realInvestors : [
     // TOP TIER INVESTORS (Executives)
     {
       // Executive - High Investment
@@ -2200,6 +2204,35 @@ export default function Investors() {
   const handleExport = () => {
     console.log('Export investors data')
     // In real app, this would export the data
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Loading investor data...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-red-600">Error Loading Data</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <Button onClick={refetch} className="w-full">Retry</Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (

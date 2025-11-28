@@ -18,6 +18,43 @@ export interface UserProfile {
   occupation?: string;
   createdAt?: string;
   updatedAt?: string;
+  profileData?: {
+    investmentProfile?: {
+      experience?: string;
+      riskTolerance?: string;
+      investmentGoals?: string;
+      preferredTypes?: string[];
+      investmentAmount?: number;
+      timeline?: string;
+      completed?: boolean;
+    };
+    bankingDetails?: {
+      bankName?: string;
+      iban?: string;
+      accountHolder?: string;
+      swiftCode?: string;
+      accountType?: string;
+      completed?: boolean;
+    };
+    communicationPreferences?: {
+      emailNotifications?: boolean;
+      smsAlerts?: boolean;
+      languagePreference?: string;
+      timezone?: string;
+      marketingEmails?: boolean;
+      monthlyReports?: boolean;
+      completed?: boolean;
+    };
+    employmentPortfolio?: {
+      employmentStatus?: string;
+      employer?: string;
+      jobTitle?: string;
+      monthlySalary?: number;
+      hasInvestmentPortfolio?: boolean;
+      portfolioValue?: number;
+      completed?: boolean;
+    };
+  };
 }
 
 export interface UserProfileResponse {
