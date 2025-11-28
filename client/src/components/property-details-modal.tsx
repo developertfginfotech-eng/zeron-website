@@ -65,6 +65,18 @@ export function PropertyDetailsModal({
   const lockingPeriod = investmentTerms.lockingPeriodYears != null ? Number(investmentTerms.lockingPeriodYears) : 5
   const penalty = investmentTerms.earlyWithdrawalPenaltyPercentage != null ? Number(investmentTerms.earlyWithdrawalPenaltyPercentage) : 5
 
+  // Get graduated penalties if available
+  const graduatedPenalties = investmentTerms.graduatedPenalties || []
+  const hasGraduatedPenalties = graduatedPenalties && graduatedPenalties.length > 0
+
+  // Display penalty text
+  const getPenaltyDisplay = () => {
+    if (hasGraduatedPenalties) {
+      return graduatedPenalties.map((p: any) => `Year ${p.year}: ${p.penaltyPercentage}%`).join(', ')
+    }
+    return `${penalty}%`
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -199,8 +211,8 @@ export function PropertyDetailsModal({
                 <div className="flex items-start gap-3">
                   <DollarSign className="w-5 h-5 text-red-600 mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Early Withdrawal Penalty</p>
-                    <p className="text-lg font-semibold">{penalty}%</p>
+                    <p className="text-xs text-muted-foreground">Early Withdrawal Penalty {hasGraduatedPenalties && '(Graduated)'}</p>
+                    <p className="text-lg font-semibold">{getPenaltyDisplay()}</p>
                     <p className="text-xs text-muted-foreground">If withdrawn before maturity</p>
                   </div>
                 </div>
@@ -209,7 +221,12 @@ export function PropertyDetailsModal({
               {/* Info Box */}
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-sm text-blue-900 dark:text-blue-100">
-                  <span className="font-semibold">How it works:</span> During the {lockingPeriod}-year locking period, you earn {rentalYield}% annual rental yield. After maturity, you get both rental yield + {appreciation}% appreciation gains. Early withdrawal incurs a {penalty}% penalty.
+                  <span className="font-semibold">How it works:</span> During the {lockingPeriod}-year locking period, you earn {rentalYield}% annual rental yield. After maturity, you get both rental yield + {appreciation}% appreciation gains.
+                  {hasGraduatedPenalties ? (
+                    <span> Early withdrawal incurs graduated penalties: {getPenaltyDisplay()}.</span>
+                  ) : (
+                    <span> Early withdrawal incurs a {penalty}% penalty.</span>
+                  )}
                 </p>
               </div>
             </CardContent>

@@ -47,8 +47,13 @@ interface BackendProperty {
     rentalYieldRate?: number | null;
     appreciationRate?: number | null;
     lockingPeriodYears?: number | null;
+    bondMaturityYears?: number | null;
     investmentDurationYears?: number | null;
     earlyWithdrawalPenaltyPercentage?: number | null;
+    graduatedPenalties?: Array<{
+      year: number;
+      penaltyPercentage: number;
+    }>;
   };
   propertyType: 'residential' | 'commercial' | 'retail';
   status: 'active' | 'upcoming' | 'fully_funded' | 'completed' | 'cancelled' | 'closed';
@@ -564,11 +569,24 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                       <div className="font-bold text-sm">{calculateMaturityDate()}</div>
                     </div>
                   </div>
-                  <div className="pt-2 border-t border-purple-200 dark:border-purple-800">
+                  <div className="pt-2 border-t border-purple-200 dark:border-purple-800 space-y-2">
                     <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
                       <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-                      <span>Early withdrawal (before {investmentSettings.maturityPeriodYears} years): {investmentSettings.earlyWithdrawalPenaltyPercentage}% penalty</span>
+                      <span>Early Withdrawal Penalties (Graduated)</span>
                     </div>
+                    {property.investmentTerms?.graduatedPenalties && property.investmentTerms.graduatedPenalties.length > 0 ? (
+                      <div className="ml-5 space-y-1">
+                        {property.investmentTerms.graduatedPenalties.map((penalty: any) => (
+                          <div key={penalty.year} className="text-xs text-amber-600 dark:text-amber-300">
+                            Year {penalty.year}: {penalty.penaltyPercentage}% penalty
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="ml-5 text-xs text-amber-600 dark:text-amber-300">
+                        Before {investmentSettings.maturityPeriodYears} years: {investmentSettings.earlyWithdrawalPenaltyPercentage}% penalty
+                      </div>
+                    )}
                   </div>
                 </>
               )}

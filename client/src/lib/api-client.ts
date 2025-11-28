@@ -153,6 +153,7 @@ export const API_ENDPOINTS = {
   INVEST_PROPERTY: (id: string) => `/properties/${id}/invest`,
   INVESTMENT_SETTINGS: '/investments/settings',
   CALCULATE_RETURNS: '/investments/calculate',
+  GET_INVESTMENT_RETURNS: (id: string) => `/investments/${id}/returns`,
   WITHDRAW_INVESTMENT: (id: string) => `/investments/${id}/bond-break-withdraw`,
   WITHDRAW_WALLET: '/wallet/withdraw',
 
