@@ -269,10 +269,17 @@ const PropertyCard = ({ property, onInvestClick }: { property: BackendProperty; 
           {/* Property title and location - always visible */}
           <div className="absolute bottom-4 left-4 right-4">
             <h3 className="text-xl font-bold text-white mb-1">{property.title}</h3>
-            <div className="flex items-center text-emerald-200">
-              <MapPin className="w-4 h-4 mr-1" />
-              <span className="text-sm">{property.location.address}, {property.location.city}</span>
-            </div>
+            {property.location && (property.location.address || property.location.city) ? (
+              <div className="flex items-center text-emerald-200">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span className="text-sm">{property.location.address || property.location.city || 'Location TBD'}</span>
+              </div>
+            ) : (
+              <div className="flex items-center text-emerald-200">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span className="text-sm text-orange-300">Location information pending</span>
+              </div>
+            )}
           </div>
         </div>
 
