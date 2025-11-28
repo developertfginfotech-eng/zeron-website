@@ -25,7 +25,6 @@ import InvestorPortfolio from "@/pages/investor/portfolio";
 import InvestorProfile from "@/pages/investor/profile";
 import InvestorWallet from "@/pages/investor/wallet";
 import InvestmentGuide from "@/pages/investor/investment-guide";
-import InvestorProperties from "@/pages/investor/properties";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -50,8 +49,8 @@ function App() {
                   <Route path="/kyc" component={KYCVerificationPage} />
                   <Route path="/user-dashboard" component={UserDashboard} />
                   <Route path="/investor/dashboard" component={InvestorDashboard} />
+                  <Route path="/investor/properties" component={WebsiteProperties} />
                   <Route path="/investor/portfolio" component={InvestorPortfolio} />
-                  <Route path="/investor/properties" component={InvestorProperties} />
                   <Route path="/investor/profile" component={InvestorProfile} />
                   <Route path="/investor/wallet" component={InvestorWallet} />
                   <Route path="/investor/guide" component={InvestmentGuide} />

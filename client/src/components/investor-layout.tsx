@@ -46,7 +46,7 @@ export function InvestorLayout({ children }: InvestorLayoutProps) {
 
   const navigationItems = [
     { href: "/investor", icon: LayoutDashboard, label: "Dashboard", exact: true },
-    { href: "/investor/properties", icon: Building, label: "Properties" },
+    { href: "/website/properties", icon: Building, label: "Properties" },
     { href: "/investor/portfolio", icon: PieChart, label: "Portfolio" },
     { href: "/investor/wallet", icon: Wallet, label: "Wallet" },
     { href: "/investor/investment-guide", icon: BookOpen, label: "Investment Guide" },

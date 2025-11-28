@@ -96,7 +96,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
       // Handle different response structures
       // Try multiple possible locations for user data
       const userData = response.user || response.data?.user || response.investor || response.data || response
-      const authToken = response.token || response.accessToken || response.data?.token
+      const authToken = response.token || response.accessToken || response.data?.token || (response.data && typeof response.data === 'object' ? response.data.token : null)
 
       console.log('Parsed userData:', userData)
       console.log('Parsed token:', authToken)
@@ -128,6 +128,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
         firstName: userData.firstName || userData.name?.split(' ')[0] || 'User',
         lastName: userData.lastName || userData.name?.split(' ')[1] || '',
         email: userData.email,
+        token: authToken,
         kycStatus: userData.kycStatus || 'not_started',
         kycCurrentStep: userData.kycCurrentStep || 0,
         kycCompletedSteps: userData.kycCompletedSteps || [],
@@ -179,8 +180,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
       console.log('Registration response:', response) // Debug log
 
       // Handle different response structures
-      const userData = response.user || response.data || response
-      const authToken = response.token || response.accessToken
+      const userData = response.user || response.data?.user || response.data || response
+      const authToken = response.token || response.accessToken || response.data?.token || (response.data && typeof response.data === 'object' ? response.data.token : null)
 
       // Save token to localStorage
       if (authToken) {
@@ -196,6 +197,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
         firstName: userData.firstName || userData.name?.split(' ')[0] || 'User',
         lastName: userData.lastName || userData.name?.split(' ')[1] || '',
         email: userData.email,
+        token: authToken,
         kycStatus: userData.kycStatus || 'not_started',
         kycCurrentStep: userData.kycCurrentStep || 0,
         kycCompletedSteps: userData.kycCompletedSteps || [],

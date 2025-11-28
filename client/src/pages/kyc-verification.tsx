@@ -257,14 +257,62 @@ const KYCVerificationPage = () => {
       const formDataToSend = prepareFormData(formData, uploadedFiles);
       setUploadProgress(30);
 
-      // Get auth token - check multiple locations
+      // Get auth token - check multiple locations with detailed logging
+      console.log("=== KYC TOKEN RETRIEVAL DEBUG ===");
+      console.log("All localStorage keys:", Object.keys(localStorage));
+      console.log("All localStorage entries:");
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        console.log(`  ${key}:`, localStorage.getItem(key)?.substring(0, 100));
+      }
+
       const user = JSON.parse(localStorage.getItem("zaron_user") || "{}");
-      const token =
-        user.token ||
-        localStorage.getItem("zaron_token") ||
-        localStorage.getItem("authToken");
+      console.log("Parsed user object:", user);
+      console.log("user.token:", user.token);
+
+      // Try to get token from multiple sources
+      let token = null;
+
+      // Priority 1: Check user.token property
+      if (user.token) {
+        console.log("✓ Token found in user.token");
+        token = user.token;
+      }
+      // Priority 2: Check zaron_token key
+      else if (localStorage.getItem("zaron_token")) {
+        console.log("✓ Token found in zaron_token");
+        token = localStorage.getItem("zaron_token");
+      }
+      // Priority 3: Check authToken key
+      else if (localStorage.getItem("authToken")) {
+        console.log("✓ Token found in authToken");
+        token = localStorage.getItem("authToken");
+      }
+      // Priority 4: As last resort, try to get from any key containing 'token'
+      else {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.toLowerCase().includes("token")) {
+            const val = localStorage.getItem(key);
+            if (val && val.length > 20) { // Tokens are usually long
+              console.log(`✓ Token found in ${key}`);
+              token = val;
+              break;
+            }
+          }
+        }
+      }
+
+      console.log("Final token selected:", token ? "✓ Found (length: " + token?.length + ")" : "✗ Not found");
 
       if (!token) {
+        console.error("Token retrieval failed - localStorage state:", {
+          hasZaronUser: !!localStorage.getItem("zaron_user"),
+          hasZaronToken: !!localStorage.getItem("zaron_token"),
+          hasAuthToken: !!localStorage.getItem("authToken"),
+          userTokenProperty: user.token ? "✓ exists" : "✗ missing",
+          allKeys: Object.keys(localStorage)
+        });
         throw new Error("Authentication token not found. Please login again.");
       }
 
@@ -675,8 +723,8 @@ const KYCVerificationPage = () => {
           </div>
         </div>
 
-        {/* Content - Only show if KYC is not submitted or approved */}
-        {(kycStatus === 'not_started' || kycStatus === 'in_progress') && (
+        {/* Content - Show form for all statuses except approved */}
+        {kycStatus !== 'approved' && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
