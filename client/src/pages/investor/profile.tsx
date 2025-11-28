@@ -76,7 +76,12 @@ export default function InvestorProfile() {
       title: 'Investment Profile',
       description: 'Investment experience and risk preferences',
       icon: <Wallet className="w-5 h-5" />,
-      completed: userProfile?.profileData?.investmentProfile?.completed || false,
+      completed:
+        userProfile?.profileData?.investmentProfile?.completed ||
+        (userProfile?.profileData?.investmentProfile?.experience &&
+         userProfile?.profileData?.investmentProfile?.riskTolerance &&
+         userProfile?.profileData?.investmentProfile?.investmentGoals) ||
+        false,
       items: [
         'Investment Experience',
         'Risk Tolerance',
@@ -89,7 +94,12 @@ export default function InvestorProfile() {
       title: 'Banking Details',
       description: 'Bank account verification for payouts',
       icon: <Wallet className="w-5 h-5" />,
-      completed: userProfile?.profileData?.bankingDetails?.completed || false,
+      completed:
+        userProfile?.profileData?.bankingDetails?.completed ||
+        (userProfile?.profileData?.bankingDetails?.bankName &&
+         userProfile?.profileData?.bankingDetails?.iban &&
+         userProfile?.profileData?.bankingDetails?.accountHolder) ||
+        false,
       items: [
         'Bank Account',
         'IBAN Verification',
@@ -102,7 +112,11 @@ export default function InvestorProfile() {
       title: 'Communication Preferences',
       description: 'Notification and communication settings',
       icon: <Bell className="w-5 h-5" />,
-      completed: userProfile?.profileData?.communicationPreferences?.completed || false,
+      completed:
+        userProfile?.profileData?.communicationPreferences?.completed ||
+        (userProfile?.profileData?.communicationPreferences?.emailNotifications !== undefined &&
+         userProfile?.profileData?.communicationPreferences?.languagePreference) ||
+        false,
       items: [
         'Email Notifications',
         'SMS Alerts',
@@ -115,7 +129,12 @@ export default function InvestorProfile() {
       title: 'Additional Documents',
       description: 'Optional supporting documentation',
       icon: <FileText className="w-5 h-5" />,
-      completed: userProfile?.profileData?.employmentPortfolio?.completed || false,
+      completed:
+        userProfile?.profileData?.employmentPortfolio?.completed ||
+        (userProfile?.profileData?.employmentPortfolio?.employmentStatus &&
+         userProfile?.profileData?.employmentPortfolio?.employer &&
+         userProfile?.profileData?.employmentPortfolio?.jobTitle) ||
+        false,
       items: [
         'Employment Letter',
         'Salary Certificate',

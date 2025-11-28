@@ -28,6 +28,7 @@ import { useLocation } from "wouter"
 import { usePortfolio } from "@/hooks/use-portfolio"
 import { useMyInvestments } from "@/hooks/use-investments"
 import { useKYCStatus } from "@/hooks/use-kyc"
+import { useUserProfile } from "@/hooks/use-user-profile"
 import { useToast } from "@/hooks/use-toast"
 import { apiClient, API_ENDPOINTS } from "@/lib/api-client"
 import { useState } from "react"
@@ -63,6 +64,7 @@ export default function InvestorDashboard() {
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio()
   const { data: myInvestments = [], isLoading: investmentsLoading } = useMyInvestments()
   const { data: kycStatus } = useKYCStatus()
+  const { data: userProfile } = useUserProfile()
 
   // Show loading state
   if (portfolioLoading || investmentsLoading) {
@@ -93,10 +95,29 @@ export default function InvestorDashboard() {
   const profileFields = {
     basicInfo: user?.firstName && user?.lastName && user?.email && user?.phone,
     kycStatus: user?.kycStatus === 'approved',
-    investmentProfile: false, // Mock: investment experience, risk tolerance
-    bankDetails: false, // Mock: bank account verification
-    preferences: false, // Mock: communication preferences
-    documents: false // Mock: additional documents
+    investmentProfile:
+      userProfile?.profileData?.investmentProfile?.completed ||
+      (userProfile?.profileData?.investmentProfile?.experience &&
+       userProfile?.profileData?.investmentProfile?.riskTolerance &&
+       userProfile?.profileData?.investmentProfile?.investmentGoals) ||
+      false,
+    bankDetails:
+      userProfile?.profileData?.bankingDetails?.completed ||
+      (userProfile?.profileData?.bankingDetails?.bankName &&
+       userProfile?.profileData?.bankingDetails?.iban &&
+       userProfile?.profileData?.bankingDetails?.accountHolder) ||
+      false,
+    preferences:
+      userProfile?.profileData?.communicationPreferences?.completed ||
+      (userProfile?.profileData?.communicationPreferences?.emailNotifications !== undefined &&
+       userProfile?.profileData?.communicationPreferences?.languagePreference) ||
+      false,
+    documents:
+      userProfile?.profileData?.employmentPortfolio?.completed ||
+      (userProfile?.profileData?.employmentPortfolio?.employmentStatus &&
+       userProfile?.profileData?.employmentPortfolio?.employer &&
+       userProfile?.profileData?.employmentPortfolio?.jobTitle) ||
+      false
   }
 
   const completedFields = Object.values(profileFields).filter(Boolean).length

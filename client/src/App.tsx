@@ -13,6 +13,7 @@ import WebsiteProperties from "@/pages/website/properties";
 import WebsiteAbout from "@/pages/website/about";
 import WebsiteBusiness from "@/pages/website/business";
 import WebsiteContact from "@/pages/website/contact";
+import WebsiteRegister from "@/pages/website/register";
 import WebsiteLayout from "@/components/website-layout";
 import KYCVerificationPage from "@/pages/kyc-verification";
 import UserDashboard from "@/pages/user-dashboard";
@@ -39,6 +40,8 @@ function App() {
                   <Route path="/invest" component={WebsiteInvest} />
                   <Route path="/website" component={WebsiteInvest} />
                   <Route path="/website/invest" component={WebsiteInvest} />
+                  <Route path="/website/register" component={WebsiteRegister} />
+                  <Route path="/register" component={WebsiteRegister} />
                   <Route path="/website/properties" component={WebsiteProperties} />
                   <Route path="/website/about" component={WebsiteAbout} />
                   <Route path="/website/business" component={WebsiteBusiness} />

@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/hooks/use-auth"
-import { X, ChevronLeft, ChevronRight, CheckCircle, User, Wallet, Bell, FileText, Home, DollarSign, Sparkles, Target, TrendingUp, Shield } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import { apiClient, API_ENDPOINTS } from "@/lib/api-client"
+import { X, ChevronLeft, ChevronRight, CheckCircle, User, Wallet, Bell, FileText, Home, DollarSign, Sparkles, Target, TrendingUp, Shield, Loader2 } from "lucide-react"
 
 interface ProfileCompletionWizardProps {
   onClose: () => void
@@ -17,9 +19,11 @@ interface ProfileCompletionWizardProps {
 
 export function ProfileCompletionWizard({ onClose }: ProfileCompletionWizardProps) {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(0)
   const [animationClass, setAnimationClass] = useState("")
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
   // Mock form data with dummy values (no validation as requested)
   const [formData, setFormData] = useState({
@@ -143,31 +147,73 @@ export function ProfileCompletionWizard({ onClose }: ProfileCompletionWizardProp
 
   const handleComplete = async () => {
     try {
-      const token = localStorage.getItem('zaron_token') ||
-                   JSON.parse(localStorage.getItem('zaron_user') || '{}').token;
+      setIsSubmitting(true);
 
-      const response = await fetch('https://zeron-backend-z5o1.onrender.com/api/users/profile/complete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
+      // Prepare profile data structure
+      const profileData = {
+        profileData: {
+          investmentProfile: {
+            experience: formData.experience,
+            riskTolerance: formData.riskTolerance,
+            investmentGoals: formData.investmentGoals,
+            preferredTypes: formData.preferredTypes,
+            investmentAmount: Number(formData.investmentAmount),
+            timeline: formData.timeline,
+            completed: true
+          },
+          bankingDetails: {
+            bankName: formData.bankName,
+            iban: formData.iban,
+            accountHolder: formData.accountHolder,
+            swiftCode: formData.swiftCode,
+            accountType: formData.accountType,
+            completed: true
+          },
+          communicationPreferences: {
+            emailNotifications: formData.emailNotifications,
+            smsAlerts: formData.smsAlerts,
+            languagePreference: formData.languagePreference,
+            timezone: formData.timezone,
+            marketingEmails: formData.marketingEmails,
+            monthlyReports: formData.monthlyReports,
+            completed: true
+          },
+          employmentPortfolio: {
+            employmentStatus: formData.employmentStatus,
+            employer: formData.employer,
+            jobTitle: formData.jobTitle,
+            monthlySalary: Number(formData.monthlySalary),
+            hasInvestmentPortfolio: formData.hasInvestmentPortfolio,
+            portfolioValue: Number(formData.portfolioValue),
+            completed: true
+          }
+        }
+      };
+
+      // Use the centralized API client
+      const response = await apiClient.put(API_ENDPOINTS.UPDATE_PROFILE, profileData);
+
+      console.log("Profile saved successfully:", response);
+
+      toast({
+        title: "Success!",
+        description: "Your profile has been completed successfully.",
+        variant: "default"
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save profile');
-      }
-
-      const data = await response.json();
-      console.log("Profile saved successfully:", data);
-
-      // Refresh the page to show updated status
-      window.location.reload();
+      // Close wizard and refresh data
+      setTimeout(() => {
+        onClose();
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Error saving profile:", error);
-      // Refresh anyway to show current state
-      window.location.reload();
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save profile. Please try again.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
     }
   }
 
@@ -671,12 +717,18 @@ export function ProfileCompletionWizard({ onClose }: ProfileCompletionWizardProp
                   <p className="font-bold text-lg text-emerald-600">{completionPercentage}%</p>
                 </div>
                 
-                <Button 
-                  onClick={handleNext} 
+                <Button
+                  onClick={handleNext}
+                  disabled={isSubmitting}
                   data-testid="button-next"
-                  className="h-12 px-8 text-base font-medium bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="h-12 px-8 text-base font-medium bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {currentStep === steps.length - 1 ? (
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Saving Profile...
+                    </>
+                  ) : currentStep === steps.length - 1 ? (
                     <>
                       <CheckCircle className="w-5 h-5 mr-2" />
                       Complete Profile
