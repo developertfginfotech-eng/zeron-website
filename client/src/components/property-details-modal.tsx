@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, DollarSign, TrendingUp, Clock, X } from "lucide-react"
 import { InvestmentCalculator } from "@/components/investment-calculator"
+import { API_BASE_URL } from "@/lib/api-client"
 
 interface PropertyDetailsModalProps {
   isOpen: boolean
@@ -13,8 +14,6 @@ interface PropertyDetailsModalProps {
 }
 
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2UyZThmMCIvPjxwYXRoIGQ9Ik0xNTAgMTAwaDEwMHYxMDBIMTUweiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjE3MCIgeT0iMTIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiM2NDc0OGIiLz48cmVjdCB4PSIyMTAiIHk9IjEyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjNjQ3NDhiIi8+PHJlY3QgeD0iMTcwIiB5PSIxNjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzY0NzQ4YiIvPjxyZWN0IHg9IjIxMCIgeT0iMTYwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiM2NDc0OGIiLz48dGV4dCB4PSIyMDAiIHk9IjEzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjQ3NDhiIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='
-
-const BACKEND_BASE = 'https://zeron-backend-z5o1.onrender.com'
 
 export function PropertyDetailsModal({
   isOpen,
@@ -32,8 +31,22 @@ export function PropertyDetailsModal({
 
   // Extract image URL from backend format
   let imageUrl = PLACEHOLDER_IMAGE
-  if (property.images && property.images[0]?.url) {
-    imageUrl = `${BACKEND_BASE}${property.images[0].url}`
+  if (property.images && property.images.length > 0) {
+    const primaryImage = property.images.find((img: any) => img.isPrimary) || property.images[0]
+    if (primaryImage.url) {
+      // Handle /uploads/ paths by constructing full URL
+      if (primaryImage.url.startsWith('/uploads/')) {
+        const baseUrl = API_BASE_URL.replace('/api', '')
+        imageUrl = `${baseUrl}${primaryImage.url}`
+      } else if (primaryImage.url.startsWith('http')) {
+        // Already a full URL (e.g., Unsplash, Cloudinary)
+        imageUrl = primaryImage.url
+      } else {
+        // Assume it's a path that needs the base URL
+        const baseUrl = API_BASE_URL.replace('/api', '')
+        imageUrl = `${baseUrl}${primaryImage.url}`
+      }
+    }
   } else if (property.image) {
     imageUrl = property.image
   }
