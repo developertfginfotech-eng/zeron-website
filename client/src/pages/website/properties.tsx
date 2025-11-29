@@ -54,6 +54,8 @@ interface BackendProperty {
     totalValue: number;
     minInvestment: number;
     projectedYield: number;
+    pricePerShare?: number;
+    availableShares?: number;
   };
   propertyType: 'residential' | 'commercial' | 'retail';
   status: 'active' | 'upcoming' | 'fully_funded' | 'completed' | 'cancelled' | 'closed';
@@ -400,6 +402,10 @@ export default function WebsitePropertiesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [cityFilter, setCityFilter] = useState("all");
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(100000);
+  const [minReturn, setMinReturn] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState<BackendProperty | null>(null);
   const [isInvestmentModalOpen, setIsInvestmentModalOpen] = useState(false);
   const [selectedPropertyDetails, setSelectedPropertyDetails] = useState<BackendProperty | null>(null);
@@ -512,6 +518,13 @@ export default function WebsitePropertiesPage() {
     fetchProperties();
   }, [isAuthenticated, user]);
 
+  // Get unique cities for filter dropdown
+  const uniqueCities = Array.from(
+    new Set(
+      properties.map(p => p.location.city).filter(Boolean)
+    )
+  ).sort();
+
   // Filter properties
   const filteredProperties = properties.filter(property => {
     const matchesSearch = searchTerm === "" ||
@@ -521,8 +534,15 @@ export default function WebsitePropertiesPage() {
 
     const matchesStatus = statusFilter === "all" || property.status === statusFilter;
     const matchesType = typeFilter === "all" || property.propertyType === typeFilter;
+    const matchesCity = cityFilter === "all" || property.location.city === cityFilter;
 
-    return matchesSearch && matchesStatus && matchesType;
+    const pricePerShare = property.financials?.pricePerShare || 0;
+    const matchesPrice = pricePerShare >= minPrice && pricePerShare <= maxPrice;
+
+    const yield_ = property.financials?.projectedYield || 0;
+    const matchesReturn = yield_ >= minReturn;
+
+    return matchesSearch && matchesStatus && matchesType && matchesCity && matchesPrice && matchesReturn;
   });
 
   return (
@@ -613,40 +633,110 @@ export default function WebsitePropertiesPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by title or location..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 bg-background/50"
-                  />
+              <div className="space-y-4">
+                {/* Primary Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by title or location..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9 bg-background/50"
+                    />
+                  </div>
+
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="bg-background/50">
+                      <Filter className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Live Properties</SelectItem>
+                      <SelectItem value="upcoming">Coming Soon</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="bg-background/50">
+                      <SelectValue placeholder="Property type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="residential">Residential</SelectItem>
+                      <SelectItem value="commercial">Commercial</SelectItem>
+                      <SelectItem value="retail">Retail</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="bg-background/50">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Live Properties</SelectItem>
-                    <SelectItem value="upcoming">Coming Soon</SelectItem>
-                  </SelectContent>
-                </Select>
+                {/* Advanced Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2 border-t">
+                  <Select value={cityFilter} onValueChange={setCityFilter}>
+                    <SelectTrigger className="bg-background/50">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Filter by city" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Cities</SelectItem>
+                      {uniqueCities.map(city => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="bg-background/50">
-                    <SelectValue placeholder="Property type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="residential">Residential</SelectItem>
-                    <SelectItem value="commercial">Commercial</SelectItem>
-                    <SelectItem value="retail">Retail</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Price: SAR {minPrice}-{maxPrice}</label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        placeholder="Min"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(Math.max(0, parseInt(e.target.value) || 0))}
+                        className="bg-background/50 text-xs"
+                      />
+                      <Input
+                        type="number"
+                        placeholder="Max"
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(Math.max(minPrice, parseInt(e.target.value) || 100000))}
+                        className="bg-background/50 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Min Return: {minReturn}%</label>
+                    <Input
+                      type="number"
+                      placeholder="Min return %"
+                      value={minReturn}
+                      onChange={(e) => setMinReturn(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="bg-background/50"
+                    />
+                  </div>
+
+                  <div className="flex items-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setStatusFilter("all");
+                        setTypeFilter("all");
+                        setCityFilter("all");
+                        setMinPrice(0);
+                        setMaxPrice(100000);
+                        setMinReturn(0);
+                      }}
+                      className="w-full"
+                    >
+                      Clear All
+                    </Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
