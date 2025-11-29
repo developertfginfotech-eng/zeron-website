@@ -9,6 +9,9 @@ interface InvestmentCalculatorProps {
   pricePerShare: number
   availableShares: number
   minShares?: number
+  propertyId?: string
+  lockingPeriodYears?: number
+  graduatedPenalties?: Array<{ year: number; penaltyPercentage: number }>
   onCalculate?: (shares: number, totalAmount: number, results: any) => void
 }
 
@@ -16,6 +19,9 @@ export function InvestmentCalculator({
   pricePerShare,
   availableShares,
   minShares = 1,
+  propertyId,
+  lockingPeriodYears = 5,
+  graduatedPenalties = [],
   onCalculate
 }: InvestmentCalculatorProps) {
   const [shares, setShares] = useState(minShares.toString())
@@ -47,7 +53,12 @@ export function InvestmentCalculator({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ investmentAmount })
+        body: JSON.stringify({
+          investmentAmount,
+          propertyId,
+          lockingPeriodYears,
+          graduatedPenalties
+        })
       })
 
       const data = await response.json()

@@ -10,6 +10,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 // Website Pages
 import WebsiteInvest from "@/pages/website/invest";
 import WebsiteProperties from "@/pages/website/properties";
+import PropertyDetailsPage from "@/pages/website/property-details";
 import WebsiteAbout from "@/pages/website/about";
 import WebsiteBusiness from "@/pages/website/business";
 import WebsiteContact from "@/pages/website/contact";
@@ -42,6 +43,7 @@ function App() {
                   <Route path="/website/register" component={WebsiteRegister} />
                   <Route path="/register" component={WebsiteRegister} />
                   <Route path="/website/properties" component={WebsiteProperties} />
+                  <Route path="/website/property/:id" component={PropertyDetailsPage} />
                   <Route path="/website/about" component={WebsiteAbout} />
                   <Route path="/website/business" component={WebsiteBusiness} />
                   <Route path="/website/contact" component={WebsiteContact} />
