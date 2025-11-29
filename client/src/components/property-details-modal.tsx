@@ -11,6 +11,7 @@ interface PropertyDetailsModalProps {
   property: any
   onClose: () => void
   onInvest: () => void
+  onViewFullDetails?: () => void
 }
 
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2UyZThmMCIvPjxwYXRoIGQ9Ik0xNTAgMTAwaDEwMHYxMDBIMTUweiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjE3MCIgeT0iMTIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiM2NDc0OGIiLz48cmVjdCB4PSIyMTAiIHk9IjEyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjNjQ3NDhiIi8+PHJlY3QgeD0iMTcwIiB5PSIxNjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzY0NzQ4YiIvPjxyZWN0IHg9IjIxMCIgeT0iMTYwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIGZpbGw9IiM2NDc0OGIiLz48dGV4dCB4PSIyMDAiIHk9IjEzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjQ3NDhiIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='
@@ -19,7 +20,8 @@ export function PropertyDetailsModal({
   isOpen,
   property,
   onClose,
-  onInvest
+  onInvest,
+  onViewFullDetails
 }: PropertyDetailsModalProps) {
   if (!property) return null
 
@@ -250,6 +252,9 @@ export function PropertyDetailsModal({
             pricePerShare={pricePerShare}
             availableShares={availableShares}
             minShares={1}
+            propertyId={property._id}
+            lockingPeriodYears={lockingPeriod}
+            graduatedPenalties={graduatedPenalties}
           />
 
           {/* Action Buttons */}
