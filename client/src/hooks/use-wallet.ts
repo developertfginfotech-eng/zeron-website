@@ -44,6 +44,24 @@ export interface RechargeResponse {
   };
 }
 
+export interface WithdrawalRequest {
+  _id: string;
+  amount: number;
+  rentalYieldEarned: number;
+  principalAmount: number;
+  status: 'pending' | 'approved' | 'rejected' | 'processing' | 'completed';
+  propertyId: {
+    _id: string;
+    title: string;
+  };
+  requestedAt: string;
+}
+
+export interface WithdrawalRequestsResponse {
+  success: boolean;
+  data: WithdrawalRequest[];
+}
+
 // Get wallet balance
 export function useWalletBalance() {
   const hasAuth = !!localStorage.getItem('zaron_token') || !!localStorage.getItem('zaron_user');
@@ -75,6 +93,22 @@ export function useWalletTransactions() {
       return response.data.data || response.data;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled: hasAuth,
+    retry: false,
+  });
+}
+
+// Get withdrawal requests
+export function useWithdrawalRequests() {
+  const hasAuth = !!localStorage.getItem('zaron_token') || !!localStorage.getItem('zaron_user');
+
+  return useQuery<WithdrawalRequest[]>({
+    queryKey: ["withdrawal-requests"],
+    queryFn: async () => {
+      const response = await apiClient.get<WithdrawalRequestsResponse>(API_ENDPOINTS.WITHDRAWAL_REQUESTS);
+      return (response.data as any).data || response.data;
+    },
+    staleTime: 30 * 1000, // 30 seconds - refresh more frequently to pick up approvals
     enabled: hasAuth,
     retry: false,
   });

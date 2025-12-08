@@ -332,34 +332,16 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
 
               {/* Action buttons for KYC-approved users */}
               {property.status === 'active' ? (
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      onDetailsClick(property);
-                    }}
-                  >
-                    View Details
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="flex-1 bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
-                    onClick={() => {
-                      // Scroll to top of the property card
-                      const cardElement = document.querySelector('[data-property-id="' + property._id + '"]');
-                      if (cardElement) {
-                        cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                      // Open investment modal
-                      onInvestClick(property);
-                    }}
-                  >
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    Invest Now
-                  </Button>
-                </div>
+                <Button
+                  size="sm"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
+                  onClick={() => {
+                    onDetailsClick(property);
+                  }}
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  View Property & Invest
+                </Button>
               ) : (
                 <Button
                   size="sm"
@@ -426,10 +408,9 @@ export default function WebsitePropertiesPage() {
   // Get KYC status for page-level features
   const { isKYCCompleted, kycStatus, isLoggedIn } = getKYCStatus();
 
-  // Handle details click
+  // Handle details click - navigate to property details page
   const handleDetailsClick = (property: BackendProperty) => {
-    setSelectedPropertyDetails(property);
-    setIsDetailsModalOpen(true);
+    setLocation(`/website/property/${property._id}`);
   };
 
   // Handle investment click

@@ -6,7 +6,9 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/hooks/use-auth"
+import { InvestmentModal } from "@/components/investment-modal"
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-client"
+import { Input } from "@/components/ui/input"
 import {
   MapPin,
   TrendingUp,
@@ -17,7 +19,8 @@ import {
   Building2,
   ArrowLeft,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Calculator
 } from "lucide-react"
 import { useLocation } from "wouter"
 
@@ -32,13 +35,84 @@ export default function PropertyDetailsPage() {
   const [property, setProperty] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showInvestModal, setShowInvestModal] = useState(false)
+  const [calculatorUnits, setCalculatorUnits] = useState(1)
+  const [calculatorLoading, setCalculatorLoading] = useState(false)
+  const [calculatorResults, setCalculatorResults] = useState<any>(null)
+  const [calculatorView, setCalculatorView] = useState<'annual' | 'bond'>('annual')
+
+  // Get KYC status
+  const getKYCStatus = () => {
+    try {
+      const userData = localStorage.getItem('zaron_user')
+      if (!userData) return { isKYCCompleted: false, kycStatus: 'not_submitted', isLoggedIn: false }
+      const user = JSON.parse(userData)
+      const kycStatus = user.kycStatus || 'not_submitted'
+      const isKYCCompleted = kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'approved'
+      return { isKYCCompleted, kycStatus, isLoggedIn: true }
+    } catch {
+      return { isKYCCompleted: false, kycStatus: 'not_submitted', isLoggedIn: false }
+    }
+  }
+
+  const { isKYCCompleted, kycStatus, isLoggedIn } = getKYCStatus()
+
+  // Calculate returns using API
+  const calculateReturns = async (units: number) => {
+    if (!property) return
+
+    const investmentAmount = units * (property.financials?.pricePerShare || 0)
+    if (investmentAmount <= 0) return
+
+    setCalculatorLoading(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CALCULATE_RETURNS}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          investmentAmount,
+          propertyId: property._id,
+          lockingPeriodYears: property.investmentTerms?.lockingPeriodYears || 5,
+          graduatedPenalties: property.investmentTerms?.graduatedPenalties || []
+        })
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        setCalculatorResults(data)
+      }
+    } catch (err) {
+      console.error('Calculation error:', err)
+    } finally {
+      setCalculatorLoading(false)
+    }
+  }
+
+  // Handle slider change with debounce
+  const handleSliderChange = (value: number[]) => {
+    setCalculatorUnits(value[0])
+    // Debounce API call
+    const timeoutId = setTimeout(() => {
+      calculateReturns(value[0])
+    }, 300)
+    return () => clearTimeout(timeoutId)
+  }
+
+  // Initial calculation when property loads
+  useEffect(() => {
+    if (property && !calculatorResults) {
+      calculateReturns(calculatorUnits)
+    }
+  }, [property])
 
   useEffect(() => {
     const fetchProperty = async () => {
       try {
         setLoading(true)
         const response = await fetch(
-          `${API_BASE_URL}${API_ENDPOINTS.GET_PROPERTIES}?search=${params?.id}`,
+          `${API_BASE_URL}${API_ENDPOINTS.PROPERTIES}/${params?.id}`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('zaron_token')}`
@@ -47,13 +121,8 @@ export default function PropertyDetailsPage() {
         )
         const data = await response.json()
 
-        if (data.success && data.data.properties.length > 0) {
-          const prop = data.data.properties.find((p: any) => p._id === params?.id)
-          if (prop) {
-            setProperty(prop)
-          } else {
-            setError('Property not found')
-          }
+        if (data.success && data.data) {
+          setProperty(data.data)
         } else {
           setError('Failed to load property')
         }
@@ -81,6 +150,31 @@ export default function PropertyDetailsPage() {
         </Card>
       </div>
     )
+  }
+
+  // Handle invest click
+  const handleInvestClick = () => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to start investing",
+        variant: "destructive"
+      })
+      setLocation('/website/login')
+      return
+    }
+
+    if (!isKYCCompleted) {
+      toast({
+        title: "KYC Verification Required",
+        description: "Complete your KYC verification to start investing",
+        variant: "destructive"
+      })
+      setLocation('/website/kyc-verification')
+      return
+    }
+
+    setShowInvestModal(true)
   }
 
   if (error || !property) {
@@ -325,13 +419,334 @@ export default function PropertyDetailsPage() {
               </CardContent>
             </Card>
 
+            {/* Investment Calculator */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="w-5 h-5 text-emerald-600" />
+                  Investment Calculator
+                </CardTitle>
+                <CardDescription>
+                  Estimate your returns based on units purchased
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Units Slider */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Units to Purchase</span>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        value={calculatorUnits}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value) || 1
+                          const maxUnits = Math.min(property.financials?.availableShares || 100, 500)
+                          const clampedVal = Math.max(1, Math.min(val, maxUnits))
+                          setCalculatorUnits(clampedVal)
+                          calculateReturns(clampedVal)
+                        }}
+                        className="w-20 h-8 text-center font-bold text-emerald-600"
+                        min={1}
+                        max={Math.min(property.financials?.availableShares || 100, 500)}
+                      />
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    value={calculatorUnits}
+                    onChange={(e) => handleSliderChange([parseInt(e.target.value)])}
+                    min={1}
+                    max={Math.min(property.financials?.availableShares || 100, 500)}
+                    step={1}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>1 unit</span>
+                    <span>{Math.min(property.financials?.availableShares || 100, 500)} units</span>
+                  </div>
+                </div>
+
+                {/* Investment Amount */}
+                <div className="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">Investment Amount</p>
+                  <p className="text-2xl font-bold text-emerald-600">
+                    SAR {(calculatorUnits * (property.financials?.pricePerShare || 0)).toLocaleString()}
+                  </p>
+                </div>
+
+                {/* Loading State */}
+                {calculatorLoading && (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
+                    <span className="ml-2 text-sm text-muted-foreground">Calculating...</span>
+                  </div>
+                )}
+
+                {/* API Results with Tabs */}
+                {calculatorResults && !calculatorLoading && (
+                  <div className="space-y-4">
+                    {/* Tab Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant={calculatorView === 'annual' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setCalculatorView('annual')}
+                        className={calculatorView === 'annual' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                      >
+                        <TrendingUp className="w-4 h-4 mr-2" />
+                        Annual Returns
+                      </Button>
+                      <Button
+                        variant={calculatorView === 'bond' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setCalculatorView('bond')}
+                        className={calculatorView === 'bond' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                      >
+                        <Clock className="w-4 h-4 mr-2" />
+                        Bond Investment
+                      </Button>
+                    </div>
+
+                    {/* Annual Returns View */}
+                    {calculatorView === 'annual' && (
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold text-muted-foreground">Annual Returns</p>
+
+                        {/* Annual Rental Income */}
+                        <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-600" />
+                            <span className="text-sm">Rental Yield ({calculatorResults.settings?.rentalYieldPercentage || 0}%)</span>
+                          </div>
+                          <span className="font-bold text-green-600">
+                            +SAR {Math.round(calculatorResults.returns?.annualRentalIncome || 0).toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Annual Appreciation */}
+                        <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Home className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm">Appreciation ({calculatorResults.settings?.appreciationRatePercentage || 0}%)</span>
+                          </div>
+                          <span className="font-bold text-blue-600">
+                            +SAR {Math.round(calculatorResults.returns?.annualAppreciation || 0).toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Total Annual Return */}
+                        <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-100 to-blue-100 dark:from-emerald-900/30 dark:to-blue-900/30 rounded-lg border-2 border-emerald-200 dark:border-emerald-800">
+                          <span className="text-sm font-bold">Total Annual Return</span>
+                          <span className="text-xl font-bold text-emerald-600">
+                            +SAR {Math.round(calculatorResults.returns?.totalAnnualReturn || ((calculatorResults.returns?.annualRentalIncome || 0) + (calculatorResults.returns?.annualAppreciation || 0))).toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Annual ROI */}
+                        <div className="bg-muted/50 p-3 rounded-lg text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Investment:</span>
+                            <span className="font-medium">SAR {calculatorResults.investmentAmount?.toLocaleString() || 0}</span>
+                          </div>
+                          <div className="flex justify-between pt-2 border-t mt-2">
+                            <span className="font-semibold">Annual ROI:</span>
+                            <span className="font-bold text-emerald-600">
+                              {(((calculatorResults.returns?.annualRentalIncome || 0) + (calculatorResults.returns?.annualAppreciation || 0)) / (calculatorResults.investmentAmount || 1) * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bond Investment View */}
+                    {calculatorView === 'bond' && (
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold text-muted-foreground">Bond Investment Returns</p>
+
+                        {/* After Locking Period */}
+                        <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg space-y-2">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-orange-600" />
+                              <span className="text-sm font-semibold">After Locking Period ({calculatorResults.returns?.lockingPeriod?.years || calculatorResults.settings?.lockingPeriodYears || 5} years)</span>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Rental Yield:</span>
+                              <span className="text-green-600">+SAR {Math.round(calculatorResults.returns?.lockingPeriod?.rentalYield || 0).toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Appreciation:</span>
+                              <span className="text-blue-600">+SAR {Math.round(calculatorResults.returns?.lockingPeriod?.appreciation || 0).toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center pt-2 border-t border-orange-200">
+                            <span className="text-sm">Total Value:</span>
+                            <span className="font-bold text-orange-600">
+                              SAR {Math.round(calculatorResults.returns?.lockingPeriod?.projectedValue || 0).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* At Bond Maturity */}
+                        <div className="p-4 bg-gradient-to-r from-emerald-100 to-blue-100 dark:from-emerald-900/30 dark:to-blue-900/30 rounded-lg border-2 border-emerald-200 dark:border-emerald-800 space-y-2">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <DollarSign className="w-5 h-5 text-emerald-600" />
+                              <span className="text-sm font-bold">At Bond Maturity ({calculatorResults.returns?.atMaturity?.years || calculatorResults.settings?.bondMaturityYears || 10} years)</span>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Total Rental:</span>
+                              <span className="text-green-600">+SAR {Math.round(calculatorResults.returns?.atMaturity?.rentalYield || 0).toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Total Appreciation:</span>
+                              <span className="text-blue-600">+SAR {Math.round(calculatorResults.returns?.atMaturity?.appreciation || 0).toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center pt-2 border-t border-emerald-300">
+                            <span className="text-sm font-semibold">Final Value:</span>
+                            <span className="text-xl font-bold text-emerald-600">
+                              SAR {Math.round(calculatorResults.returns?.atMaturity?.projectedValue || 0).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Total Returns Summary */}
+                        <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Investment:</span>
+                            <span className="font-medium">SAR {calculatorResults.investmentAmount?.toLocaleString() || 0}</span>
+                          </div>
+                          <div className="flex justify-between pt-2 border-t">
+                            <span className="font-semibold">Total Returns at Maturity:</span>
+                            <span className="font-bold text-lg text-emerald-600">+SAR {Math.round(calculatorResults.returns?.atMaturity?.totalReturns || 0).toLocaleString()}</span>
+                          </div>
+                        </div>
+
+                        {/* Early Withdrawal Warning */}
+                        {calculatorResults.earlyWithdrawal && (
+                          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 rounded-lg">
+                            <p className="text-xs font-semibold text-red-900 dark:text-red-100">Early Withdrawal Penalty</p>
+                            <p className="text-xs text-red-800 dark:text-red-200 mt-1">
+                              {calculatorResults.earlyWithdrawal.penaltyPercentage}% penalty if withdrawn before {calculatorResults.earlyWithdrawal.lockingPeriodYears} years
+                              (You'd receive: SAR {Math.round(calculatorResults.earlyWithdrawal.amountAfterPenalty || 0).toLocaleString()})
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Fallback - Show local calculation if API not loaded */}
+                {!calculatorResults && !calculatorLoading && (
+                  <div className="space-y-3">
+                    <p className="text-sm font-semibold text-muted-foreground">Projected Annual Returns</p>
+
+                    {/* Rental Yield */}
+                    <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-green-600" />
+                        <span className="text-sm">Rental Yield ({investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0}%)</span>
+                      </div>
+                      <span className="font-bold text-green-600">
+                        +SAR {((calculatorUnits * (property.financials?.pricePerShare || 0)) * ((investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0) / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+
+                    {/* Appreciation */}
+                    {investmentTerms.appreciationRate > 0 && (
+                      <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Home className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm">Appreciation ({investmentTerms.appreciationRate}%)</span>
+                        </div>
+                        <span className="font-bold text-blue-600">
+                          +SAR {((calculatorUnits * (property.financials?.pricePerShare || 0)) * (investmentTerms.appreciationRate / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Total Annual Return */}
+                    <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-2 border-purple-200 dark:border-purple-800">
+                      <span className="text-sm font-semibold">Total Annual Return</span>
+                      <span className="font-bold text-purple-600">
+                        +SAR {((calculatorUnits * (property.financials?.pricePerShare || 0)) * (((investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0) + (investmentTerms.appreciationRate || 0)) / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+
+                    {/* After Locking Period */}
+                    {investmentTerms.lockingPeriodYears > 0 && (
+                      <div className="pt-3 border-t">
+                        <div className="flex justify-between items-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-orange-600" />
+                            <div>
+                              <span className="text-sm font-semibold">After Locking Period</span>
+                              <p className="text-xs text-muted-foreground">{investmentTerms.lockingPeriodYears} years</p>
+                            </div>
+                          </div>
+                          <span className="font-bold text-orange-600">
+                            SAR {(
+                              (calculatorUnits * (property.financials?.pricePerShare || 0)) +
+                              ((calculatorUnits * (property.financials?.pricePerShare || 0)) *
+                              (((investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0) + (investmentTerms.appreciationRate || 0)) / 100) *
+                              investmentTerms.lockingPeriodYears)
+                            ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* At Bond Maturity */}
+                    {investmentTerms.bondMaturityYears > 0 && (
+                      <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-100 to-blue-100 dark:from-emerald-900/30 dark:to-blue-900/30 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="w-4 h-4 text-emerald-600" />
+                          <div>
+                            <span className="text-sm font-semibold">At Bond Maturity</span>
+                            <p className="text-xs text-muted-foreground">{investmentTerms.bondMaturityYears} years</p>
+                          </div>
+                        </div>
+                        <span className="text-lg font-bold text-emerald-600">
+                          SAR {(
+                            (calculatorUnits * (property.financials?.pricePerShare || 0)) +
+                            ((calculatorUnits * (property.financials?.pricePerShare || 0)) *
+                            (((investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0) + (investmentTerms.appreciationRate || 0)) / 100) *
+                            investmentTerms.bondMaturityYears)
+                          ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Early Withdrawal Warning */}
+                    {investmentTerms.graduatedPenalties && investmentTerms.graduatedPenalties.length > 0 && (
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 rounded-lg">
+                        <p className="text-xs font-semibold text-red-900 dark:text-red-100">Early Withdrawal Penalty</p>
+                        <p className="text-xs text-red-800 dark:text-red-200 mt-1">
+                          {investmentTerms.graduatedPenalties[0]?.penaltyPercentage}% penalty if withdrawn before {investmentTerms.lockingPeriodYears} years
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Action Buttons */}
             <div className="space-y-3">
               <Button
                 size="lg"
-                className="w-full"
-                disabled={propertyStatus === 'Fully Funded' || !isAuthenticated}
+                className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
+                disabled={propertyStatus === 'Fully Funded'}
+                onClick={handleInvestClick}
               >
+                <DollarSign className="w-4 h-4 mr-2" />
                 {propertyStatus === 'Fully Funded' ? 'Fully Funded' : 'Invest Now'}
               </Button>
               <Button
@@ -346,6 +761,20 @@ export default function PropertyDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Investment Modal */}
+      <InvestmentModal
+        property={property}
+        isOpen={showInvestModal}
+        onClose={() => setShowInvestModal(false)}
+        onSuccess={() => {
+          setShowInvestModal(false)
+          // Refresh property data after successful investment
+          if (params?.id) {
+            setLoading(true)
+          }
+        }}
+      />
     </div>
   )
 }
