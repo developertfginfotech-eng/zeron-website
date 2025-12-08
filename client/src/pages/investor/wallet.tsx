@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useWalletBalance, useWalletTransactions } from "@/hooks/use-wallet"
+import { useWalletBalance, useWalletTransactions, useWithdrawalRequests } from "@/hooks/use-wallet"
 import { useMyInvestments } from "@/hooks/use-investments"
 import { usePortfolio } from "@/hooks/use-portfolio"
 import { apiClient, API_ENDPOINTS } from "@/lib/api-client"
@@ -31,7 +31,8 @@ import {
   Loader2,
   Building,
   Plus,
-  Minus
+  Minus,
+  RefreshCw
 } from "lucide-react"
 
 export default function InvestorWallet() {
@@ -41,12 +42,31 @@ export default function InvestorWallet() {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
   const [isDepositing, setIsDepositing] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const queryClient = useQueryClient()
   const { toast } = useToast()
+
+  // Refresh all wallet data
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    try {
+      await queryClient.invalidateQueries({ queryKey: ["wallet-balance"] })
+      await queryClient.invalidateQueries({ queryKey: ["wallet-transactions"] })
+      await queryClient.invalidateQueries({ queryKey: ["withdrawal-requests"] })
+      await queryClient.invalidateQueries({ queryKey: ["portfolio"] })
+      toast({
+        title: "Refreshed",
+        description: "Wallet data updated"
+      })
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
 
   // Fetch data from backend
   const { data: walletData, isLoading: balanceLoading } = useWalletBalance()
   const { data: transactions = [], isLoading: transactionsLoading } = useWalletTransactions()
+  const { data: withdrawalRequests = [], isLoading: withdrawalRequestsLoading } = useWithdrawalRequests()
   const { data: investments = [], isLoading: investmentsLoading } = useMyInvestments()
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio()
 
@@ -184,8 +204,24 @@ export default function InvestorWallet() {
     }
   }) : []
 
+  // Combine withdrawal requests with transactions
+  const allItems = [
+    ...withdrawalRequests.map((req: any) => ({
+      id: req._id,
+      type: 'withdrawal' as const,
+      amount: req.amount,
+      description: `Withdrawal from ${req.propertyId?.title || 'Property'}`,
+      date: req.requestedAt,
+      createdAt: req.requestedAt,
+      status: req.status,
+      isWithdrawalRequest: true,
+      request: req
+    })),
+    ...transactions
+  ].sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime())
+
   // Show loading state
-  if (balanceLoading || transactionsLoading) {
+  if (balanceLoading || transactionsLoading || withdrawalRequestsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -211,6 +247,15 @@ export default function InvestorWallet() {
             </div>
 
             <div className="flex gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
+              >
+                <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
               <Dialog open={isDepositOpen} onOpenChange={setIsDepositOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-white text-emerald-700 hover:bg-white/90 font-semibold px-6 h-auto">
@@ -448,50 +493,64 @@ export default function InvestorWallet() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {transactions.length === 0 ? (
+                {allItems.length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                     <p className="text-muted-foreground">No transactions yet</p>
                     <p className="text-sm text-muted-foreground">Your transactions will appear here</p>
                   </div>
                 ) : (
-                  transactions.map((transaction: any) => {
+                  allItems.map((item: any) => {
                     // Determine if this is money IN (+) or OUT (-)
-                    const isMoneyIn = transaction.type === 'deposit' || transaction.type === 'recharge' || transaction.type === 'payout'
-                    const isMoneyOut = transaction.type === 'withdrawal' || transaction.type === 'investment'
-                    const displayAmount = isMoneyOut ? -Math.abs(transaction.amount) : Math.abs(transaction.amount)
+                    const isMoneyIn = item.type === 'deposit' || item.type === 'recharge' || item.type === 'payout'
+                    const isMoneyOut = item.type === 'withdrawal' || item.type === 'investment'
+                    const displayAmount = isMoneyOut ? -Math.abs(item.amount) : Math.abs(item.amount)
+
+                    // Determine status display for withdrawal requests
+                    const statusLabel = item.isWithdrawalRequest ?
+                      (item.status === 'pending' ? 'Pending Approval' :
+                       item.status === 'approved' ? 'Approved' :
+                       item.status === 'processing' ? 'Processing' :
+                       item.status === 'completed' ? 'Completed' :
+                       item.status === 'rejected' ? 'Rejected' : item.status) : item.status
 
                     return (
-                      <div key={transaction.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-900/50 dark:to-slate-900/50 border border-gray-200 dark:border-gray-800">
+                      <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-900/50 dark:to-slate-900/50 border border-gray-200 dark:border-gray-800">
                         <div className="flex items-center gap-4">
                           <div className={`p-2 rounded-lg ${
                             isMoneyIn ? 'bg-green-100 dark:bg-green-900/30' :
+                            isMoneyOut && item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'bg-yellow-100 dark:bg-yellow-900/30' :
                             isMoneyOut ? 'bg-red-100 dark:bg-red-900/30' :
                             'bg-blue-100 dark:bg-blue-900/30'
                           }`}>
                             {isMoneyIn && <ArrowDownLeft className="h-5 w-5 text-green-600" />}
-                            {isMoneyOut && <ArrowUpRight className="h-5 w-5 text-red-600" />}
+                            {isMoneyOut && <ArrowUpRight className={`h-5 w-5 ${item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-yellow-600' : 'text-red-600'}`} />}
                           </div>
                           <div>
                             <p className="font-semibold text-gray-900 dark:text-white">
-                              {transaction.description || transaction.type}
+                              {item.description || item.type}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              {transaction.date || new Date(transaction.createdAt).toLocaleDateString()}
+                              {new Date(item.date || item.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-xl font-mono font-bold ${isMoneyIn ? 'text-green-600' : 'text-red-600'}`}>
+                          <p className={`text-xl font-mono font-bold ${isMoneyIn ? 'text-green-600' : isMoneyOut && item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-yellow-600' : 'text-red-600'}`}>
                             {displayAmount > 0 ? '+' : ''}SAR {Math.abs(displayAmount).toLocaleString()}
                           </p>
-                          <Badge variant={transaction.status === 'completed' || transaction.status === 'confirmed' ? 'default' : 'secondary'}>
-                            {transaction.status === 'completed' || transaction.status === 'confirmed' ? (
+                          <Badge variant={
+                            item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'secondary' :
+                            item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved' ? 'default' : 'secondary'
+                          }>
+                            {item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? (
+                              <Clock className="h-3 w-3 mr-1" />
+                            ) : item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved' ? (
                               <CheckCircle className="h-3 w-3 mr-1" />
                             ) : (
                               <Clock className="h-3 w-3 mr-1" />
                             )}
-                            {transaction.status}
+                            {statusLabel}
                           </Badge>
                         </div>
                       </div>

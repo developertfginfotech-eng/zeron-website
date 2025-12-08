@@ -169,8 +169,8 @@ export default function InvestorDashboard() {
 
       if (response.success) {
         toast({
-          title: "Investment Withdrawn",
-          description: response.message || `Successfully withdrew SAR ${response.data?.withdrawalDetails?.totalWithdrawalAmount?.toFixed(2)}`,
+          title: "Withdrawal Request Submitted",
+          description: response.message || `Withdrawal request submitted for admin approval. You will be notified once it's processed.`,
         })
 
         // Refresh all related data
@@ -184,8 +184,8 @@ export default function InvestorDashboard() {
       }
     } catch (error: any) {
       toast({
-        title: "Withdrawal Failed",
-        description: error.response?.data?.message || "Failed to process withdrawal",
+        title: "Withdrawal Request Failed",
+        description: error.response?.data?.message || "Failed to submit withdrawal request",
         variant: "destructive",
       })
     } finally {

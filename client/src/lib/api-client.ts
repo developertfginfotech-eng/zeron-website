@@ -170,6 +170,7 @@ export const API_ENDPOINTS = {
   WALLET_BALANCE: '/wallet/balance',
   WALLET_RECHARGE: '/wallet/recharge',
   WALLET_TRANSACTIONS: '/wallet/transactions',
+  WITHDRAWAL_REQUESTS: '/investments/withdrawal-requests',
 
   // Admin (for settings)
   ADMIN_SETTINGS: '/admin/settings',
