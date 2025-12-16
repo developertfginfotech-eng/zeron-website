@@ -398,7 +398,7 @@ const KYCVerificationPage = () => {
 
       // Redirect to dashboard
       setTimeout(() => {
-        window.location.href = "/user-dashboard";
+        window.location.href = "/investor/dashboard";
       }, 2000);
     } catch (error) {
       console.error("KYC upload error:", error);
@@ -438,7 +438,7 @@ const KYCVerificationPage = () => {
       localStorage.setItem("zaron_user", JSON.stringify(user));
     }
 
-    window.location.href = "/user-dashboard";
+    window.location.href = "/investor/dashboard";
   };
 
   const handleComplete = async () => {
