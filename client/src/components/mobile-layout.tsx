@@ -2,6 +2,7 @@ import { ReactNode } from "react"
 import { MobileNavigation } from "./mobile-navigation"
 import { ThemeToggle } from "./theme-toggle"
 import { LanguageSwitcher } from "./language-switcher"
+import Logo from "./logo"
 import { useTranslation } from "@/hooks/use-translation"
 
 interface MobileLayoutProps {
@@ -16,12 +17,7 @@ export function MobileLayout({ children }: MobileLayoutProps) {
       {/* Mobile Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <div className="text-lg font-bold bg-gradient-to-r from-foreground to-primary/80 bg-clip-text text-transparent">
-              Zaron
-            </div>
-          </div>
+          <Logo size="small" showTagline={false} />
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />

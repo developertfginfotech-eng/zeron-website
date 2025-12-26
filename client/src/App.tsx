@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/components/language-provider";
 import { AuthProvider } from "@/hooks/use-auth";
 
 // Website Pages
+import WebsiteHome from "@/pages/website/home";
 import WebsiteInvest from "@/pages/website/invest";
 import WebsiteProperties from "@/pages/website/properties";
 import PropertyDetailsPage from "@/pages/website/property-details";
@@ -38,7 +39,7 @@ function App() {
               <WebsiteLayout>
                 <Switch>
                   <Route path="/invest" component={WebsiteInvest} />
-                  <Route path="/website" component={WebsiteInvest} />
+                  <Route path="/website" component={WebsiteHome} />
                   <Route path="/website/invest" component={WebsiteInvest} />
                   <Route path="/website/register" component={WebsiteRegister} />
                   <Route path="/register" component={WebsiteRegister} />
@@ -57,7 +58,7 @@ function App() {
                   <Route path="/investor/wallet" component={InvestorWallet} />
                   <Route path="/investor/guide" component={InvestmentGuide} />
                   <Route path="/user-notifications" component={UserNotificationPage} />
-                  <Route path="/" component={WebsiteInvest} />
+                  <Route path="/" component={WebsiteHome} />
                   <Route component={NotFound} />
                 </Switch>
               </WebsiteLayout>

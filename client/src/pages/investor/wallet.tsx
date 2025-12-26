@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
@@ -233,17 +232,17 @@ export default function InvestorWallet() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800 p-6 space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-blue-600 to-purple-600 p-8 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 p-8 text-white shadow-2xl border border-teal-200 dark:border-teal-700/50">
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-24 translate-x-24" />
 
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-serif font-bold mb-2">My Wallet</h1>
-              <p className="text-emerald-100 text-lg">Manage your funds and track returns</p>
+              <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">My Wallet</h1>
+              <p className="text-teal-100 text-lg">Manage your funds and track returns</p>
             </div>
 
             <div className="flex gap-3">
@@ -258,7 +257,7 @@ export default function InvestorWallet() {
               </Button>
               <Dialog open={isDepositOpen} onOpenChange={setIsDepositOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-white text-emerald-700 hover:bg-white/90 font-semibold px-6 h-auto">
+                  <Button className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold px-6 h-auto">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Funds
                   </Button>
@@ -370,16 +369,16 @@ export default function InvestorWallet() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <p className="text-emerald-100 text-sm mb-1">Available Balance</p>
+            <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
+              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Available Balance</p>
               <p className="text-3xl font-mono font-bold">SAR {balance.toLocaleString()}</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <p className="text-emerald-100 text-sm mb-1">Total Returns</p>
-              <p className="text-3xl font-mono font-bold text-green-300">+SAR {totalReturns.toLocaleString()}</p>
+            <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
+              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Total Returns</p>
+              <p className="text-3xl font-mono font-bold text-green-400">+SAR {totalReturns.toLocaleString()}</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <p className="text-emerald-100 text-sm mb-1">Pending</p>
+            <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
+              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Pending</p>
               <p className="text-3xl font-mono font-bold">SAR {pendingBalance.toLocaleString()}</p>
             </div>
           </div>
@@ -389,85 +388,73 @@ export default function InvestorWallet() {
       {/* Balance Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Available Balance */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-blue-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                  <WalletIcon className="w-6 h-6 text-white" />
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <WalletIcon className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Available Balance</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {balance.toLocaleString()}
-                </p>
-                <p className="text-xs text-emerald-600 mt-1">Ready to invest</p>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Available Balance</p>
+              <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
+                SAR {balance.toLocaleString()}
+              </p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Ready to invest</p>
             </div>
           </div>
         </div>
 
         {/* Total Returns */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Returns</p>
-                <p className="text-2xl font-mono font-bold text-green-600">
-                  +SAR {totalReturns.toLocaleString()}
-                </p>
-                <p className="text-xs text-emerald-600 mt-1">From all investments</p>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Returns</p>
+              <p className="text-2xl font-mono font-bold text-green-400">
+                +SAR {totalReturns.toLocaleString()}
+              </p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">From all investments</p>
             </div>
           </div>
         </div>
 
         {/* Unrealized Gains */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-white" />
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <DollarSign className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Unrealized Gains</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {unrealizedGains.toLocaleString()}
-                </p>
-                <p className="text-xs text-blue-600 mt-1">Current investments</p>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Unrealized Gains</p>
+              <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
+                SAR {unrealizedGains.toLocaleString()}
+              </p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Current investments</p>
             </div>
           </div>
         </div>
 
         {/* Realized Gains */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-pink-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-pink-50 dark:from-orange-900/10 dark:to-pink-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-pink-600 flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-white" />
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <CheckCircle className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Realized Gains</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {realizedGains.toLocaleString()}
-                </p>
-                <p className="text-xs text-orange-600 mt-1">Withdrawn returns</p>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Realized Gains</p>
+              <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
+                SAR {realizedGains.toLocaleString()}
+              </p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Withdrawn returns</p>
             </div>
           </div>
         </div>
@@ -475,29 +462,29 @@ export default function InvestorWallet() {
 
       {/* Tabs */}
       <Tabs defaultValue="transactions" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          <TabsTrigger value="returns">Property Returns</TabsTrigger>
-          <TabsTrigger value="actions">Quick Actions</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
+          <TabsTrigger value="transactions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Transactions</TabsTrigger>
+          <TabsTrigger value="returns" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Property Returns</TabsTrigger>
+          <TabsTrigger value="actions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Quick Actions</TabsTrigger>
         </TabsList>
 
         {/* Transactions Tab */}
         <TabsContent value="transactions" className="space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-emerald-600" />
+              <CardTitle className="flex items-center gap-2 text-teal-900 dark:text-white">
+                <Clock className="w-5 h-5 text-yellow-400" />
                 Transaction History
               </CardTitle>
-              <CardDescription>View all your wallet transactions</CardDescription>
+              <CardDescription className="text-teal-700 dark:text-teal-200">View all your wallet transactions</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {allItems.length === 0 ? (
                   <div className="text-center py-8">
-                    <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground">No transactions yet</p>
-                    <p className="text-sm text-muted-foreground">Your transactions will appear here</p>
+                    <Clock className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
+                    <p className="text-teal-900 dark:text-white">No transactions yet</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-200">Your transactions will appear here</p>
                   </div>
                 ) : (
                   allItems.map((item: any) => {
@@ -515,7 +502,7 @@ export default function InvestorWallet() {
                        item.status === 'rejected' ? 'Rejected' : item.status) : item.status
 
                     return (
-                      <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-900/50 dark:to-slate-900/50 border border-gray-200 dark:border-gray-800">
+                      <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-teal-100 dark:bg-teal-700/50 border border-teal-300 dark:border-teal-600/30">
                         <div className="flex items-center gap-4">
                           <div className={`p-2 rounded-lg ${
                             isMoneyIn ? 'bg-green-100 dark:bg-green-900/30' :
@@ -527,31 +514,46 @@ export default function InvestorWallet() {
                             {isMoneyOut && <ArrowUpRight className={`h-5 w-5 ${item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-yellow-600' : 'text-red-600'}`} />}
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900 dark:text-white">
+                            <p className="font-semibold text-teal-900 dark:text-white">
                               {item.description || item.type}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-teal-700 dark:text-teal-200">
                               {new Date(item.date || item.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-xl font-mono font-bold ${isMoneyIn ? 'text-green-600' : isMoneyOut && item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-yellow-600' : 'text-red-600'}`}>
+                          <p className={`text-2xl font-mono font-bold ${
+                            isMoneyIn ? 'text-green-600 dark:text-green-400' :
+                            isMoneyOut && item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-yellow-600 dark:text-yellow-400' :
+                            'text-red-600 dark:text-red-400'
+                          }`}>
                             {displayAmount > 0 ? '+' : ''}SAR {Math.abs(displayAmount).toLocaleString()}
                           </p>
-                          <Badge variant={
-                            item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'secondary' :
-                            item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved' ? 'default' : 'secondary'
-                          }>
+                          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border mt-2 ${
+                            item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing')
+                              ? 'bg-yellow-500/20 border-yellow-400/30' :
+                            item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved'
+                              ? 'bg-green-500/20 border-green-400/30'
+                              : 'bg-blue-500/20 border-blue-400/30'
+                          }`}>
                             {item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? (
-                              <Clock className="h-3 w-3 mr-1" />
+                              <Clock className="h-3 w-3 text-yellow-600 dark:text-yellow-300" />
                             ) : item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved' ? (
-                              <CheckCircle className="h-3 w-3 mr-1" />
+                              <CheckCircle className="h-3 w-3 text-green-600 dark:text-green-300" />
                             ) : (
-                              <Clock className="h-3 w-3 mr-1" />
+                              <Clock className="h-3 w-3 text-blue-600 dark:text-blue-300" />
                             )}
-                            {statusLabel}
-                          </Badge>
+                            <span className={`text-xs font-semibold ${
+                              item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing')
+                                ? 'text-yellow-700 dark:text-yellow-300' :
+                              item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved'
+                                ? 'text-green-700 dark:text-green-300'
+                                : 'text-blue-700 dark:text-blue-300'
+                            }`}>
+                              {statusLabel}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )
@@ -564,41 +566,41 @@ export default function InvestorWallet() {
 
         {/* Property Returns Tab */}
         <TabsContent value="returns" className="space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <CardTitle className="flex items-center gap-2 text-teal-900 dark:text-white">
+                <TrendingUp className="w-5 h-5 text-yellow-400" />
                 Property-wise Returns
               </CardTitle>
-              <CardDescription>Detailed breakdown of returns from each property</CardDescription>
+              <CardDescription className="text-teal-700 dark:text-teal-200">Detailed breakdown of returns from each property</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {propertyReturns.length === 0 ? (
                   <div className="text-center py-8">
-                    <Building className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground">No property investments yet</p>
-                    <p className="text-sm text-muted-foreground">Start investing to see returns</p>
+                    <Building className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
+                    <p className="text-teal-900 dark:text-white">No property investments yet</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see returns</p>
                   </div>
                 ) : (
                   propertyReturns.map((item: any) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 border border-emerald-200 dark:border-emerald-800">
+                    <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 border border-teal-700/50">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                          <Building className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-lg bg-yellow-400 flex items-center justify-center">
+                          <Building className="w-5 h-5 text-gray-900" />
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">{item.property}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-semibold text-white">{item.property}</p>
+                          <p className="text-sm text-teal-200">
                             Invested: SAR {item.investedAmount.toLocaleString()} • Yield: {item.rentalYield}%
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xl font-mono font-bold text-green-600">
+                        <p className="text-2xl font-mono font-bold text-white">
                           +SAR {item.returns.toLocaleString()}
                         </p>
-                        <p className="text-sm text-green-500 font-medium">
+                        <p className="text-sm text-yellow-400 font-semibold">
                           +{item.returnRate.toFixed(2)}% return
                         </p>
                       </div>
@@ -607,17 +609,17 @@ export default function InvestorWallet() {
                 )}
 
                 {propertyReturns.length > 0 && (
-                  <div className="mt-6 pt-6 border-t">
-                    <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
+                  <div className="mt-6 pt-6 border-t border-teal-700/50">
+                    <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 border border-teal-700/50">
                       <div>
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Returns</p>
+                        <p className="text-sm font-medium text-white uppercase">Total Returns</p>
                         <div className="flex items-center gap-4 mt-1">
-                          <span className="text-xs text-emerald-600">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
-                          <span className="text-xs text-blue-600">Realized: SAR {realizedGains.toLocaleString()}</span>
+                          <span className="text-xs text-teal-200 font-medium">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
+                          <span className="text-xs text-teal-200 font-medium">Realized: SAR {realizedGains.toLocaleString()}</span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-mono font-bold text-green-600">
+                        <p className="text-3xl font-mono font-bold text-yellow-400">
                           +SAR {totalReturns.toLocaleString()}
                         </p>
                       </div>
@@ -632,18 +634,18 @@ export default function InvestorWallet() {
         {/* Quick Actions Tab */}
         <TabsContent value="actions" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="hover:shadow-lg transition-all">
+            <Card className="hover:shadow-lg transition-all bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <ArrowDownLeft className="w-5 h-5 text-emerald-600" />
+                <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
+                  <ArrowDownLeft className="w-5 h-5 text-yellow-400" />
                   Deposit Funds
                 </CardTitle>
-                <CardDescription>Add money to your wallet</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">Add money to your wallet</CardDescription>
               </CardHeader>
               <CardContent>
                 <Dialog open={isDepositOpen} onOpenChange={setIsDepositOpen}>
                   <DialogTrigger asChild>
-                    <Button className="w-full bg-gradient-to-r from-emerald-600 to-blue-600">
+                    <Button className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
                       <Plus className="w-4 h-4 mr-2" />
                       Add Funds
                     </Button>
@@ -652,20 +654,20 @@ export default function InvestorWallet() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-all">
+            <Card className="hover:shadow-lg transition-all bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <ArrowUpRight className="w-5 h-5 text-orange-600" />
+                <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
+                  <ArrowUpRight className="w-5 h-5 text-yellow-400" />
                   Withdraw Funds
                 </CardTitle>
-                <CardDescription>Transfer money to your bank</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">Transfer money to your bank</CardDescription>
               </CardHeader>
               <CardContent>
                 <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
                   <DialogTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className="w-full bg-teal-700/50 border-teal-600/50 text-white hover:bg-yellow-400 hover:text-gray-900 hover:border-yellow-500"
                       disabled={balance < 1000}
                     >
                       <Minus className="w-4 h-4 mr-2" />
@@ -674,27 +676,27 @@ export default function InvestorWallet() {
                   </DialogTrigger>
                 </Dialog>
                 {balance < 1000 && (
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-teal-600 dark:text-teal-300 mt-2">
                     Minimum balance SAR 1,000 required
                   </p>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-all">
+            <Card className="hover:shadow-lg transition-all bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <CreditCard className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
+                  <CreditCard className="w-5 h-5 text-yellow-400" />
                   Payment Methods
                 </CardTitle>
-                <CardDescription>Manage payment options</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">Manage payment options</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full" disabled>
+                <Button variant="outline" className="w-full bg-teal-700/50 border-teal-600/50 text-teal-600 dark:text-teal-300" disabled>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Add Method
                 </Button>
-                <p className="text-xs text-muted-foreground mt-2">Coming soon</p>
+                <p className="text-xs text-teal-600 dark:text-teal-300 mt-2">Coming soon</p>
               </CardContent>
             </Card>
           </div>

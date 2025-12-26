@@ -60,6 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('zaron_token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('token');
+    // Redirect to home page and refresh
+    window.location.href = '/';
   };
 
   const setUserAndStore = (newUser: User | null) => {

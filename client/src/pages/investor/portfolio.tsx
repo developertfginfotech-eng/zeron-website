@@ -146,21 +146,21 @@ export default function InvestorPortfolio() {
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800 p-6 space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-blue-600 to-purple-600 p-8 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 p-8 text-white shadow-2xl border border-teal-200 dark:border-teal-700/50">
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-24 translate-x-24" />
 
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-serif font-bold mb-2">Investment Portfolio</h1>
-              <p className="text-emerald-100 text-lg">Track your real estate investments and returns</p>
+              <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">Investment Portfolio</h1>
+              <p className="text-teal-100 text-lg">Track your real estate investments and returns</p>
             </div>
             <Button
               onClick={() => setLocation('/investor/properties')}
-              className="bg-white text-emerald-700 hover:bg-white/90 font-semibold px-6 h-auto"
+              className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold px-8 py-3 h-auto shadow-lg rounded-full uppercase"
             >
               <Building className="w-4 h-4 mr-2" />
               Explore Properties
@@ -168,17 +168,17 @@ export default function InvestorPortfolio() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <p className="text-emerald-100 text-sm mb-1">Total Value</p>
-              <p className="text-3xl font-mono font-bold">SAR {portfolioValue.toLocaleString()}</p>
+            <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
+              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Total Value</p>
+              <p className="text-3xl font-mono font-bold text-white">SAR {portfolioValue.toLocaleString()}</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <p className="text-emerald-100 text-sm mb-1">Total Returns</p>
-              <p className="text-3xl font-mono font-bold text-green-300">+SAR {totalReturns.toLocaleString()}</p>
+            <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
+              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Total Returns</p>
+              <p className="text-3xl font-mono font-bold text-green-400">+SAR {totalReturns.toLocaleString()}</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <p className="text-emerald-100 text-sm mb-1">Active Investments</p>
-              <p className="text-3xl font-mono font-bold">{activeInvestments}</p>
+            <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
+              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Active Investments</p>
+              <p className="text-3xl font-mono font-bold text-white">{activeInvestments}</p>
             </div>
           </div>
         </div>
@@ -187,99 +187,85 @@ export default function InvestorPortfolio() {
       {/* Portfolio Summary Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Portfolio Value */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-blue-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                  <Wallet className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
-                  <ArrowUpRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs font-semibold text-green-600">
-                    {portfolioGrowthPercentage >= 0 ? '+' : ''}{portfolioGrowthPercentage.toFixed(1)}%
-                  </span>
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <Wallet className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Portfolio Value</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {portfolioValue.toLocaleString()}
-                </p>
+              <div className="flex items-center gap-1 px-2 py-1">
+                <span className="text-sm font-semibold text-teal-700 dark:text-teal-200">
+                  +{portfolioGrowthPercentage.toFixed(1)}%
+                </span>
               </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Portfolio Value</p>
+              <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
+                SAR {portfolioValue.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Total Invested */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <Target className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Invested</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {totalInvested.toLocaleString()}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Across {activeInvestments} properties</p>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Invested</p>
+              <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
+                SAR {totalInvested.toLocaleString()}
+              </p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Across {activeInvestments} properties</p>
             </div>
           </div>
         </div>
 
         {/* Total Returns */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
-                  <ArrowUpRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs font-semibold text-green-600">
-                    {totalReturnsPercentage >= 0 ? '+' : ''}{totalReturnsPercentage.toFixed(1)}%
-                  </span>
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Returns</p>
-                <p className="text-2xl font-mono font-bold text-green-600">
-                  SAR {totalReturns.toLocaleString()}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-emerald-600">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
-                  <span className="text-xs text-blue-600">Realized: SAR {realizedGains.toLocaleString()}</span>
-                </div>
+              <div className="flex items-center gap-1 px-2 py-1">
+                <span className="text-sm font-semibold text-teal-700 dark:text-teal-200">
+                  +{totalReturnsPercentage.toFixed(1)}%
+                </span>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Returns</p>
+              <p className="text-2xl font-mono font-bold text-green-600 dark:text-green-400">
+                SAR {totalReturns.toLocaleString()}
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-teal-600 dark:text-teal-300 uppercase">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
+                <span className="text-xs text-teal-600 dark:text-teal-300 uppercase">Realized: SAR {realizedGains.toLocaleString()}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Active Properties */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-pink-600 p-1 shadow-lg hover:shadow-2xl transition-all">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-pink-50 dark:from-orange-900/10 dark:to-pink-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-pink-600 flex items-center justify-center">
-                  <Building className="w-6 h-6 text-white" />
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-teal-800/90 backdrop-blur-sm border border-teal-200 dark:border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
+                <Building className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Properties</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  {activeInvestments}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Diversified portfolio</p>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Active Properties</p>
+              <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
+                {activeInvestments}
+              </p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Diversified portfolio</p>
             </div>
           </div>
         </div>
@@ -287,22 +273,22 @@ export default function InvestorPortfolio() {
 
       {/* Tabs */}
       <Tabs defaultValue="investments" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="investments">My Investments</TabsTrigger>
-          <TabsTrigger value="returns">Return Breakdown</TabsTrigger>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
+          <TabsTrigger value="investments" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">My Investments</TabsTrigger>
+          <TabsTrigger value="returns" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Return Breakdown</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Overview</TabsTrigger>
         </TabsList>
 
         {/* Investments Tab */}
         <TabsContent value="investments" className="space-y-6">
           <div className="space-y-6">
             {investments.length === 0 ? (
-              <Card>
+              <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
                 <CardContent className="flex flex-col items-center justify-center py-16">
-                  <Building className="w-16 h-16 text-muted-foreground mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">No investments yet</h3>
-                  <p className="text-muted-foreground mb-6">Start investing in real estate properties</p>
-                  <Button onClick={() => setLocation('/investor/properties')}>
+                  <Building className="w-16 h-16 text-yellow-400 mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 text-teal-900 dark:text-white">No investments yet</h3>
+                  <p className="text-teal-700 dark:text-teal-200 mb-6">Start investing in real estate properties</p>
+                  <Button onClick={() => setLocation('/investor/properties')} className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
                     Explore Properties
                   </Button>
                 </CardContent>
@@ -315,9 +301,9 @@ export default function InvestorPortfolio() {
                 const currentValueInProperty = propertyGroup.investments.reduce((sum: number, inv: any) => sum + inv.currentValue, 0)
 
                 return (
-                  <Card key={propertyGroup.propertyId} className="overflow-hidden border-2">
+                  <Card key={propertyGroup.propertyId} className="overflow-hidden border-2 border-teal-200 dark:border-teal-700/50 bg-teal-900/70">
                     {/* Property Header */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-blue-600 to-purple-600 p-6 text-white">
+                    <div className="relative overflow-hidden bg-gradient-to-br from-teal-800 to-emerald-900 p-6 text-white border-b border-teal-200 dark:border-teal-700/50">
                       <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
                       <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-16 translate-x-16" />
 
@@ -367,24 +353,24 @@ export default function InvestorPortfolio() {
                     </div>
 
                     {/* Individual Investments List */}
-                    <CardContent className="p-0">
-                      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                    <CardContent className="p-0 bg-teal-900/50">
+                      <div className="divide-y divide-teal-700/30">
                         {propertyGroup.investments.map((investment: any, idx: number) => (
-                          <div key={investment.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                          <div key={investment.id} className="p-4 hover:bg-teal-800/70 transition-colors">
                             {/* Investment Type Badge */}
                             <div className="flex flex-col gap-3 mb-4">
                               <div className="flex flex-wrap items-center gap-2">
                                 <Badge className={`text-xs font-semibold ${
                                   investment.investmentType === 'bond'
-                                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-700'
-                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+                                    ? 'bg-yellow-400 text-gray-900 border-yellow-500'
+                                    : 'bg-teal-700 text-white border-teal-600'
                                 }`}>
                                   {investment.investmentType === 'bond' ? '🏆 Bond Investment' : '📅 Annual Plan'}
                                 </Badge>
                                 <Badge className={`text-xs ${
-                                  investment.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/20' :
-                                  investment.status === 'Completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20' :
-                                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20'
+                                  investment.status === 'Active' ? 'bg-green-100 text-green-800' :
+                                  investment.status === 'Completed' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-yellow-100 text-yellow-800'
                                 }`}>
                                   {investment.status}
                                 </Badge>
@@ -399,7 +385,7 @@ export default function InvestorPortfolio() {
                                   </Badge>
                                 )}
                               </div>
-                              <div className="text-xs text-muted-foreground">
+                              <div className="text-xs text-teal-700 dark:text-teal-200">
                                 Investment #{idx + 1} • Rental Yield: {investment.rentalYield}%
                               </div>
                             </div>
@@ -408,54 +394,54 @@ export default function InvestorPortfolio() {
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
                                 {/* Units */}
                                 <div className="text-center">
-                                  <p className="text-xs text-muted-foreground mb-1">Units</p>
-                                  <p className="font-mono font-semibold text-sm text-gray-900 dark:text-white">{investment.units}</p>
+                                  <p className="text-xs text-teal-200 mb-1">Units</p>
+                                  <p className="font-mono font-semibold text-sm text-white">{investment.units}</p>
                                 </div>
 
                                 {/* Invested Amount */}
                                 <div className="text-center">
-                                  <p className="text-xs text-muted-foreground mb-1">Invested</p>
-                                  <p className="font-mono font-semibold text-sm text-gray-900 dark:text-white">SAR {investment.investedAmount.toLocaleString()}</p>
+                                  <p className="text-xs text-teal-200 mb-1">Invested</p>
+                                  <p className="font-mono font-semibold text-sm text-white">SAR {investment.investedAmount.toLocaleString()}</p>
                                   {investment.managementFee > 0 && (
-                                    <p className="text-xs text-red-600">-SAR {investment.managementFee.toLocaleString()} fee</p>
+                                    <p className="text-xs text-red-400">-SAR {investment.managementFee.toLocaleString()} fee</p>
                                   )}
                                 </div>
 
                                 {/* Net Investment */}
                                 <div className="text-center">
-                                  <p className="text-xs text-muted-foreground mb-1">Net Amount</p>
-                                  <p className="font-mono font-semibold text-sm text-emerald-700 dark:text-emerald-400">SAR {investment.netInvestment.toLocaleString()}</p>
+                                  <p className="text-xs text-teal-200 mb-1">Net Amount</p>
+                                  <p className="font-mono font-semibold text-sm text-yellow-400">SAR {investment.netInvestment.toLocaleString()}</p>
                                 </div>
 
                                 {/* Current Value */}
                                 <div className="text-center">
-                                  <p className="text-xs text-muted-foreground mb-1">Current</p>
-                                  <p className="font-mono font-semibold text-sm text-gray-900 dark:text-white">SAR {investment.currentValue.toLocaleString()}</p>
+                                  <p className="text-xs text-teal-200 mb-1">Current</p>
+                                  <p className="font-mono font-semibold text-sm text-white">SAR {investment.currentValue.toLocaleString()}</p>
                                 </div>
 
                                 {/* Returns */}
                                 <div className="text-center">
-                                  <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>Returns</p>
-                                  <p className={`font-mono font-bold text-sm ${investment.returns >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-green-400' : 'text-red-400'}`}>Returns</p>
+                                  <p className={`font-mono font-bold text-sm ${investment.returns >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                     {investment.returns >= 0 ? '+' : ''}SAR {investment.returns.toLocaleString()}
                                   </p>
-                                  <p className={`text-xs font-medium ${investment.returnRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                  <p className={`text-xs font-medium ${investment.returnRate >= 0 ? 'text-green-300' : 'text-red-300'}`}>
                                     {investment.returnRate >= 0 ? '+' : ''}{investment.returnRate.toFixed(1)}%
                                   </p>
                                 </div>
 
                                 {/* Investment Date */}
                                 <div className="text-center">
-                                  <p className="text-xs text-muted-foreground mb-1">Invested On</p>
-                                  <p className="font-mono text-sm text-gray-900 dark:text-white">{investment.investmentDate}</p>
+                                  <p className="text-xs text-teal-200 mb-1">Invested On</p>
+                                  <p className="font-mono text-sm text-white">{investment.investmentDate}</p>
                                 </div>
 
                                 {/* Maturity/Lock-in Date */}
                                 <div className="text-center">
-                                  <p className="text-xs text-muted-foreground mb-1">
+                                  <p className="text-xs text-teal-200 mb-1">
                                     {investment.investmentType === 'bond' && investment.isInLockInPeriod ? 'Lock-in Ends' : 'Matures On'}
                                   </p>
-                                  <p className="font-mono text-sm text-gray-900 dark:text-white">
+                                  <p className="font-mono text-sm text-white">
                                     {investment.investmentType === 'bond' && investment.isInLockInPeriod
                                       ? investment.lockInEndDate
                                       : investment.investmentType === 'bond'
@@ -479,34 +465,34 @@ export default function InvestorPortfolio() {
         <TabsContent value="returns" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Property-wise Returns */}
-            <Card className="col-span-2">
+            <Card className="col-span-2 bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-emerald-600" />
+                <CardTitle className="flex items-center gap-2 text-teal-900 dark:text-white">
+                  <TrendingUp className="w-5 h-5 text-yellow-400" />
                   Property-wise Return Breakdown
                 </CardTitle>
-                <CardDescription>Detailed returns from each property investment</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">Detailed returns from each property investment</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {investments.map((investment) => (
-                    <div key={investment.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 border border-emerald-200 dark:border-emerald-800">
+                    <div key={investment.id} className="flex items-center justify-between p-4 rounded-xl bg-teal-100 dark:bg-teal-700/50 border border-teal-300 dark:border-teal-600/30">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                          <Building className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-lg bg-yellow-400 flex items-center justify-center">
+                          <Building className="w-5 h-5 text-gray-900" />
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">{investment.property}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-semibold text-teal-900 dark:text-white">{investment.property}</p>
+                          <p className="text-sm text-teal-700 dark:text-teal-200">
                             Invested: SAR {investment.investedAmount.toLocaleString()} • Yield: {investment.rentalYield}%
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className={`text-xl font-mono font-bold ${investment.returns >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <p className={`text-xl font-mono font-bold ${investment.returns >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                           {investment.returns >= 0 ? '+' : ''}SAR {investment.returns.toLocaleString()}
                         </p>
-                        <p className={`text-sm font-medium ${investment.returnRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        <p className={`text-sm font-medium ${investment.returnRate >= 0 ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
                           {investment.returnRate >= 0 ? '+' : ''}{investment.returnRate.toFixed(2)}% return
                         </p>
                       </div>
@@ -515,28 +501,28 @@ export default function InvestorPortfolio() {
 
                   {investments.length === 0 && (
                     <div className="text-center py-8">
-                      <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-muted-foreground">No return data available yet</p>
-                      <p className="text-sm text-muted-foreground">Start investing to see returns</p>
+                      <TrendingUp className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
+                      <p className="text-teal-900 dark:text-white">No return data available yet</p>
+                      <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see returns</p>
                     </div>
                   )}
                 </div>
 
                 {investments.length > 0 && (
-                  <div className="mt-6 pt-6 border-t">
-                    <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
+                  <div className="mt-6 pt-6 border-t border-teal-200 dark:border-teal-700/50">
+                    <div className="flex items-center justify-between p-4 rounded-xl bg-teal-700/50 border border-teal-600/30">
                       <div>
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Portfolio Returns</p>
+                        <p className="text-sm font-medium text-white">Total Portfolio Returns</p>
                         <div className="flex items-center gap-4 mt-1">
-                          <span className="text-xs text-emerald-600">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
-                          <span className="text-xs text-blue-600">Realized: SAR {realizedGains.toLocaleString()}</span>
+                          <span className="text-xs text-teal-700 dark:text-teal-200">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
+                          <span className="text-xs text-teal-700 dark:text-teal-200">Realized: SAR {realizedGains.toLocaleString()}</span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-mono font-bold text-green-600">
+                        <p className="text-2xl font-mono font-bold text-green-400">
                           +SAR {totalReturns.toLocaleString()}
                         </p>
-                        <p className="text-sm text-green-500 font-medium">
+                        <p className="text-sm text-green-300 font-medium">
                           +{totalReturnsPercentage.toFixed(2)}% average
                         </p>
                       </div>
@@ -552,13 +538,13 @@ export default function InvestorPortfolio() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Portfolio Growth Chart */}
-            <Card>
+            <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <PieChart className="w-5 h-5 text-emerald-600" />
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <PieChart className="w-5 h-5 text-yellow-400" />
                   Portfolio Growth
                 </CardTitle>
-                <CardDescription>Investment value over time</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">Investment value over time</CardDescription>
               </CardHeader>
               <CardContent>
                 <DashboardChart
@@ -570,33 +556,33 @@ export default function InvestorPortfolio() {
             </Card>
 
             {/* Asset Allocation */}
-            <Card>
+            <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-emerald-600" />
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Target className="w-5 h-5 text-yellow-400" />
                   Asset Allocation
                 </CardTitle>
-                <CardDescription>Distribution by property type</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">Distribution by property type</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {assetAllocation.length > 0 ? (
                   assetAllocation.map((allocation: any) => (
                     <div key={allocation.type} className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">{allocation.type}</span>
-                        <span className="font-mono">SAR {allocation.amount.toLocaleString()}</span>
+                        <span className="font-medium text-white">{allocation.type}</span>
+                        <span className="font-mono text-white">SAR {allocation.amount.toLocaleString()}</span>
                       </div>
                       <Progress value={allocation.percentage} className="h-2" />
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-teal-700 dark:text-teal-200">
                         {allocation.percentage}% of portfolio
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>No allocation data yet</p>
-                    <p className="text-sm">Start investing to see distribution</p>
+                  <div className="text-center py-8">
+                    <Target className="w-12 h-12 mx-auto mb-3 text-yellow-400 opacity-50" />
+                    <p className="text-white">No allocation data yet</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see distribution</p>
                   </div>
                 )}
               </CardContent>

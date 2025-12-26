@@ -1,14 +1,10 @@
 import { useState } from "react"
 import { useLocation } from "wouter"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/hooks/use-auth"
 import { useKYC } from "@/hooks/use-kyc"
 import { useUserProfile } from "@/hooks/use-user-profile"
-import { Separator } from "@/components/ui/separator"
 import {
   User,
   Shield,
@@ -20,7 +16,8 @@ import {
   Clock,
   AlertTriangle,
   Edit,
-  Loader2
+  Loader2,
+  Target
 } from "lucide-react"
 import { ProfileCompletionWizard } from "@/components/profile-completion-wizard"
 
@@ -56,7 +53,7 @@ export default function InvestorProfile() {
       id: 'basic',
       title: 'Basic Information',
       description: 'Personal details and contact information',
-      icon: <User className="w-5 h-5" />,
+      icon: <User className="w-5 h-5 text-current" />,
       completed: !!(userProfile?.firstName && userProfile?.lastName && userProfile?.email && userProfile?.phone),
       items: [
         `Full Name: ${kycData?.personalInfo?.fullNameEnglish || `${userProfile?.firstName} ${userProfile?.lastName}` || 'Not provided'}`,
@@ -73,7 +70,7 @@ export default function InvestorProfile() {
       id: 'kyc',
       title: 'Identity Verification',
       description: 'KYC documentation and verification status',
-      icon: <Shield className="w-5 h-5" />,
+      icon: <Shield className="w-5 h-5 text-current" />,
       completed: kycData?.status === 'approved',
       items: [
         `Government ID: ${getDocumentStatus(kycData?.documents?.nationalId)}`,
@@ -86,7 +83,7 @@ export default function InvestorProfile() {
       id: 'investment',
       title: 'Investment Profile',
       description: 'Investment experience and risk preferences',
-      icon: <Wallet className="w-5 h-5" />,
+      icon: <Wallet className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.investmentProfile?.completed ||
         (userProfile?.profileData?.investmentProfile?.experience &&
@@ -104,7 +101,7 @@ export default function InvestorProfile() {
       id: 'banking',
       title: 'Banking Details',
       description: 'Bank account verification for payouts',
-      icon: <Wallet className="w-5 h-5" />,
+      icon: <Wallet className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.bankingDetails?.completed ||
         (userProfile?.profileData?.bankingDetails?.bankName &&
@@ -122,7 +119,7 @@ export default function InvestorProfile() {
       id: 'preferences',
       title: 'Communication Preferences',
       description: 'Notification and communication settings',
-      icon: <Bell className="w-5 h-5" />,
+      icon: <Bell className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.communicationPreferences?.completed ||
         (userProfile?.profileData?.communicationPreferences?.emailNotifications !== undefined &&
@@ -139,7 +136,7 @@ export default function InvestorProfile() {
       id: 'documents',
       title: 'Additional Documents',
       description: 'Optional supporting documentation',
-      icon: <FileText className="w-5 h-5" />,
+      icon: <FileText className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.employmentPortfolio?.completed ||
         (userProfile?.profileData?.employmentPortfolio?.employmentStatus &&
@@ -159,20 +156,6 @@ export default function InvestorProfile() {
   const totalSections = profileSections.length
   const profileCompletion = Math.round((completedSections / totalSections) * 100)
 
-  const getStatusIcon = (completed: boolean) => {
-    if (completed) {
-      return <CheckCircle className="w-5 h-5 text-green-600" />
-    }
-    return <Clock className="w-5 h-5 text-amber-500" />
-  }
-
-  const getStatusBadge = (completed: boolean) => {
-    if (completed) {
-      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Completed</Badge>
-    }
-    return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Pending</Badge>
-  }
-
   if (showWizard) {
     return <ProfileCompletionWizard onClose={() => setShowWizard(false)} />
   }
@@ -190,333 +173,382 @@ export default function InvestorProfile() {
   }
 
   return (
-    <div className="space-y-8" data-testid="investor-profile">
-      {/* Profile Header */}
-      <div className="flex items-start gap-6">
-        <Avatar className="w-20 h-20">
-          <AvatarImage src={userProfile?.profilePicture} />
-          <AvatarFallback className="text-xl font-semibold bg-primary/10 text-primary">
-            {(kycData?.personalInfo?.fullNameEnglish?.[0] || userProfile?.firstName?.[0])}
-            {(userProfile?.lastName?.[0])}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold tracking-tight" data-testid="text-profile-name">
-              {kycData?.personalInfo?.fullNameEnglish ||
-               (userProfile?.firstName && userProfile?.lastName ? `${userProfile.firstName} ${userProfile.lastName}` :
-                user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` :
-                'Guest User')}
-            </h1>
-            <Button variant="outline" size="sm" data-testid="button-edit-profile">
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          </div>
-          <p className="text-muted-foreground mb-3">{userProfile?.email || user?.email}</p>
-          <div className="flex items-center gap-4">
-            <Badge variant="outline" className="gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              Active Investor
-            </Badge>
-            {kycData?.status === 'approved' && (
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-2">
-                <Shield className="w-3 h-3" />
-                Verified
-              </Badge>
-            )}
-            {kycData?.status === 'pending' && (
-              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 gap-2">
-                <Clock className="w-3 h-3" />
-                Verification Pending
-              </Badge>
-            )}
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800 p-6 space-y-8" data-testid="investor-profile">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 p-8 text-white shadow-2xl border border-teal-200 dark:border-teal-700/50">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-24 translate-x-24" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-emerald-400/20 rounded-full blur-2xl translate-y-24 -translate-x-24" />
 
-      {/* Profile Completion Overview */}
-      <Card className={profileCompletion < 100 ? "border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800" : ""}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className={profileCompletion < 100 ? "text-amber-800 dark:text-amber-200" : ""}>
-                Profile Completion
-              </CardTitle>
-              <CardDescription>
-                {profileCompletion === 100 
-                  ? "Your profile is complete! You have access to all features."
-                  : "Complete your profile to unlock all investment features and benefits"
-                }
-              </CardDescription>
+        <div className="relative z-10 flex items-start justify-between">
+          <div className="flex items-start gap-6">
+            <Avatar className="w-20 h-20 border-2 border-teal-600/50">
+              <AvatarImage src={userProfile?.profilePicture} />
+              <AvatarFallback className="text-xl font-semibold bg-teal-700/50 text-white">
+                {(kycData?.personalInfo?.fullNameEnglish?.[0] || userProfile?.firstName?.[0])}
+                {(userProfile?.lastName?.[0])}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-4xl font-serif font-bold tracking-tight text-white" data-testid="text-profile-name">
+                  {kycData?.personalInfo?.fullNameEnglish ||
+                   (userProfile?.firstName && userProfile?.lastName ? `${userProfile.firstName} ${userProfile.lastName}` :
+                    user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` :
+                    'Guest User')}
+                </h1>
+                <Button className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold" size="sm" data-testid="button-edit-profile">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+              </div>
+              <p className="text-emerald-100 text-lg mb-3">{userProfile?.email || user?.email}</p>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 bg-teal-700/50 backdrop-blur-sm rounded-full px-4 py-2 border border-yellow-400/30">
+                  <div className="w-3 h-3 rounded-full bg-yellow-400 animate-pulse" />
+                  <span className="font-semibold text-yellow-200">Active Investor</span>
+                </div>
+                {kycData?.status === 'approved' && (
+                  <div className="flex items-center gap-2 bg-green-500/20 border border-green-400/30 rounded-full px-4 py-2">
+                    <Shield className="w-4 h-4 text-green-400" />
+                    <span className="font-semibold text-green-200">Verified</span>
+                  </div>
+                )}
+                {kycData?.status === 'pending' && (
+                  <div className="flex items-center gap-2 bg-yellow-500/20 border border-yellow-400/30 rounded-full px-4 py-2">
+                    <Clock className="w-4 h-4 text-yellow-300" />
+                    <span className="font-semibold text-yellow-200">Verification Pending</span>
+                  </div>
+                )}
+              </div>
             </div>
+          </div>
+
+          <div className="text-right bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            <p className="text-emerald-100 text-sm font-medium uppercase tracking-wide">Profile Completion</p>
+            <p className="text-3xl font-mono font-bold text-white">{profileCompletion}%</p>
             {profileCompletion < 100 && (
-              <Button 
+              <Button
                 onClick={() => setShowWizard(true)}
-                className="bg-amber-600 hover:bg-amber-700"
+                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-2 mt-3 rounded-full uppercase"
                 data-testid="button-complete-profile-wizard"
               >
                 Complete Profile
               </Button>
             )}
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Progress value={profileCompletion} className="flex-1" />
-              <span className="text-lg font-bold" data-testid="text-completion-percentage">
-                {profileCompletion}%
-              </span>
+        </div>
+      </div>
+
+      {/* Profile Completion Overview */}
+      {profileCompletion < 100 && (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 p-1 shadow-xl">
+          <div className="bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm rounded-2xl p-6 relative border border-teal-700/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg">
+                  <Target className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-serif font-bold text-white">
+                    Complete Your Investor Profile
+                  </h3>
+                  <p className="text-teal-200 font-medium">
+                    Unlock premium features and higher investment limits
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="text-2xl font-mono font-bold text-white" data-testid="text-completion-percentage">
+                    {profileCompletion}%
+                  </p>
+                  <p className="text-sm text-teal-200">Complete</p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <span>{completedSections} of {totalSections} sections completed</span>
-              {profileCompletion < 100 && (
+
+            <div className="mt-6 relative">
+              <div className="w-full bg-teal-700/30 rounded-full h-3">
+                <div
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-500 relative"
+                  style={{ width: `${profileCompletion}%` }}
+                >
+                  <div className="absolute right-0 top-0 w-2 h-3 bg-white rounded-full shadow-sm animate-pulse" />
+                </div>
+              </div>
+              <div className="flex items-center gap-6 text-sm text-teal-200 mt-3">
+                <span>{completedSections} of {totalSections} sections completed</span>
                 <span className="flex items-center gap-1">
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                  <AlertTriangle className="w-4 h-4 text-amber-400" />
                   {totalSections - completedSections} sections remaining
                 </span>
-              )}
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
       {/* Profile Sections */}
       <div className="grid gap-6">
-        <h2 className="text-2xl font-semibold">Profile Sections</h2>
-        
+        <h2 className="text-2xl font-semibold text-white uppercase tracking-wide">Profile Sections</h2>
+
         <div className="grid gap-4">
           {profileSections.map((section) => (
-            <Card
+            <div
               key={section.id}
-              className="hover-elevate transition-all duration-200 cursor-pointer hover:shadow-md"
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all duration-200 cursor-pointer"
               data-testid={`section-${section.id}`}
               onClick={() => handleSectionClick(section.id)}
             >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${section.completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}`}>
-                      {section.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">{section.title}</h3>
-                      <p className="text-muted-foreground text-sm">{section.description}</p>
-                    </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${
+                    section.completed
+                      ? 'bg-green-500/20 border-green-400/30 text-green-400'
+                      : 'bg-teal-700/50 border-teal-600/30 text-yellow-400'
+                  }`}>
+                    {section.icon}
                   </div>
-                  <div className="flex items-center gap-3">
-                    {getStatusIcon(section.completed)}
-                    {getStatusBadge(section.completed)}
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  <div>
+                    <h3 className="font-semibold text-lg text-white">{section.title}</h3>
+                    <p className="text-teal-200 text-sm">{section.description}</p>
                   </div>
                 </div>
-                
-                {/* Section Items Preview */}
-                <Separator className="my-4" />
+                <div className="flex items-center gap-3">
+                  {section.completed ? (
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <Clock className="w-5 h-5 text-yellow-400" />
+                  )}
+                  <div className={`px-3 py-1.5 rounded-lg border ${
+                    section.completed
+                      ? 'bg-green-500/20 border-green-400/30 text-green-300'
+                      : 'bg-yellow-500/20 border-yellow-400/30 text-yellow-300'
+                  }`}>
+                    <span className="text-sm font-bold uppercase">
+                      {section.completed ? 'Completed' : 'Pending'}
+                    </span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-yellow-400" />
+                </div>
+              </div>
+
+              {/* Section Items Preview */}
+              <div className="mt-4 pt-4 border-t border-teal-700/50">
                 <div className="grid grid-cols-2 gap-2">
                   {section.items.map((item, index) => (
                     <div key={index} className="flex items-center gap-2 text-sm">
-                      <div className={`w-2 h-2 rounded-full ${section.completed ? 'bg-green-500' : 'bg-gray-300'}`} />
-                      <span className={section.completed ? 'text-green-700' : 'text-muted-foreground'}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        section.completed ? 'bg-green-400' : 'bg-teal-400'
+                      }`} />
+                      <span className={section.completed ? 'text-green-300' : 'text-teal-200'}>
                         {item}
                       </span>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
       {/* KYC Details Section */}
       {kycData && (
-        <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-blue-800 dark:text-blue-200">KYC Information</CardTitle>
-                <CardDescription>
-                  Your identity verification and personal details
-                </CardDescription>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-teal-700/50 flex items-center justify-center border border-teal-600/30">
+                <Shield className="h-6 w-6 text-yellow-400" />
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                  {kycData.completionPercentage}% Complete
-                </p>
-                <p className="text-xs text-blue-600 dark:text-blue-400 capitalize">
-                  Status: {kycData.status}
-                </p>
+              <div>
+                <h3 className="text-xl font-bold text-white uppercase tracking-wide">KYC Information</h3>
+                <p className="text-teal-200">Your identity verification and personal details</p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
+            <div className="text-right bg-teal-700/50 backdrop-blur-sm rounded-xl p-4 border border-teal-600/30">
+              <p className="text-sm font-medium text-teal-200 uppercase">
+                {kycData.completionPercentage}% Complete
+              </p>
+              <p className="text-xs text-teal-200 capitalize">
+                Status: {kycData.status}
+              </p>
+            </div>
+          </div>
+          <div className="space-y-6">
             {/* Personal Information */}
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Personal Information</h4>
+            <div className="bg-teal-900/70 rounded-xl p-4 border border-teal-700/50">
+              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">Personal Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Full Name (English)</p>
-                  <p className="font-medium">{kycData.personalInfo?.fullNameEnglish || 'Not provided'}</p>
+                  <p className="text-xs text-teal-200">Full Name (English)</p>
+                  <p className="font-medium text-white">{kycData.personalInfo?.fullNameEnglish || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Full Name (Arabic)</p>
-                  <p className="font-medium">{kycData.personalInfo?.fullNameArabic || 'Not provided'}</p>
+                  <p className="text-xs text-teal-200">Full Name (Arabic)</p>
+                  <p className="font-medium text-white">{kycData.personalInfo?.fullNameArabic || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Date of Birth</p>
-                  <p className="font-medium">
+                  <p className="text-xs text-teal-200">Date of Birth</p>
+                  <p className="font-medium text-white">
                     {kycData.personalInfo?.dateOfBirth
                       ? new Date(kycData.personalInfo.dateOfBirth).toLocaleDateString()
                       : 'Not provided'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Nationality</p>
-                  <p className="font-medium capitalize">{kycData.personalInfo?.nationality || 'Not provided'}</p>
+                  <p className="text-xs text-teal-200">Nationality</p>
+                  <p className="font-medium text-white capitalize">{kycData.personalInfo?.nationality || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Occupation</p>
-                  <p className="font-medium">{kycData.personalInfo?.occupation || 'Not provided'}</p>
+                  <p className="text-xs text-teal-200">Occupation</p>
+                  <p className="font-medium text-white">{kycData.personalInfo?.occupation || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Monthly Income</p>
-                  <p className="font-medium">
+                  <p className="text-xs text-teal-200">Monthly Income</p>
+                  <p className="font-medium text-white">
                     SAR {(kycData.personalInfo?.monthlyIncome || 0).toLocaleString()}
                   </p>
                 </div>
               </div>
             </div>
 
-            <Separator />
-
             {/* Address Information */}
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Address</h4>
+            <div className="bg-teal-900/70 rounded-xl p-4 border border-teal-700/50">
+              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">Address</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Country</p>
-                  <p className="font-medium">{kycData.address?.country || 'Not provided'}</p>
+                  <p className="text-xs text-teal-200">Country</p>
+                  <p className="font-medium text-white">{kycData.address?.country || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">City</p>
-                  <p className="font-medium">{kycData.address?.city || 'Not provided'}</p>
+                  <p className="text-xs text-teal-200">City</p>
+                  <p className="font-medium text-white">{kycData.address?.city || 'Not provided'}</p>
                 </div>
                 <div className="md:col-span-2">
-                  <p className="text-xs text-muted-foreground">Address</p>
-                  <p className="font-medium">{kycData.address?.address || 'Not provided'}</p>
+                  <p className="text-xs text-teal-200">Address</p>
+                  <p className="font-medium text-white">{kycData.address?.address || 'Not provided'}</p>
                 </div>
               </div>
             </div>
 
-            <Separator />
-
             {/* Document Uploads */}
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Document Uploads</h4>
+            <div className="bg-teal-900/70 rounded-xl p-4 border border-teal-700/50">
+              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">Document Uploads</h4>
               <div className="space-y-2">
                 {kycData.documents?.nationalId && (
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg">
-                    <span>National ID</span>
-                    {kycData.documents.nationalId.uploaded ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Uploaded
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Pending
-                      </Badge>
-                    )}
+                  <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
+                    <span className="text-white">National ID</span>
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
+                      kycData.documents.nationalId.uploaded
+                        ? 'bg-green-500/20 border-green-400/30'
+                        : 'bg-yellow-500/20 border-yellow-400/30'
+                    }`}>
+                      {kycData.documents.nationalId.uploaded ? (
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                      ) : (
+                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                      )}
+                    </div>
                   </div>
                 )}
                 {kycData.documents?.addressProof && (
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg">
-                    <span>Address Proof</span>
-                    {kycData.documents.addressProof.uploaded ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Uploaded
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Pending
-                      </Badge>
-                    )}
+                  <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
+                    <span className="text-white">Address Proof</span>
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
+                      kycData.documents.addressProof.uploaded
+                        ? 'bg-green-500/20 border-green-400/30'
+                        : 'bg-yellow-500/20 border-yellow-400/30'
+                    }`}>
+                      {kycData.documents.addressProof.uploaded ? (
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                      ) : (
+                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                      )}
+                    </div>
                   </div>
                 )}
                 {kycData.documents?.selfie && (
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg">
-                    <span>Selfie Verification</span>
-                    {kycData.documents.selfie.uploaded ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Uploaded
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Pending
-                      </Badge>
-                    )}
+                  <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
+                    <span className="text-white">Selfie Verification</span>
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
+                      kycData.documents.selfie.uploaded
+                        ? 'bg-green-500/20 border-green-400/30'
+                        : 'bg-yellow-500/20 border-yellow-400/30'
+                    }`}>
+                      {kycData.documents.selfie.uploaded ? (
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                      ) : (
+                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                      )}
+                    </div>
                   </div>
                 )}
                 {kycData.documents?.proofOfIncome && (
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg">
-                    <span>Proof of Income</span>
-                    {kycData.documents.proofOfIncome.uploaded ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Uploaded
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Pending
-                      </Badge>
-                    )}
+                  <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
+                    <span className="text-white">Proof of Income</span>
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
+                      kycData.documents.proofOfIncome.uploaded
+                        ? 'bg-green-500/20 border-green-400/30'
+                        : 'bg-yellow-500/20 border-yellow-400/30'
+                    }`}>
+                      {kycData.documents.proofOfIncome.uploaded ? (
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                      ) : (
+                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>
-            Manage your account and preferences
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="outline" className="justify-start h-auto p-4" data-testid="button-update-password">
-              <div className="text-left">
-                <div className="font-medium">Update Password</div>
-                <div className="text-sm text-muted-foreground">Change your account password</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="justify-start h-auto p-4" data-testid="button-notification-settings">
-              <div className="text-left">
-                <div className="font-medium">Notification Settings</div>
-                <div className="text-sm text-muted-foreground">Manage your preferences</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="justify-start h-auto p-4" data-testid="button-download-data">
-              <div className="text-left">
-                <div className="font-medium">Download Data</div>
-                <div className="text-sm text-muted-foreground">Export your information</div>
-              </div>
-            </Button>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-xl bg-teal-700/50 flex items-center justify-center border border-teal-600/30">
+            <FileText className="h-6 w-6 text-yellow-400" />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <h3 className="text-xl font-bold text-white uppercase tracking-wide">Quick Actions</h3>
+            <p className="text-teal-200">Manage your account and preferences</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Button
+            className="justify-start h-auto p-4 bg-teal-700/50 border border-teal-600/50 text-white hover:bg-yellow-400 hover:text-gray-900 hover:border-yellow-500"
+            data-testid="button-update-password"
+          >
+            <div className="text-left">
+              <div className="font-medium">Update Password</div>
+              <div className="text-sm opacity-80">Change your account password</div>
+            </div>
+          </Button>
+          <Button
+            className="justify-start h-auto p-4 bg-teal-700/50 border border-teal-600/50 text-white hover:bg-yellow-400 hover:text-gray-900 hover:border-yellow-500"
+            data-testid="button-notification-settings"
+          >
+            <div className="text-left">
+              <div className="font-medium">Notification Settings</div>
+              <div className="text-sm opacity-80">Manage your preferences</div>
+            </div>
+          </Button>
+          <Button
+            className="justify-start h-auto p-4 bg-teal-700/50 border border-teal-600/50 text-white hover:bg-yellow-400 hover:text-gray-900 hover:border-yellow-500"
+            data-testid="button-download-data"
+          >
+            <div className="text-left">
+              <div className="font-medium">Download Data</div>
+              <div className="text-sm opacity-80">Export your information</div>
+            </div>
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

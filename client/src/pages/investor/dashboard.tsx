@@ -299,9 +299,16 @@ export default function InvestorDashboard() {
     : 0
 
   return (
-    <div className="space-y-8 relative" data-testid="investor-dashboard">
+    <div className="min-h-screen relative p-6 space-y-8 bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800" data-testid="investor-dashboard">
+      {/* Background Image */}
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-30"
+        style={{
+          backgroundImage: "url('/images/BG%20Image.jpg')"
+        }}
+      />
       {/* Impressive Welcome Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-blue-600 to-emerald-700 p-8 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 p-8 text-white shadow-2xl border border-teal-200 dark:border-teal-700/50">
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-24 translate-x-24" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-emerald-400/20 rounded-full blur-2xl translate-y-24 -translate-x-24" />
@@ -323,9 +330,9 @@ export default function InvestorDashboard() {
             </div>
             
             <div className="flex items-center gap-6 pt-4">
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
-                <span className="font-semibold">Portfolio Active</span>
+              <div className="flex items-center gap-2 bg-teal-700/50 backdrop-blur-sm rounded-full px-4 py-2 border border-yellow-400/30">
+                <div className="w-3 h-3 rounded-full bg-yellow-400 animate-pulse" />
+                <span className="font-semibold text-yellow-200">Portfolio Active</span>
               </div>
               <div className="flex items-center gap-2 text-emerald-100">
                 <Clock className="w-4 h-4" />
@@ -346,12 +353,11 @@ export default function InvestorDashboard() {
               </div>
             </div>
             
-            <Button 
-              onClick={() => setLocation('/investor/properties')} 
+            <Button
+              onClick={() => setLocation('/investor/properties')}
               data-testid="button-browse-properties"
-              className="bg-white text-emerald-700 hover:bg-white/90 font-semibold px-8 py-3 h-auto shadow-lg"
+              className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold px-8 py-3 h-auto shadow-lg rounded-full uppercase"
             >
-              <Building className="w-5 h-5 mr-2" />
               Explore New Properties
             </Button>
           </div>
@@ -386,9 +392,9 @@ export default function InvestorDashboard() {
                   </p>
                   <p className="text-sm text-orange-600">Complete</p>
                 </div>
-                <Button 
+                <Button
                   onClick={() => setLocation('/investor/profile')}
-                  className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-semibold px-6 py-3 h-auto shadow-lg"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-3 h-auto shadow-lg rounded-lg uppercase"
                   data-testid="button-complete-profile"
                 >
                   Complete Now
@@ -413,96 +419,87 @@ export default function InvestorDashboard() {
       {/* Impressive Portfolio Overview Stats */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Portfolio Value Card */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-blue-600 p-1 shadow-lg hover:shadow-2xl transition-all duration-300" data-testid="stat-portfolio-value">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                  <Wallet className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
-                  <ArrowUpRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs font-semibold text-green-600">
-                    {portfolioGrowthPercentage >= 0 ? '+' : ''}{portfolioGrowthPercentage.toFixed(1)}%
-                  </span>
-                </div>
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all duration-300" data-testid="stat-portfolio-value">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Portfolio Value</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {portfolioValue.toLocaleString()}
-                </p>
+              <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
+                <span className="text-sm font-semibold text-teal-700">
+                  +{portfolioGrowthPercentage.toFixed(1)}%
+                </span>
               </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Portfolio Value</p>
+              <p className="text-2xl font-mono font-bold text-white">
+                SAR {portfolioValue.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Total Invested Card */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-lg hover:shadow-2xl transition-all duration-300" data-testid="stat-total-invested">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all duration-300" data-testid="stat-total-invested">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Invested</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {totalInvested.toLocaleString()}
-                </p>
+              <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
+                <span className="text-sm font-semibold text-teal-700">
+                  +{totalReturnsPercentage.toFixed(1)}%
+                </span>
               </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Total Invested</p>
+              <p className="text-2xl font-mono font-bold text-white">
+                SAR {totalInvested.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Total Returns Card */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-lg hover:shadow-2xl transition-all duration-300" data-testid="stat-total-returns">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded-full">
-                  <ArrowUpRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs font-semibold text-green-600">
-                    {totalReturnsPercentage >= 0 ? '+' : ''}{totalReturnsPercentage.toFixed(1)}%
-                  </span>
-                </div>
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all duration-300" data-testid="stat-total-returns">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Returns</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  SAR {totalReturns.toLocaleString()}
-                </p>
+              <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
+                <span className="text-sm font-semibold text-teal-700">
+                  +{totalReturnsPercentage.toFixed(1)}%
+                </span>
               </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Total Returns</p>
+              <p className="text-2xl font-mono font-bold text-white">
+                SAR {totalReturns.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Active Investments Card */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-1 shadow-lg hover:shadow-2xl transition-all duration-300" data-testid="stat-active-investments">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 h-full relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 rounded-2xl" />
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                  <Building className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 bg-purple-100 dark:bg-purple-900/20 px-2 py-1 rounded-full">
-                  <span className="text-xs font-semibold text-purple-600">+2 this month</span>
-                </div>
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 p-6 shadow-xl hover:shadow-2xl transition-all duration-300" data-testid="stat-active-investments">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                <Building className="w-6 h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Investments</p>
-                <p className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-                  {activeInvestments}
-                </p>
+              <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
+                <span className="text-xs font-semibold text-teal-700">+2 this month</span>
               </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Active Investments</p>
+              <p className="text-2xl font-mono font-bold text-white">
+                {activeInvestments}
+              </p>
             </div>
           </div>
         </div>
@@ -510,257 +507,251 @@ export default function InvestorDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Enhanced Portfolio Performance Chart */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-900/50 border border-gray-200 dark:border-gray-700 shadow-xl" data-testid="card-portfolio-chart">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5" />
-          <div className="relative z-10 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                  <PieChart className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-serif font-bold text-gray-900 dark:text-white">
-                    Portfolio Performance
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Investment growth over the last 7 months
-                  </p>
-                </div>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-6" data-testid="card-portfolio-chart">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                <PieChart className="h-6 w-6 text-yellow-400" />
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500">ROI</p>
-                <p className="text-2xl font-mono font-bold text-emerald-600">
-                  {totalReturnPercentage >= 0 ? '+' : ''}{totalReturnPercentage.toFixed(1)}%
+              <div>
+                <h3 className="text-xl font-bold text-white uppercase tracking-wide">
+                  Portfolio Performance
+                </h3>
+                <p className="text-teal-200 text-sm">
+                  Investment growth over the last 7 months
                 </p>
               </div>
             </div>
-            
-            <div className="bg-white/50 dark:bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-              <DashboardChart 
-                title="Portfolio Growth"
-                type="line"
-                data={portfolioData} 
-              />
+            <div className="text-right">
+              <p className="text-sm text-teal-200 uppercase">ROI</p>
+              <p className="text-2xl font-mono font-bold text-white">
+                {totalReturnPercentage >= 0 ? '+' : ''}{totalReturnPercentage.toFixed(1)}%
+              </p>
             </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border border-teal-200">
+            <DashboardChart
+              title="Portfolio Growth"
+              type="line"
+              data={portfolioData}
+            />
           </div>
         </div>
 
         {/* Enhanced Quick Actions & Info */}
         <div className="space-y-6">
           {/* Enhanced Upcoming Payouts */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-1 shadow-xl" data-testid="card-upcoming-payouts">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl" />
-              
-              <div className="relative z-10 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                    <Calendar className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-serif font-bold text-gray-900 dark:text-white">
-                      Upcoming Payouts
-                    </h3>
-                  </div>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 p-6 shadow-xl" data-testid="card-upcoming-payouts">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                  <Calendar className="h-6 w-6 text-yellow-400" />
                 </div>
-                
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">Next Payout</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">{nextPayout}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-mono font-bold text-green-600">SAR {pendingReturns.toLocaleString()}</p>
-                      <p className="text-xs text-green-500 font-medium">Estimated</p>
-                    </div>
-                  </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white uppercase tracking-wide">
+                    Upcoming Payouts
+                  </h3>
                 </div>
-                
-                <Button 
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 font-semibold" 
-                  data-testid="button-view-payouts"
-                >
-                  View All Payouts
-                </Button>
               </div>
+
+              <div className="bg-teal-700/50 rounded-xl p-4 border border-teal-600/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-teal-200 uppercase text-sm">Next Payout</p>
+                    <p className="text-sm text-white font-mono">{nextPayout}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-mono font-bold text-white">SAR {pendingReturns.toLocaleString()}</p>
+                    <p className="text-xs text-teal-200 font-medium uppercase">Estimated</p>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 rounded-lg uppercase"
+                data-testid="button-view-payouts"
+              >
+                View All Payouts
+              </Button>
             </div>
           </div>
 
           {/* Enhanced KYC Status */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-1 shadow-xl" data-testid="card-kyc-status">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-2xl" />
-              
-              <div className="relative z-10 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                    <CheckCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-serif font-bold text-gray-900 dark:text-white">
-                      Verification Status
-                    </h3>
-                  </div>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 p-6 shadow-xl" data-testid="card-kyc-status">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                  <CheckCircle className="h-6 w-6 text-yellow-400" />
                 </div>
-                
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 dark:text-white">KYC Verification</span>
-                    <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                <div>
+                  <h3 className="text-xl font-bold text-white uppercase tracking-wide">
+                    Verification Status
+                  </h3>
+                </div>
+              </div>
+
+              <div className="bg-teal-700/50 rounded-xl p-4 border border-teal-600/30">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-white uppercase">KYC Verification</span>
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
+                    user?.kycStatus === 'approved'
+                      ? 'bg-green-500/20 border-green-400/30'
+                      : user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review'
+                      ? 'bg-blue-500/20 border-blue-400/30'
+                      : 'bg-orange-500/20 border-orange-400/30'
+                  }`}>
+                    {user?.kycStatus === 'approved' && <CheckCircle className="w-5 h-5 text-green-400" />}
+                    <span className={`text-sm font-bold uppercase ${
                       user?.kycStatus === 'approved'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                        ? 'text-green-300'
                         : user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300'
-                        : 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300'
+                        ? 'text-blue-300'
+                        : 'text-orange-300'
                     }`}>
                       {user?.kycStatus === 'approved' ? 'Verified' :
-                       user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review' ? 'Completed - Under Review' :
-                       'Pending'}
-                    </div>
+                       user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review' ? 'Pending' :
+                       'Not Verified'}
+                    </span>
                   </div>
-
-                  {(user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review') && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
-                      <Clock className="h-4 w-4" />
-                      <span>Your documents are being reviewed. This usually takes 1-2 business days.</span>
-                    </div>
-                  )}
                 </div>
 
-                {user?.kycStatus !== 'approved' && user?.kycStatus !== 'submitted' && user?.kycStatus !== 'under_review' && user?.kycStatus !== 'pending_review' && (
-                  <Button
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-semibold"
-                    onClick={() => setLocation('/kyc')}
-                    data-testid="button-complete-kyc"
-                  >
-                    Complete KYC Verification
-                  </Button>
-                )}
-
                 {(user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review') && (
-                  <Button
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-semibold"
-                    onClick={() => setLocation('/kyc')}
-                    data-testid="button-view-kyc"
-                  >
-                    View Verification Status
-                  </Button>
+                  <div className="mt-3 flex items-center gap-2 text-sm text-teal-200">
+                    <Clock className="h-4 w-4" />
+                    <span>Your documents are being reviewed. This usually takes 1-2 business days.</span>
+                  </div>
                 )}
               </div>
+
+              {user?.kycStatus !== 'approved' && user?.kycStatus !== 'submitted' && user?.kycStatus !== 'under_review' && user?.kycStatus !== 'pending_review' && (
+                <Button
+                  className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 rounded-lg uppercase"
+                  onClick={() => setLocation('/kyc')}
+                  data-testid="button-complete-kyc"
+                >
+                  Complete Verification
+                </Button>
+              )}
+
+              {(user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review') && (
+                <Button
+                  className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 rounded-lg uppercase"
+                  onClick={() => setLocation('/kyc')}
+                  data-testid="button-view-kyc"
+                >
+                  View Verification Status
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Enhanced Recent Investments */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900 dark:to-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl" data-testid="card-recent-investments">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5" />
-        
-        <div className="relative z-10 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-                <Building className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">
-                  Recent Investments
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Your latest property investments and their performance
-                </p>
-              </div>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-6" data-testid="card-recent-investments">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+              <Building className="h-6 w-6 text-yellow-400" />
             </div>
-            <Button 
-              onClick={() => setLocation('/investor/portfolio')} 
-              data-testid="button-view-all-investments"
-              className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-semibold px-6"
-            >
-              View All Investments
-            </Button>
+            <div>
+              <h3 className="text-2xl font-bold text-white uppercase tracking-wide">
+                Recent Investments
+              </h3>
+              <p className="text-teal-200 text-sm">
+                Your latest property investments and their performance
+              </p>
+            </div>
           </div>
-          
-          <div className="space-y-3">
-            {recentInvestments.map((investment, index) => (
-              <div
-                key={index}
-                className="relative overflow-hidden rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-sm p-4 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-lg transition-all duration-300 group"
-                data-testid={`investment-${index}`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Button
+            onClick={() => setLocation('/investor/portfolio')}
+            data-testid="button-view-all-investments"
+            className="bg-white hover:bg-gray-100 text-teal-900 font-bold px-6 py-3 rounded-lg uppercase shadow-lg"
+          >
+            View All Investments
+          </Button>
+        </div>
 
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center shadow-md">
-                      <Building className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-serif font-semibold text-gray-900 dark:text-white text-lg">
-                        {investment.property}
-                      </h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                        {investment.date}
-                      </p>
-                    </div>
+        <div className="space-y-3">
+          {recentInvestments.map((investment, index) => (
+            <div
+              key={index}
+              className="relative overflow-hidden rounded-xl bg-teal-700/50 backdrop-blur-sm p-4 border border-teal-600/30 hover:bg-teal-700/60 transition-all duration-300"
+              data-testid={`investment-${index}`}
+            >
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
+                    <Building className="w-6 h-6 text-yellow-400" />
                   </div>
-
-                  <div className="text-right flex items-center gap-6">
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Invested</p>
-                      <p className="text-lg font-mono font-semibold text-gray-900 dark:text-white">
-                        SAR {investment.amount.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Current Value</p>
-                      <p className="text-lg font-mono font-bold text-emerald-600">
-                        SAR {investment.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Returns</p>
-                      <p className={`text-lg font-mono font-bold ${investment.returns >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        +SAR {investment.returns.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className={`w-2 h-2 rounded-full ${
-                          investment.status === 'confirmed' ? 'bg-green-500 animate-pulse' : 'bg-orange-500'
-                        }`} />
-                        <span className={`text-xs font-medium capitalize ${
-                          investment.status === 'confirmed' ? 'text-green-600' : 'text-orange-600'
-                        }`}>
-                          {investment.status === 'confirmed' ? 'Active' : investment.status}
-                        </span>
-                      </div>
-                    </div>
-                    {investment.status === 'confirmed' && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openWithdrawDialog(investment)}
-                        className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                      >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Exit
-                      </Button>
-                    )}
+                  <div>
+                    <h4 className="font-semibold text-white text-lg">
+                      {investment.property}
+                    </h4>
+                    <p className="text-sm text-teal-200 font-mono">
+                      {investment.date}
+                    </p>
                   </div>
                 </div>
+
+                <div className="text-right flex items-center gap-6">
+                  <div>
+                    <p className="text-sm text-teal-200 uppercase">Invested</p>
+                    <p className="text-lg font-mono font-semibold text-white">
+                      SAR {investment.amount.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-teal-200 uppercase">Current Value</p>
+                    <p className="text-lg font-mono font-bold text-white">
+                      SAR {investment.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-teal-200 uppercase">Returns</p>
+                    <p className={`text-lg font-mono font-bold ${investment.returns >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                      +SAR {investment.returns.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className={`w-2 h-2 rounded-full ${
+                        investment.status === 'confirmed' ? 'bg-green-400 animate-pulse' : 'bg-orange-400'
+                      }`} />
+                      <span className={`text-xs font-medium capitalize ${
+                        investment.status === 'confirmed' ? 'text-green-400' : 'text-orange-400'
+                      }`}>
+                        {investment.status === 'confirmed' ? 'Active' : investment.status}
+                      </span>
+                    </div>
+                  </div>
+                  {investment.status === 'confirmed' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openWithdrawDialog(investment)}
+                      className="border-red-400/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Exit
+                    </Button>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 rounded-xl border border-emerald-200 dark:border-emerald-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-white">Total Active Investments</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Across {activeInvestments} properties</p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-mono font-bold text-emerald-600">SAR {totalInvested.toLocaleString()}</p>
-                <p className="text-sm text-emerald-500 font-medium">Total Invested</p>
-              </div>
+            </div>
+          ))}
+        </div>
+
+
+        <div className="mt-6 p-4 bg-teal-700/50 rounded-xl border border-teal-600/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-white uppercase">Total Active Investments</p>
+              <p className="text-sm text-teal-200 uppercase">Across {activeInvestments} properties</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-mono font-bold text-yellow-400">SAR {totalInvested.toLocaleString()}</p>
+              <p className="text-sm text-teal-200 font-medium uppercase">Total Invested</p>
             </div>
           </div>
         </div>

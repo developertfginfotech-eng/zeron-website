@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ThemeToggle } from "@/components/theme-toggle"
+import Logo from "@/components/logo"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,15 +65,8 @@ export function InvestorLayout({ children }: InvestorLayoutProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50 dark:from-slate-900 dark:via-gray-900 dark:to-blue-950" data-testid="investor-layout">
       {/* Enhanced Mobile Header */}
       <div className="lg:hidden flex items-center justify-between p-4 border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center shadow-lg">
-            <Building className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-serif font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">Zaron</h1>
-            <p className="text-xs text-gray-500">Investment Portal</p>
-          </div>
-        </div>
+        <Logo size="small" showTagline={false} className="scale-75 -mx-3" />
+
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <Button
@@ -112,15 +106,9 @@ export function InvestorLayout({ children }: InvestorLayoutProps) {
         {/* Enhanced Desktop Sidebar */}
         <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white/80 dark:lg:bg-slate-900/80 lg:backdrop-blur-sm lg:shadow-xl">
           <div className="flex flex-col flex-1 overflow-y-auto">
-            {/* Enhanced Logo */}
-            <div className="flex items-center gap-3 px-6 py-6 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 mx-4 mt-4 rounded-2xl border border-emerald-200 dark:border-emerald-800">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <Building className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-serif font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">Zaron</h1>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Investment Portal</p>
-              </div>
+            {/* Logo */}
+            <div className="flex justify-center px-6 py-6">
+              <Logo size="medium" showTagline={false} />
             </div>
 
             {/* Enhanced User Info */}
