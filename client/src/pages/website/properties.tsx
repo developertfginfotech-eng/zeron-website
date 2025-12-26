@@ -200,22 +200,22 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className="overflow-hidden hover-elevate group cursor-pointer border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm" data-property-id={property._id}>
-        <div className="relative cursor-pointer" onClick={() => onDetailsClick(property)}>
-          {/* Image with KYC Lock */}
+      <Card className="bg-white overflow-hidden h-full flex flex-col shadow-lg hover:shadow-xl transition-shadow" data-property-id={property._id}>
+        {/* Property Image */}
+        <div className="h-48 relative bg-gradient-to-br from-emerald-600 to-teal-600 cursor-pointer" onClick={() => onDetailsClick(property)}>
           {isKYCCompleted ? (
             // Show normal image for KYC-approved users
             <img
               src={getImageUrl(property)}
               alt={property.title}
-              className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+              className="w-full h-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop'
               }}
             />
           ) : (
             // Show blurred/locked image for non-KYC users
-            <div className="relative w-full h-56">
+            <>
               <img
                 src={getImageUrl(property)}
                 alt={property.title}
@@ -248,128 +248,92 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
                   </Button>
                 </div>
               </div>
+            </>
+          )}
+          {!isKYCCompleted && (
+            <div className="absolute top-4 left-4 bg-emerald-800/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold">
+              <Lock className="inline h-3 w-3 mr-1" />
+              KYC Required
             </div>
           )}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-          {/* Tags - always visible */}
-          <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-            {tags.map((tag, index) => (
-              <Badge key={index} className={`${tag.class} text-white border-0 backdrop-blur-sm`}>
-                {tag.text}
-              </Badge>
-            ))}
-          </div>
-
-          <div className="absolute top-4 right-4">
-            <Badge className="bg-blue-500/90 text-white border-0 backdrop-blur-sm">
-              <Zap className="w-3 h-3 mr-1" />
-              {property.status === 'active' ? 'Live' : 'Coming Soon'}
-            </Badge>
-          </div>
-
-          {/* Property title and location - always visible */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h3 className="text-xl font-bold text-white mb-1">{property.title}</h3>
-            {property.location && (property.location.address || property.location.city) ? (
-              <div className="flex items-center text-emerald-200">
-                <MapPin className="w-4 h-4 mr-1" />
-                <span className="text-sm">{property.location.address || property.location.city || 'Location TBD'}</span>
-              </div>
-            ) : (
-              <div className="flex items-center text-emerald-200">
-                <MapPin className="w-4 h-4 mr-1" />
-                <span className="text-sm text-orange-300">Location information pending</span>
-              </div>
-            )}
+          <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm text-emerald-700">
+            {Math.round(property.fundingProgress)}% Funded
           </div>
         </div>
 
-        <CardContent className="p-6">
+        <CardContent className="p-6 flex-1 flex flex-col">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">{property.title}</h3>
+          <p className="text-gray-600 mb-4 flex items-center">
+            <span className="mr-1">📍</span>
+            {property.location.district}, {property.location.city}
+          </p>
+
           {isKYCCompleted ? (
             <>
-              {/* Basic info - visible for KYC-approved users */}
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    {property.investorCount}+ investors
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    {remainingDays > 0 ? `${remainingDays} days left` : 'Investment Open'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Funding progress */}
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Funding Progress</span>
-                  <span className="font-medium">{property.fundingProgress}%</span>
-                </div>
-                <Progress value={property.fundingProgress} className="h-2" />
-              </div>
-
-              {/* Financial details */}
-              <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="grid grid-cols-3 gap-3 mb-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Min. Investment</p>
-                  <p className="text-lg font-bold">
-                    SAR {formatCurrency(property.financials.minInvestment)}
+                  <p className="text-xs text-gray-500">Target Return</p>
+                  <p className="text-lg font-bold text-emerald-600">{property.financials.projectedYield}%</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Min. Investment</p>
+                  <p className="text-sm font-bold text-gray-900">
+                    SAR {(property.financials.minInvestment / 1000).toFixed(0)}K
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Expected Return</p>
-                  <p className="text-lg font-bold text-emerald-600">
-                    {property.financials.projectedYield}%
-                  </p>
+                  <p className="text-xs text-gray-500">Investors</p>
+                  <p className="text-sm font-bold text-gray-900">{property.investorCount}</p>
                 </div>
               </div>
 
-              {/* Action buttons for KYC-approved users */}
-              {property.status === 'active' ? (
+              {/* Progress Bar */}
+              <div className="mb-2">
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+                    style={{ width: `${property.fundingProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-6">
+                SAR {((property.financials.totalValue * property.fundingProgress / 100) / 1000000).toFixed(2)}M of SAR {(property.financials.totalValue / 1000000).toFixed(0)}M funded
+              </p>
+
+              <div className="flex gap-3 mt-auto">
                 <Button
-                  size="sm"
-                  className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
-                  onClick={() => {
-                    onDetailsClick(property);
-                  }}
+                  variant="outline"
+                  className="flex-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+                  onClick={() => onDetailsClick(property)}
                 >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  View Property & Invest
+                  Learn More
                 </Button>
-              ) : (
                 <Button
-                  size="sm"
-                  disabled
-                  className="w-full bg-gray-400 cursor-not-allowed"
+                  className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
+                  onClick={() => onInvestClick(property)}
                 >
-                  Coming Soon
+                  Invest Now
                 </Button>
-              )}
+              </div>
             </>
           ) : (
             <>
-              {/* Different prompts for not logged in vs logged in without KYC */}
-              <div className="py-8 text-center">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Lock className="w-6 h-6 text-blue-600" />
+              {/* Locked state for non-KYC users */}
+              <div className="flex-1 flex flex-col justify-center items-center py-8 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Lock className="w-6 h-6 text-gray-400" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">
+                <h3 className="font-semibold text-lg mb-2 text-gray-900">
                   {isLoggedIn ? "Complete KYC Verification" : "Please Login to View Details"}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-6">
+                <p className="text-sm text-gray-600 mb-6">
                   {isLoggedIn
-                    ? "Verify your identity to unlock full property details and start investing. It only takes a few minutes."
-                    : "Sign in to unlock property details and start investing in Saudi Arabia's best real estate opportunities."}
+                    ? "Verify your identity to unlock full property details and start investing."
+                    : "Sign in to unlock property details and start investing."}
                 </p>
                 <Button
                   size="sm"
-                  className="bg-gradient-to-r from-emerald-600 to-blue-600"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
                   onClick={handleKYCRequired}
                 >
                   {isLoggedIn ? "Verify KYC Now" : "Login Now"}
@@ -539,8 +503,8 @@ export default function WebsitePropertiesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/50 dark:from-gray-900 dark:to-emerald-950/50">
-      <div className="container mx-auto px-6 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800">
+      <div className="w-full px-2 py-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -552,7 +516,7 @@ export default function WebsitePropertiesPage() {
             <Button
               variant="ghost"
               onClick={() => setLocation('/website/invest')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-white hover:bg-teal-700/50"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Invest
@@ -560,10 +524,10 @@ export default function WebsitePropertiesPage() {
           </div>
 
           <div className="text-center">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-emerald-600 dark:from-gray-100 dark:to-emerald-400 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold text-white mb-4 uppercase tracking-wide">
               All Investment Properties
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-teal-100 max-w-2xl mx-auto">
               Explore all available real estate investment opportunities in Saudi Arabia
             </p>
           </div>
@@ -577,17 +541,17 @@ export default function WebsitePropertiesPage() {
             transition={{ duration: 0.6 }}
             className="mb-8"
           >
-            <Card className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/50 dark:to-yellow-950/50 border-orange-200 dark:border-orange-800">
+            <Card className="bg-teal-800/90 border border-teal-700/50">
               <CardContent className="flex items-center justify-between py-4">
                 <div className="flex items-center gap-3">
-                  <Shield className="h-8 w-8 text-orange-600" />
+                  <Shield className="h-8 w-8 text-yellow-400" />
                   <div>
-                    <p className="font-semibold text-orange-900 dark:text-orange-100">
+                    <p className="font-semibold text-white">
                       {kycStatus === 'submitted' || kycStatus === 'under_review'
                         ? 'KYC Under Review'
                         : 'Complete Your KYC Verification'}
                     </p>
-                    <p className="text-sm text-orange-800 dark:text-orange-200">
+                    <p className="text-sm text-teal-200">
                       {kycStatus === 'submitted' || kycStatus === 'under_review'
                         ? 'Your documents are being reviewed. Property details will be unlocked once approved.'
                         : 'Verify your identity to unlock full property details and start investing'}
@@ -596,7 +560,7 @@ export default function WebsitePropertiesPage() {
                 </div>
                 {kycStatus !== 'submitted' && kycStatus !== 'under_review' && (
                   <Button
-                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                    className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold"
                     onClick={() => setLocation('/kyc-verification')}
                   >
                     Complete KYC
@@ -613,13 +577,13 @@ export default function WebsitePropertiesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <Card className="mb-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-0 shadow-lg">
+          <Card className="mb-8 bg-teal-800/90 backdrop-blur-sm border border-teal-700/50 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Search className="w-5 h-5 text-yellow-400" />
                 Find Your Perfect Investment
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-teal-200">
                 {isKYCCompleted
                   ? "Search and filter properties - you have full access to all details"
                   : "Browse available properties - complete KYC to unlock full details"}
@@ -630,18 +594,18 @@ export default function WebsitePropertiesPage() {
                 {/* Primary Filters */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-teal-300" />
                     <Input
                       placeholder="Search by title or location..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9 bg-background/50"
+                      className="pl-9 bg-teal-700/50 border-teal-600/50 text-white placeholder:text-teal-300"
                     />
                   </div>
 
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="bg-background/50">
-                      <Filter className="h-4 w-4 mr-2" />
+                    <SelectTrigger className="bg-teal-700/50 border-teal-600/50 text-white">
+                      <Filter className="h-4 w-4 mr-2 text-yellow-400" />
                       <SelectValue placeholder="Filter by status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -652,7 +616,7 @@ export default function WebsitePropertiesPage() {
                   </Select>
 
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="bg-background/50">
+                    <SelectTrigger className="bg-teal-700/50 border-teal-600/50 text-white">
                       <SelectValue placeholder="Property type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -667,8 +631,8 @@ export default function WebsitePropertiesPage() {
                 {/* Advanced Filters */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2 border-t">
                   <Select value={cityFilter} onValueChange={setCityFilter}>
-                    <SelectTrigger className="bg-background/50">
-                      <MapPin className="h-4 w-4 mr-2" />
+                    <SelectTrigger className="bg-teal-700/50 border-teal-600/50 text-white">
+                      <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
                       <SelectValue placeholder="Filter by city" />
                     </SelectTrigger>
                     <SelectContent>
@@ -682,33 +646,33 @@ export default function WebsitePropertiesPage() {
                   </Select>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Price: SAR {minPrice}-{maxPrice}</label>
+                    <label className="text-sm font-medium mb-2 block text-white">Price: SAR {minPrice}-{maxPrice}</label>
                     <div className="flex gap-2">
                       <Input
                         type="number"
                         placeholder="Min"
                         value={minPrice}
                         onChange={(e) => setMinPrice(Math.max(0, parseInt(e.target.value) || 0))}
-                        className="bg-background/50 text-xs"
+                        className="bg-teal-700/50 border-teal-600/50 text-white text-xs"
                       />
                       <Input
                         type="number"
                         placeholder="Max"
                         value={maxPrice}
                         onChange={(e) => setMaxPrice(Math.max(minPrice, parseInt(e.target.value) || 100000))}
-                        className="bg-background/50 text-xs"
+                        className="bg-teal-700/50 border-teal-600/50 text-white text-xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Min Return: {minReturn}%</label>
+                    <label className="text-sm font-medium mb-2 block text-white">Min Return: {minReturn}%</label>
                     <Input
                       type="number"
                       placeholder="Min return %"
                       value={minReturn}
                       onChange={(e) => setMinReturn(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="bg-background/50"
+                      className="bg-teal-700/50 border-teal-600/50 text-white"
                     />
                   </div>
 
@@ -724,7 +688,7 @@ export default function WebsitePropertiesPage() {
                         setMaxPrice(100000);
                         setMinReturn(0);
                       }}
-                      className="w-full"
+                      className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold border-0"
                     >
                       Clear All
                     </Button>
@@ -742,20 +706,20 @@ export default function WebsitePropertiesPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="flex items-center justify-between mb-8"
         >
-          <h2 className="text-2xl font-semibold">
+          <h2 className="text-2xl font-semibold text-white">
             {filteredProperties.length > 0
               ? `${filteredProperties.length} Properties Found`
               : 'No Properties Found'}
           </h2>
           <div className="flex gap-2">
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
               {properties.filter(p => p.status === 'active').length} Live
             </Badge>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
               {properties.filter(p => p.status === 'upcoming').length} Coming Soon
             </Badge>
             {isKYCCompleted && (
-              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+              <Badge variant="outline" className="bg-yellow-400 text-gray-900 border-yellow-500 font-bold">
                 <CheckCircle className="w-3 h-3 mr-1" />
                 KYC Verified
               </Badge>
@@ -766,10 +730,10 @@ export default function WebsitePropertiesPage() {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-20">
-            <Card className="max-w-md mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-0">
+            <Card className="max-w-md mx-auto bg-teal-800/90 backdrop-blur-sm border border-teal-700/50">
               <CardContent className="flex flex-col items-center justify-center py-16">
-                <Loader2 className="h-12 w-12 animate-spin mb-4" />
-                <p className="text-lg text-muted-foreground">Loading properties...</p>
+                <Loader2 className="h-12 w-12 animate-spin mb-4 text-yellow-400" />
+                <p className="text-lg text-white">Loading properties...</p>
               </CardContent>
             </Card>
           </div>
@@ -778,15 +742,15 @@ export default function WebsitePropertiesPage() {
         {/* Error State */}
         {error && !loading && (
           <div className="text-center py-20">
-            <Card className="max-w-md mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-0">
+            <Card className="max-w-md mx-auto bg-teal-800/90 backdrop-blur-sm border border-teal-700/50">
               <CardContent className="flex flex-col items-center justify-center py-16">
-                <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
+                <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
                 <div className="text-center">
-                  <p className="text-lg text-destructive mb-2">Error: {error}</p>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-lg text-red-400 mb-2">Error: {error}</p>
+                  <p className="text-sm text-teal-200 mb-4">
                     Unable to load properties. Please try again.
                   </p>
-                  <Button onClick={fetchProperties} variant="outline">
+                  <Button onClick={fetchProperties} className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
                     Try Again
                   </Button>
                 </div>
@@ -812,21 +776,21 @@ export default function WebsitePropertiesPage() {
         {/* No Properties State */}
         {!loading && !error && filteredProperties.length === 0 && properties.length > 0 && (
           <div className="text-center py-20">
-            <Card className="max-w-md mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-0">
+            <Card className="max-w-md mx-auto bg-teal-800/90 backdrop-blur-sm border border-teal-700/50">
               <CardContent className="flex flex-col items-center justify-center py-16">
-                <Search className="h-12 w-12 text-muted-foreground mb-4" />
+                <Search className="h-12 w-12 text-yellow-400 mb-4" />
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-2">No Properties Found</h3>
-                  <p className="text-muted-foreground mb-4">
+                  <h3 className="text-lg font-semibold mb-2 text-white">No Properties Found</h3>
+                  <p className="text-teal-200 mb-4">
                     No properties match your current search criteria
                   </p>
                   <Button
-                    variant="outline"
                     onClick={() => {
                       setSearchTerm("");
                       setStatusFilter("all");
                       setTypeFilter("all");
                     }}
+                    className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold"
                   >
                     Clear All Filters
                   </Button>
@@ -844,25 +808,24 @@ export default function WebsitePropertiesPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-16"
           >
-            <Card className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white border-0">
+            <Card className="bg-teal-800/90 border border-teal-700/50">
               <CardContent className="text-center py-12">
-                <h3 className="text-3xl font-bold mb-4">Ready to Start Investing?</h3>
-                <p className="text-emerald-100 mb-6 text-lg max-w-2xl mx-auto">
+                <h3 className="text-3xl font-bold mb-4 text-white uppercase">Ready to Start Investing?</h3>
+                <p className="text-teal-200 mb-6 text-lg max-w-2xl mx-auto">
                   {isKYCCompleted
                     ? "You have access! Start building wealth through premium real estate opportunities"
                     : "Complete your KYC verification to unlock full access and start investing"}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {isKYCCompleted ? (
-                    <Button size="lg" variant="secondary" className="bg-white text-emerald-600 hover:bg-gray-100">
+                    <Button size="lg" className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
                       <DollarSign className="w-5 h-5 mr-2" />
                       Start Investing Now
                     </Button>
                   ) : (
                     <Button
                       size="lg"
-                      variant="secondary"
-                      className="bg-white text-emerald-600 hover:bg-gray-100"
+                      className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold"
                       onClick={() => setLocation('/kyc-verification')}
                     >
                       <Shield className="w-5 h-5 mr-2" />
@@ -872,7 +835,7 @@ export default function WebsitePropertiesPage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white text-white hover:bg-white hover:text-emerald-600"
+                    className="border-white text-white hover:bg-white hover:text-gray-900"
                     onClick={() => setLocation('/website/about')}
                   >
                     Learn More

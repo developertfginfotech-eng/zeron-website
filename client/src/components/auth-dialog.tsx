@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/form"
 import { useTranslation } from "@/hooks/use-translation"
 import { useAuth } from "@/hooks/use-auth"
+import Logo from "@/components/logo"
 import { Mail, User, Phone, Globe, TrendingUp, Building, Shield, Star } from "lucide-react"
 import { useLocation } from "wouter"
 
@@ -287,16 +288,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
               {/* Hero content */}
               <div className="relative z-10 space-y-8">
                 <div className="transform transition-all duration-1000 animate-in slide-in-from-left-10">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center shadow-2xl animate-pulse">
-                      <Building className="w-8 h-8 text-white" />
-                    </div>
-                    <div>
-                      <h1 className="font-display text-5xl font-bold bg-gradient-to-r from-emerald-300 via-blue-200 to-purple-300 bg-clip-text text-transparent">
-                        ZARON
-                      </h1>
-                      <p className="font-sans text-blue-200 text-lg">Investment Portal</p>
-                    </div>
+                  <div className="mb-6">
+                    <Logo size="large" showTagline={true} />
                   </div>
                   
                   <h2 className="font-sans text-4xl font-bold mb-6 leading-tight">
