@@ -302,15 +302,8 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
 
               <div className="flex gap-3 mt-auto">
                 <Button
-                  variant="outline"
-                  className="flex-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
                   onClick={() => onDetailsClick(property)}
-                >
-                  Learn More
-                </Button>
-                <Button
-                  className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
-                  onClick={() => onInvestClick(property)}
                 >
                   Invest Now
                 </Button>

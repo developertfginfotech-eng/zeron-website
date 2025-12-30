@@ -241,7 +241,12 @@ export default function InvestorDashboard() {
       }
     }
 
-    return selectedInvestment.amount * (penaltyPercentage / 100)
+    // Calculate penalty on total amount (Principal + Rental Yield)
+    const principalAmount = selectedInvestment.amount
+    const rentalYieldEarned = selectedInvestment.returns || 0
+    const totalAmount = principalAmount + rentalYieldEarned
+
+    return totalAmount * (penaltyPercentage / 100)
   }
 
   // Get actual penalty rate (graduated or flat)
