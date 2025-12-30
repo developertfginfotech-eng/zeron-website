@@ -273,24 +273,22 @@ export default function InvestorDashboard() {
   const calculateManagementFee = () => {
     if (!selectedInvestment) return 0
 
-    const investmentAmount = selectedInvestment.amount
-    const investmentDate = new Date(selectedInvestment.investmentDate || selectedInvestment.createdAt)
-    const now = new Date()
-    const yearsPassed = (now.getTime() - investmentDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+    // Calculate total amount = Principal + Rental Yield Earned
+    const principalAmount = selectedInvestment.amount
+    const rentalYieldEarned = selectedInvestment.returns || 0
+    const totalAmount = principalAmount + rentalYieldEarned
 
     // Get management fee percentage from property (should be in selectedInvestment)
     const managementFeePercentage = selectedInvestment.managementFeePercentage || 0
     const managementFeeDeductionType = selectedInvestment.managementFeeDeductionType || 'upfront'
 
-    // Only calculate if deduction type is annual or monthly
-    if (managementFeeDeductionType === 'annual') {
-      return (investmentAmount * managementFeePercentage * yearsPassed) / 100
-    } else if (managementFeeDeductionType === 'monthly') {
-      const monthsPassed = yearsPassed * 12
-      return (investmentAmount * managementFeePercentage * monthsPassed) / 100
-    }
     // For 'upfront', fee was already deducted at investment time
-    return 0
+    if (managementFeeDeductionType === 'upfront') {
+      return 0
+    }
+
+    // Calculate fee as simple percentage of total amount (Principal + Rental Yield)
+    return (totalAmount * managementFeePercentage) / 100
   }
 
   const managementFee = calculateManagementFee()
