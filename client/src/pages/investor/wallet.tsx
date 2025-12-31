@@ -392,7 +392,7 @@ export default function InvestorWallet() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <WalletIcon className="w-6 h-6 text-green-400" />
+                <WalletIcon className="w-6 h-6 text-yellow-400" />
               </div>
             </div>
             <div>
@@ -410,12 +410,12 @@ export default function InvestorWallet() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <TrendingUp className="w-6 h-6 text-green-400" />
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
             </div>
             <div>
               <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Returns</p>
-              <p className="text-2xl font-mono font-bold text-green-400">
+              <p className="text-2xl font-mono font-bold text-yellow-400">
                 +SAR {totalReturns.toLocaleString()}
               </p>
               <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">From all investments</p>
@@ -428,7 +428,7 @@ export default function InvestorWallet() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <DollarSign className="w-6 h-6 text-green-400" />
+                <DollarSign className="w-6 h-6 text-yellow-400" />
               </div>
             </div>
             <div>
@@ -446,7 +446,7 @@ export default function InvestorWallet() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <CheckCircle className="w-6 h-6 text-green-400" />
+                <CheckCircle className="w-6 h-6 text-yellow-400" />
               </div>
             </div>
             <div>
@@ -473,7 +473,7 @@ export default function InvestorWallet() {
           <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-teal-900 dark:text-white">
-                <Clock className="w-5 h-5 text-green-400" />
+                <Clock className="w-5 h-5 text-yellow-400" />
                 Transaction History
               </CardTitle>
               <CardDescription className="text-teal-700 dark:text-teal-200">View all your wallet transactions</CardDescription>
@@ -482,7 +482,7 @@ export default function InvestorWallet() {
               <div className="space-y-4">
                 {allItems.length === 0 ? (
                   <div className="text-center py-8">
-                    <Clock className="w-12 h-12 text-green-400 mx-auto mb-3" />
+                    <Clock className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
                     <p className="text-teal-900 dark:text-white">No transactions yet</p>
                     <p className="text-sm text-teal-700 dark:text-teal-200">Your transactions will appear here</p>
                   </div>
@@ -510,8 +510,8 @@ export default function InvestorWallet() {
                             isMoneyOut ? 'bg-red-100 dark:bg-red-900/30' :
                             'bg-blue-100 dark:bg-blue-900/30'
                           }`}>
-                            {isMoneyIn && <ArrowDownLeft className="h-5 w-5 text-green-600" />}
-                            {isMoneyOut && <ArrowUpRight className={`h-5 w-5 ${item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-green-600' : 'text-red-600'}`} />}
+                            {isMoneyIn && <ArrowDownLeft className="h-5 w-5 text-yellow-600" />}
+                            {isMoneyOut && <ArrowUpRight className={`h-5 w-5 ${item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-yellow-600' : 'text-red-600'}`} />}
                           </div>
                           <div>
                             <p className="font-semibold text-teal-900 dark:text-white">
@@ -524,8 +524,8 @@ export default function InvestorWallet() {
                         </div>
                         <div className="text-right">
                           <p className={`text-2xl font-mono font-bold ${
-                            isMoneyIn ? 'text-green-600 dark:text-green-400' :
-                            isMoneyOut && item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-green-600 dark:text-green-400' :
+                            isMoneyIn ? 'text-yellow-600 dark:text-yellow-400' :
+                            isMoneyOut && item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? 'text-yellow-600 dark:text-yellow-400' :
                             'text-red-600 dark:text-red-400'
                           }`}>
                             {displayAmount > 0 ? '+' : ''}SAR {Math.abs(displayAmount).toLocaleString()}
@@ -538,17 +538,17 @@ export default function InvestorWallet() {
                               : 'bg-blue-500/20 border-blue-400/30'
                           }`}>
                             {item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing') ? (
-                              <Clock className="h-3 w-3 text-green-600 dark:text-green-300" />
+                              <Clock className="h-3 w-3 text-yellow-600 dark:text-yellow-300" />
                             ) : item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved' ? (
-                              <CheckCircle className="h-3 w-3 text-green-600 dark:text-green-300" />
+                              <CheckCircle className="h-3 w-3 text-yellow-600 dark:text-yellow-300" />
                             ) : (
                               <Clock className="h-3 w-3 text-blue-600 dark:text-blue-300" />
                             )}
                             <span className={`text-xs font-semibold ${
                               item.isWithdrawalRequest && (item.status === 'pending' || item.status === 'processing')
-                                ? 'text-green-700 dark:text-green-300' :
+                                ? 'text-yellow-700 dark:text-yellow-300' :
                               item.status === 'completed' || item.status === 'confirmed' || item.status === 'approved'
-                                ? 'text-green-700 dark:text-green-300'
+                                ? 'text-yellow-700 dark:text-yellow-300'
                                 : 'text-blue-700 dark:text-blue-300'
                             }`}>
                               {statusLabel}
@@ -569,7 +569,7 @@ export default function InvestorWallet() {
           <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-teal-900 dark:text-white">
-                <TrendingUp className="w-5 h-5 text-green-400" />
+                <TrendingUp className="w-5 h-5 text-yellow-400" />
                 Property-wise Returns
               </CardTitle>
               <CardDescription className="text-teal-700 dark:text-teal-200">Detailed breakdown of returns from each property</CardDescription>
@@ -578,7 +578,7 @@ export default function InvestorWallet() {
               <div className="space-y-4">
                 {propertyReturns.length === 0 ? (
                   <div className="text-center py-8">
-                    <Building className="w-12 h-12 text-green-400 mx-auto mb-3" />
+                    <Building className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
                     <p className="text-teal-900 dark:text-white">No property investments yet</p>
                     <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see returns</p>
                   </div>
@@ -600,7 +600,7 @@ export default function InvestorWallet() {
                         <p className="text-2xl font-mono font-bold text-white">
                           +SAR {item.returns.toLocaleString()}
                         </p>
-                        <p className="text-sm text-green-400 font-semibold">
+                        <p className="text-sm text-yellow-400 font-semibold">
                           +{item.returnRate.toFixed(2)}% return
                         </p>
                       </div>
@@ -619,7 +619,7 @@ export default function InvestorWallet() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-3xl font-mono font-bold text-green-400">
+                        <p className="text-3xl font-mono font-bold text-yellow-400">
                           +SAR {totalReturns.toLocaleString()}
                         </p>
                       </div>
@@ -637,7 +637,7 @@ export default function InvestorWallet() {
             <Card className="hover:shadow-lg transition-all bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
-                  <ArrowDownLeft className="w-5 h-5 text-green-400" />
+                  <ArrowDownLeft className="w-5 h-5 text-yellow-400" />
                   Deposit Funds
                 </CardTitle>
                 <CardDescription className="text-teal-700 dark:text-teal-200">Add money to your wallet</CardDescription>
@@ -657,7 +657,7 @@ export default function InvestorWallet() {
             <Card className="hover:shadow-lg transition-all bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
-                  <ArrowUpRight className="w-5 h-5 text-green-400" />
+                  <ArrowUpRight className="w-5 h-5 text-yellow-400" />
                   Withdraw Funds
                 </CardTitle>
                 <CardDescription className="text-teal-700 dark:text-teal-200">Transfer money to your bank</CardDescription>
@@ -686,7 +686,7 @@ export default function InvestorWallet() {
             <Card className="hover:shadow-lg transition-all bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
-                  <CreditCard className="w-5 h-5 text-green-400" />
+                  <CreditCard className="w-5 h-5 text-yellow-400" />
                   Payment Methods
                 </CardTitle>
                 <CardDescription className="text-teal-700 dark:text-teal-200">Manage payment options</CardDescription>
