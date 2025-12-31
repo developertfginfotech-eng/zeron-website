@@ -140,7 +140,7 @@ export default function PropertyDetailsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-yellow-400" />
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-green-400" />
           <p className="text-lg text-teal-200">Loading property details...</p>
         </div>
       </div>
@@ -237,7 +237,7 @@ export default function PropertyDetailsPage() {
                 <div className="flex-1">
                   <h1 className="text-3xl font-bold text-white mb-2">{property.title}</h1>
                   <p className="flex items-center gap-2 text-teal-200 text-base">
-                    <MapPin className="w-5 h-5 text-yellow-400" />
+                    <MapPin className="w-5 h-5 text-green-400" />
                     {property.location?.address}, {property.location?.city}
                   </p>
                 </div>
@@ -285,7 +285,7 @@ export default function PropertyDetailsPage() {
 
                   <div className="bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
                     <p className="text-sm text-teal-300 mb-1 uppercase">Projected Yield</p>
-                    <p className="text-2xl font-bold text-yellow-400">
+                    <p className="text-2xl font-bold text-green-400">
                       {property.financials?.projectedYield}%
                     </p>
                   </div>
@@ -400,7 +400,7 @@ export default function PropertyDetailsPage() {
                 </div>
 
                 <div className="flex items-center gap-3 p-3 bg-teal-900/70 rounded-xl border border-teal-700/50">
-                  <DollarSign className="w-5 h-5 text-yellow-400" />
+                  <DollarSign className="w-5 h-5 text-green-400" />
                   <div>
                     <p className="text-sm text-teal-300 uppercase">Total Invested</p>
                     <p className="font-bold text-white">SAR {property.totalInvested?.toLocaleString() || 0}</p>
@@ -412,7 +412,7 @@ export default function PropertyDetailsPage() {
             {/* Investment Calculator */}
             <div className="rounded-2xl bg-teal-800/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-4">
               <div className="flex items-center gap-2 mb-4">
-                <Calculator className="w-5 h-5 text-yellow-400" />
+                <Calculator className="w-5 h-5 text-green-400" />
                 <h2 className="text-2xl font-bold text-white uppercase tracking-wide">Investment Calculator</h2>
               </div>
               <p className="text-teal-200 mb-6">Estimate your returns based on units purchased</p>

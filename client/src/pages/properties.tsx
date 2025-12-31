@@ -337,9 +337,9 @@ const KYCStatusBanner = ({ userStatus }: { userStatus: UserStatus }) => {
     return (
       <Card className="mb-6 bg-yellow-50 border-yellow-200">
         <CardContent className="flex items-center gap-3 py-4">
-          <Loader2 className="h-5 w-5 text-yellow-600 animate-spin" />
+          <Loader2 className="h-5 w-5 text-green-600 animate-spin" />
           <div>
-            <p className="font-semibold text-yellow-800">KYC Under Review</p>
+            <p className="font-semibold text-green-800">KYC Under Review</p>
             <p className="text-sm text-yellow-700">We're reviewing your documents. Property images will be unlocked once approved.</p>
           </div>
         </CardContent>

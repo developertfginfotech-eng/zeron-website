@@ -204,9 +204,9 @@ export default function InvestorProfile() {
               </div>
               <p className="text-emerald-100 text-lg mb-3">{userProfile?.email || user?.email}</p>
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-teal-700/50 backdrop-blur-sm rounded-full px-4 py-2 border border-yellow-400/30">
+                <div className="flex items-center gap-2 bg-teal-700/50 backdrop-blur-sm rounded-full px-4 py-2 border border-green-400/30">
                   <div className="w-3 h-3 rounded-full bg-yellow-400 animate-pulse" />
-                  <span className="font-semibold text-yellow-200">Active Investor</span>
+                  <span className="font-semibold text-green-200">Active Investor</span>
                 </div>
                 {kycData?.status === 'approved' && (
                   <div className="flex items-center gap-2 bg-green-500/20 border border-green-400/30 rounded-full px-4 py-2">
@@ -215,9 +215,9 @@ export default function InvestorProfile() {
                   </div>
                 )}
                 {kycData?.status === 'pending' && (
-                  <div className="flex items-center gap-2 bg-yellow-500/20 border border-yellow-400/30 rounded-full px-4 py-2">
-                    <Clock className="w-4 h-4 text-yellow-300" />
-                    <span className="font-semibold text-yellow-200">Verification Pending</span>
+                  <div className="flex items-center gap-2 bg-green-500/20 border border-green-400/30 rounded-full px-4 py-2">
+                    <Clock className="w-4 h-4 text-green-300" />
+                    <span className="font-semibold text-green-200">Verification Pending</span>
                   </div>
                 )}
               </div>
@@ -307,7 +307,7 @@ export default function InvestorProfile() {
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${
                     section.completed
                       ? 'bg-green-500/20 border-green-400/30 text-green-400'
-                      : 'bg-teal-700/50 border-teal-600/30 text-yellow-400'
+                      : 'bg-teal-700/50 border-teal-600/30 text-green-400'
                   }`}>
                     {section.icon}
                   </div>
@@ -320,18 +320,18 @@ export default function InvestorProfile() {
                   {section.completed ? (
                     <CheckCircle className="w-5 h-5 text-green-400" />
                   ) : (
-                    <Clock className="w-5 h-5 text-yellow-400" />
+                    <Clock className="w-5 h-5 text-green-400" />
                   )}
                   <div className={`px-3 py-1.5 rounded-lg border ${
                     section.completed
                       ? 'bg-green-500/20 border-green-400/30 text-green-300'
-                      : 'bg-yellow-500/20 border-yellow-400/30 text-yellow-300'
+                      : 'bg-green-500/20 border-green-400/30 text-green-300'
                   }`}>
                     <span className="text-sm font-bold uppercase">
                       {section.completed ? 'Completed' : 'Pending'}
                     </span>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-yellow-400" />
+                  <ChevronRight className="w-5 h-5 text-green-400" />
                 </div>
               </div>
 
@@ -361,7 +361,7 @@ export default function InvestorProfile() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-teal-700/50 flex items-center justify-center border border-teal-600/30">
-                <Shield className="h-6 w-6 text-yellow-400" />
+                <Shield className="h-6 w-6 text-green-400" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white uppercase tracking-wide">KYC Information</h3>
@@ -444,12 +444,12 @@ export default function InvestorProfile() {
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.nationalId.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
-                        : 'bg-yellow-500/20 border-yellow-400/30'
+                        : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.nationalId.uploaded ? (
                         <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
                       )}
                     </div>
                   </div>
@@ -460,12 +460,12 @@ export default function InvestorProfile() {
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.addressProof.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
-                        : 'bg-yellow-500/20 border-yellow-400/30'
+                        : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.addressProof.uploaded ? (
                         <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
                       )}
                     </div>
                   </div>
@@ -476,12 +476,12 @@ export default function InvestorProfile() {
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.selfie.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
-                        : 'bg-yellow-500/20 border-yellow-400/30'
+                        : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.selfie.uploaded ? (
                         <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
                       )}
                     </div>
                   </div>
@@ -492,12 +492,12 @@ export default function InvestorProfile() {
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.proofOfIncome.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
-                        : 'bg-yellow-500/20 border-yellow-400/30'
+                        : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.proofOfIncome.uploaded ? (
                         <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-300" /><span className="text-sm font-semibold text-yellow-600 dark:text-yellow-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
                       )}
                     </div>
                   </div>
@@ -512,7 +512,7 @@ export default function InvestorProfile() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-teal-700/50 flex items-center justify-center border border-teal-600/30">
-            <FileText className="h-6 w-6 text-yellow-400" />
+            <FileText className="h-6 w-6 text-green-400" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-white uppercase tracking-wide">Quick Actions</h3>
