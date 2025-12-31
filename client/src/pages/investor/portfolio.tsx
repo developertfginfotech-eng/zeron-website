@@ -543,15 +543,14 @@ export default function InvestorPortfolio() {
 
                               {/* Withdrawal Button */}
                               {investment.status === 'Active' && (
-                                <div className="mt-4 pt-4 border-t border-teal-700/30">
+                                <div className="mt-4 pt-4 border-t border-teal-700/30 flex justify-end">
                                   <Button
                                     onClick={() => openWithdrawDialog(investment)}
-                                    variant="outline"
                                     size="sm"
-                                    className="w-full sm:w-auto border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 border-0"
                                   >
                                     <LogOut className="w-4 h-4 mr-2" />
-                                    Request Withdrawal
+                                    Exit Investment
                                   </Button>
                                 </div>
                               )}
