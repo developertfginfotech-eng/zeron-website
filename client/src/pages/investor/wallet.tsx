@@ -499,7 +499,8 @@ export default function InvestorWallet() {
                        item.status === 'approved' ? 'Approved' :
                        item.status === 'processing' ? 'Processing' :
                        item.status === 'completed' ? 'Completed' :
-                       item.status === 'rejected' ? 'Rejected' : item.status) : item.status
+                       item.status === 'rejected' ? 'Rejected' :
+                       item.status === 'cancelled' ? 'Cancelled by User' : item.status) : item.status
 
                     return (
                       <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-teal-100 dark:bg-teal-700/50 border border-teal-300 dark:border-teal-600/30">
