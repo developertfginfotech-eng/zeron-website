@@ -478,7 +478,7 @@ export default function PropertyDetailsPage() {
                         variant={calculatorView === 'annual' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setCalculatorView('annual')}
-                        className={calculatorView === 'annual' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'border-teal-700 text-teal-700 dark:text-teal-200 hover:bg-teal-700/50 hover:text-white'}
+                        className={calculatorView === 'annual' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'border-white text-white hover:bg-teal-700/50 hover:text-white'}
                       >
                         <TrendingUp className="w-4 h-4 mr-2" />
                         Annual Returns
@@ -487,7 +487,7 @@ export default function PropertyDetailsPage() {
                         variant={calculatorView === 'bond' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setCalculatorView('bond')}
-                        className={calculatorView === 'bond' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'border-teal-700 text-teal-700 dark:text-teal-200 hover:bg-teal-700/50 hover:text-white'}
+                        className={calculatorView === 'bond' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'border-white text-white hover:bg-teal-700/50 hover:text-white'}
                       >
                         <Clock className="w-4 h-4 mr-2" />
                         Bond Investment

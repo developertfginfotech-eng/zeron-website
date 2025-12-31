@@ -520,7 +520,7 @@ export default function WebsitePropertiesPage() {
             <h1 className="text-4xl font-bold text-white mb-4 uppercase tracking-wide">
               All Investment Properties
             </h1>
-            <p className="text-xl text-teal-100 max-w-2xl mx-auto">
+            <p className="text-xl text-white max-w-2xl mx-auto">
               Explore all available real estate investment opportunities in Saudi Arabia
             </p>
           </div>
@@ -544,7 +544,7 @@ export default function WebsitePropertiesPage() {
                         ? 'KYC Under Review'
                         : 'Complete Your KYC Verification'}
                     </p>
-                    <p className="text-sm text-teal-200">
+                    <p className="text-sm text-white">
                       {kycStatus === 'submitted' || kycStatus === 'under_review'
                         ? 'Your documents are being reviewed. Property details will be unlocked once approved.'
                         : 'Verify your identity to unlock full property details and start investing'}
@@ -576,7 +576,7 @@ export default function WebsitePropertiesPage() {
                 <Search className="w-5 h-5 text-yellow-400" />
                 Find Your Perfect Investment
               </CardTitle>
-              <CardDescription className="text-teal-200">
+              <CardDescription className="text-white">
                 {isKYCCompleted
                   ? "Search and filter properties - you have full access to all details"
                   : "Browse available properties - complete KYC to unlock full details"}
@@ -592,7 +592,7 @@ export default function WebsitePropertiesPage() {
                       placeholder="Search by title or location..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9 bg-teal-700/50 border-teal-600/50 text-white placeholder:text-teal-300"
+                      className="pl-9 bg-teal-700/50 border-teal-600/50 text-white placeholder:text-white/70"
                     />
                   </div>
 
