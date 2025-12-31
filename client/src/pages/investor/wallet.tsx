@@ -375,7 +375,7 @@ export default function InvestorWallet() {
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
               <p className="text-white text-sm mb-1 uppercase">Total Returns</p>
-              <p className="text-3xl font-mono font-bold text-green-400">+SAR {totalReturns.toLocaleString()}</p>
+              <p className="text-3xl font-mono font-bold text-yellow-400">+SAR {totalReturns.toLocaleString()}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
               <p className="text-white text-sm mb-1 uppercase">Pending</p>
