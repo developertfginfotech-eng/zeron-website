@@ -349,8 +349,8 @@ export default function InvestorDashboard() {
               <p className="text-emerald-100 text-sm font-medium">Total Portfolio Value</p>
               <p className="text-3xl font-mono font-bold">SAR {portfolioValue.toLocaleString()}</p>
               <div className="flex items-center gap-2 mt-2">
-                <ArrowUpRight className="w-4 h-4 text-green-300" />
-                <span className="text-green-300 font-semibold">
+                <ArrowUpRight className="w-4 h-4 text-yellow-300" />
+                <span className="text-yellow-300 font-semibold">
                   {portfolioGrowthPercentage >= 0 ? '+' : ''}{portfolioGrowthPercentage.toFixed(1)}%
                 </span>
               </div>
@@ -426,7 +426,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <TrendingUp className="w-6 h-6 text-green-400" />
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-sm font-semibold text-teal-700">
@@ -448,7 +448,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <TrendingUp className="w-6 h-6 text-green-400" />
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-sm font-semibold text-teal-700">
@@ -470,7 +470,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <TrendingUp className="w-6 h-6 text-green-400" />
+                <TrendingUp className="w-6 h-6 text-yellow-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-sm font-semibold text-teal-700">
@@ -492,7 +492,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <Building className="w-6 h-6 text-green-400" />
+                <Building className="w-6 h-6 text-yellow-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-xs font-semibold text-teal-700">+2 this month</span>
@@ -514,7 +514,7 @@ export default function InvestorDashboard() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <PieChart className="h-6 w-6 text-green-400" />
+                <PieChart className="h-6 w-6 text-yellow-400" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white uppercase tracking-wide">
@@ -549,7 +549,7 @@ export default function InvestorDashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                  <Calendar className="h-6 w-6 text-green-400" />
+                  <Calendar className="h-6 w-6 text-yellow-400" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white uppercase tracking-wide">
@@ -585,7 +585,7 @@ export default function InvestorDashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                  <CheckCircle className="h-6 w-6 text-green-400" />
+                  <CheckCircle className="h-6 w-6 text-yellow-400" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white uppercase tracking-wide">
@@ -604,10 +604,10 @@ export default function InvestorDashboard() {
                       ? 'bg-blue-500/20 border-blue-400/30'
                       : 'bg-orange-500/20 border-orange-400/30'
                   }`}>
-                    {user?.kycStatus === 'approved' && <CheckCircle className="w-5 h-5 text-green-400" />}
+                    {user?.kycStatus === 'approved' && <CheckCircle className="w-5 h-5 text-yellow-400" />}
                     <span className={`text-sm font-bold uppercase ${
                       user?.kycStatus === 'approved'
-                        ? 'text-green-300'
+                        ? 'text-yellow-300'
                         : user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review'
                         ? 'text-blue-300'
                         : 'text-orange-300'
@@ -656,7 +656,7 @@ export default function InvestorDashboard() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-              <Building className="h-6 w-6 text-green-400" />
+              <Building className="h-6 w-6 text-yellow-400" />
             </div>
             <div>
               <h3 className="text-2xl font-bold text-white uppercase tracking-wide">
@@ -687,7 +687,7 @@ export default function InvestorDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                    <Building className="w-6 h-6 text-green-400" />
+                    <Building className="w-6 h-6 text-yellow-400" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-white text-lg">
@@ -714,7 +714,7 @@ export default function InvestorDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-teal-200 uppercase">Returns</p>
-                    <p className={`text-lg font-mono font-bold ${investment.returns >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                    <p className={`text-lg font-mono font-bold ${investment.returns >= 0 ? 'text-yellow-300' : 'text-red-300'}`}>
                       +SAR {investment.returns.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
@@ -722,7 +722,7 @@ export default function InvestorDashboard() {
                         investment.status === 'confirmed' ? 'bg-green-400 animate-pulse' : 'bg-orange-400'
                       }`} />
                       <span className={`text-xs font-medium capitalize ${
-                        investment.status === 'confirmed' ? 'text-green-400' : 'text-orange-400'
+                        investment.status === 'confirmed' ? 'text-yellow-400' : 'text-orange-400'
                       }`}>
                         {investment.status === 'confirmed' ? 'Active' : investment.status}
                       </span>
@@ -753,7 +753,7 @@ export default function InvestorDashboard() {
               <p className="text-sm text-teal-200 uppercase">Across {activeInvestments} properties</p>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-mono font-bold text-green-400">SAR {totalInvested.toLocaleString()}</p>
+              <p className="text-3xl font-mono font-bold text-yellow-400">SAR {totalInvested.toLocaleString()}</p>
               <p className="text-sm text-teal-200 font-medium uppercase">Total Invested</p>
             </div>
           </div>
@@ -767,7 +767,7 @@ export default function InvestorDashboard() {
             <AlertDialogTitle className="text-2xl font-serif">
               {selectedInvestment?.isAfterMaturity
                 ? "Confirm Withdrawal"
-                : "Early Withdrawal Warning"}
+                : "Investment Exit Confirmation"}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4 text-base">
               {!selectedInvestment?.isAfterMaturity && penalty > 0 && (
@@ -775,9 +775,9 @@ export default function InvestorDashboard() {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-red-900">Early Withdrawal Penalty</p>
+                      <p className="font-semibold text-red-900">Pre-Maturity Exit Fee</p>
                       <p className="text-sm text-red-700 mt-1">
-                        You are withdrawing before the maturity date. A penalty of {getActualPenaltyRate()}% will be applied.
+                        You are exiting before the maturity date. A pre-maturity exit fee of {getActualPenaltyRate()}% will be applied.
                       </p>
                     </div>
                   </div>
@@ -799,14 +799,14 @@ export default function InvestorDashboard() {
 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Rental Yield Earned:</span>
-                  <span className="font-mono font-semibold text-green-600">
+                  <span className="font-mono font-semibold text-yellow-600">
                     +SAR {selectedInvestment?.returns?.toLocaleString() || 0}
                   </span>
                 </div>
 
                 {withdrawalDetails?.penalty?.isInLockInPeriod && withdrawalDetails?.penalty?.penaltyAmount > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Early Withdrawal Penalty ({withdrawalDetails?.penalty?.penaltyPercentage}%):</span>
+                    <span className="text-gray-600">Pre-Maturity Exit Fee ({withdrawalDetails?.penalty?.penaltyPercentage}%):</span>
                     <span className="font-mono font-semibold text-red-600">
                       -SAR {withdrawalDetails?.penalty?.penaltyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
