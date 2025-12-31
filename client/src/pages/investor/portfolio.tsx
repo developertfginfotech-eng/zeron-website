@@ -174,7 +174,7 @@ export default function InvestorPortfolio() {
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
               <p className="text-white text-sm mb-1 uppercase">Total Returns</p>
-              <p className="text-3xl font-mono font-bold text-green-400">+SAR {totalReturns.toLocaleString()}</p>
+              <p className="text-3xl font-mono font-bold text-yellow-400">+SAR {totalReturns.toLocaleString()}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
               <p className="text-white text-sm mb-1 uppercase">Active Investments</p>
@@ -346,7 +346,7 @@ export default function InvestorPortfolio() {
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                             <p className="text-xs text-emerald-100 mb-1">Total Returns</p>
-                            <p className="text-lg font-mono font-bold text-green-300">+SAR {totalReturnsInProperty.toLocaleString()}</p>
+                            <p className="text-lg font-mono font-bold text-yellow-300">+SAR {totalReturnsInProperty.toLocaleString()}</p>
                           </div>
                         </div>
                       </div>
@@ -410,7 +410,7 @@ export default function InvestorPortfolio() {
                                 {/* Net Investment */}
                                 <div className="text-center">
                                   <p className="text-xs text-teal-200 mb-1">Net Amount</p>
-                                  <p className="font-mono font-semibold text-sm text-green-400">SAR {investment.netInvestment.toLocaleString()}</p>
+                                  <p className="font-mono font-semibold text-sm text-yellow-400">SAR {investment.netInvestment.toLocaleString()}</p>
                                 </div>
 
                                 {/* Current Value */}
@@ -421,11 +421,11 @@ export default function InvestorPortfolio() {
 
                                 {/* Returns */}
                                 <div className="text-center">
-                                  <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-green-400' : 'text-red-400'}`}>Returns</p>
-                                  <p className={`font-mono font-bold text-sm ${investment.returns >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>Returns</p>
+                                  <p className={`font-mono font-bold text-sm ${investment.returns >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>
                                     {investment.returns >= 0 ? '+' : ''}SAR {investment.returns.toLocaleString()}
                                   </p>
-                                  <p className={`text-xs font-medium ${investment.returnRate >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                                  <p className={`text-xs font-medium ${investment.returnRate >= 0 ? 'text-yellow-300' : 'text-red-300'}`}>
                                     {investment.returnRate >= 0 ? '+' : ''}{investment.returnRate.toFixed(1)}%
                                   </p>
                                 </div>
