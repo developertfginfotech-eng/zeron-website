@@ -800,7 +800,7 @@ export default function InvestorDashboard() {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Rental Yield Earned:</span>
                   <span className="font-mono font-semibold text-yellow-600">
-                    +SAR {selectedInvestment?.returns?.toLocaleString() || 0}
+                    +SAR {(withdrawalDetails?.rentalYield?.netRentalYield || selectedInvestment?.returns || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
 
