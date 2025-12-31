@@ -15,11 +15,36 @@ import {
   Loader2,
   Wallet,
   PieChart,
-  Target
+  Target,
+  AlertCircle,
+  LogOut
 } from "lucide-react"
+import { useState } from "react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { apiClient, API_ENDPOINTS } from "@/lib/api-client"
+import { useToast } from "@/hooks/use-toast"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function InvestorPortfolio() {
   const [, setLocation] = useLocation()
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
+
+  // State for withdrawal dialog
+  const [selectedInvestment, setSelectedInvestment] = useState<any>(null)
+  const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false)
+  const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const [withdrawalDetails, setWithdrawalDetails] = useState<any>(null)
+  const [isLoadingWithdrawalDetails, setIsLoadingWithdrawalDetails] = useState(false)
 
   // Fetch real data from backend API
   const { data: portfolioData, isLoading: portfolioLoading } = usePortfolio()
@@ -144,6 +169,71 @@ export default function InvestorPortfolio() {
     { name: 'Jun', value: totalInvested * 1.20 },
     { name: 'Jul', value: portfolioValue },
   ]
+
+  // Fetch withdrawal details from backend
+  const fetchWithdrawalDetails = async (investmentId: string) => {
+    setIsLoadingWithdrawalDetails(true)
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.GET_INVESTMENT_RETURNS(investmentId)
+      ) as any
+
+      if (response.success && response.data) {
+        setWithdrawalDetails(response.data)
+      }
+    } catch (error) {
+      console.error('Error fetching withdrawal details:', error)
+    } finally {
+      setIsLoadingWithdrawalDetails(false)
+    }
+  }
+
+  // Open withdrawal dialog
+  const openWithdrawDialog = (investment: any) => {
+    setSelectedInvestment(investment)
+    setWithdrawalDetails(null)
+    fetchWithdrawalDetails(investment.id)
+    setIsWithdrawDialogOpen(true)
+  }
+
+  // Handle withdrawal submission
+  const handleWithdraw = async () => {
+    if (!selectedInvestment) return
+
+    setIsWithdrawing(true)
+    try {
+      const response = await apiClient.post(
+        API_ENDPOINTS.WITHDRAW_INVESTMENT(selectedInvestment.id),
+        {}
+      ) as any
+
+      if (response.success) {
+        toast({
+          title: "Withdrawal Request Submitted",
+          description: "Please wait for your withdrawal request to be approved within 24-48 hours.",
+          duration: 6000,
+        })
+
+        // Refresh investment data
+        queryClient.invalidateQueries({ queryKey: ['my-investments'] })
+        queryClient.invalidateQueries({ queryKey: ['portfolio'] })
+
+        setIsWithdrawDialogOpen(false)
+        setSelectedInvestment(null)
+        setWithdrawalDetails(null)
+      } else {
+        throw new Error(response.message || 'Failed to submit withdrawal request')
+      }
+    } catch (error: any) {
+      toast({
+        title: "Withdrawal Failed",
+        description: error.message || 'Failed to submit withdrawal request. Please try again.',
+        variant: "destructive",
+      })
+    } finally {
+      setIsWithdrawing(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800 p-6 space-y-8">
@@ -450,6 +540,21 @@ export default function InvestorPortfolio() {
                                   </p>
                                 </div>
                               </div>
+
+                              {/* Withdrawal Button */}
+                              {investment.status === 'Active' && (
+                                <div className="mt-4 pt-4 border-t border-teal-700/30">
+                                  <Button
+                                    onClick={() => openWithdrawDialog(investment)}
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full sm:w-auto border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                                  >
+                                    <LogOut className="w-4 h-4 mr-2" />
+                                    Request Withdrawal
+                                  </Button>
+                                </div>
+                              )}
                           </div>
                         ))}
                       </div>
@@ -590,6 +695,103 @@ export default function InvestorPortfolio() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Withdrawal Confirmation Dialog */}
+      <AlertDialog open={isWithdrawDialogOpen} onOpenChange={setIsWithdrawDialogOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-serif">
+              Investment Exit Confirmation
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-4 text-base">
+              {withdrawalDetails?.penalty?.isInLockInPeriod && withdrawalDetails?.penalty?.penaltyAmount > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-red-900">Pre-Maturity Exit Fee</p>
+                      <p className="text-sm text-red-700 mt-1">
+                        You are exiting before the maturity date. A pre-maturity exit fee of {withdrawalDetails?.penalty?.penaltyPercentage}% will be applied.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Property:</span>
+                  <span className="font-semibold text-gray-900">{selectedInvestment?.property}</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Principal Amount:</span>
+                  <span className="font-mono font-semibold text-gray-900">
+                    SAR {selectedInvestment?.investedAmount?.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Rental Yield Earned:</span>
+                  <span className="font-mono font-semibold text-yellow-600">
+                    +SAR {(withdrawalDetails?.rentalYield?.netRentalYield || selectedInvestment?.returns || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                {withdrawalDetails?.penalty?.isInLockInPeriod && withdrawalDetails?.penalty?.penaltyAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Pre-Maturity Exit Fee ({withdrawalDetails?.penalty?.penaltyPercentage}%):</span>
+                    <span className="font-mono font-semibold text-red-600">
+                      -SAR {withdrawalDetails?.penalty?.penaltyAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                )}
+
+                {withdrawalDetails?.managementFee?.accumulatedAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Management Fee ({withdrawalDetails?.managementFee?.deductionType}):</span>
+                    <span className="font-mono font-semibold text-amber-600">
+                      -SAR {withdrawalDetails?.managementFee?.accumulatedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                )}
+
+                <div className="pt-3 border-t border-gray-300">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-900">You will receive:</span>
+                    <span className="font-mono font-bold text-emerald-600 text-lg">
+                      SAR {(withdrawalDetails?.netWithdrawalAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600">
+                <strong>Note:</strong> Your withdrawal request will be reviewed and approved within 24-48 hours.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isWithdrawing}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleWithdraw}
+              disabled={isWithdrawing || isLoadingWithdrawalDetails}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isWithdrawing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Confirm Withdrawal'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
