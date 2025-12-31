@@ -169,15 +169,15 @@ export default function InvestorPortfolio() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Total Value</p>
+              <p className="text-white text-sm mb-1 uppercase">Total Value</p>
               <p className="text-3xl font-mono font-bold text-white">SAR {portfolioValue.toLocaleString()}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Total Returns</p>
+              <p className="text-white text-sm mb-1 uppercase">Total Returns</p>
               <p className="text-3xl font-mono font-bold text-green-400">+SAR {totalReturns.toLocaleString()}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-teal-700 dark:text-teal-200 text-sm mb-1 uppercase">Active Investments</p>
+              <p className="text-white text-sm mb-1 uppercase">Active Investments</p>
               <p className="text-3xl font-mono font-bold text-white">{activeInvestments}</p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function InvestorPortfolio() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <Wallet className="w-6 h-6 text-yellow-400" />
+                <Wallet className="w-6 h-6 text-green-400" />
               </div>
               <div className="flex items-center gap-1 px-2 py-1">
                 <span className="text-sm font-semibold text-teal-700 dark:text-teal-200">
@@ -213,7 +213,7 @@ export default function InvestorPortfolio() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <Target className="w-6 h-6 text-yellow-400" />
+                <Target className="w-6 h-6 text-green-400" />
               </div>
             </div>
             <div>
@@ -231,7 +231,7 @@ export default function InvestorPortfolio() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <TrendingUp className="w-6 h-6 text-yellow-400" />
+                <TrendingUp className="w-6 h-6 text-green-400" />
               </div>
               <div className="flex items-center gap-1 px-2 py-1">
                 <span className="text-sm font-semibold text-teal-700 dark:text-teal-200">
@@ -257,7 +257,7 @@ export default function InvestorPortfolio() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600 dark:bg-teal-700/50 flex items-center justify-center border border-teal-500 dark:border-teal-600/30">
-                <Building className="w-6 h-6 text-yellow-400" />
+                <Building className="w-6 h-6 text-green-400" />
               </div>
             </div>
             <div>
@@ -285,7 +285,7 @@ export default function InvestorPortfolio() {
             {investments.length === 0 ? (
               <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
                 <CardContent className="flex flex-col items-center justify-center py-16">
-                  <Building className="w-16 h-16 text-yellow-400 mb-4" />
+                  <Building className="w-16 h-16 text-green-400 mb-4" />
                   <h3 className="text-xl font-semibold mb-2 text-teal-900 dark:text-white">No investments yet</h3>
                   <p className="text-teal-700 dark:text-teal-200 mb-6">Start investing in real estate properties</p>
                   <Button onClick={() => setLocation('/investor/properties')} className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
@@ -370,7 +370,7 @@ export default function InvestorPortfolio() {
                                 <Badge className={`text-xs ${
                                   investment.status === 'Active' ? 'bg-green-100 text-green-800' :
                                   investment.status === 'Completed' ? 'bg-blue-100 text-blue-800' :
-                                  'bg-yellow-100 text-yellow-800'
+                                  'bg-green-100 text-green-800'
                                 }`}>
                                   {investment.status}
                                 </Badge>
@@ -385,7 +385,7 @@ export default function InvestorPortfolio() {
                                   </Badge>
                                 )}
                               </div>
-                              <div className="text-xs text-teal-700 dark:text-teal-200">
+                              <div className="text-xs text-white">
                                 Investment #{idx + 1} • Rental Yield: {investment.rentalYield}%
                               </div>
                             </div>
@@ -410,7 +410,7 @@ export default function InvestorPortfolio() {
                                 {/* Net Investment */}
                                 <div className="text-center">
                                   <p className="text-xs text-teal-200 mb-1">Net Amount</p>
-                                  <p className="font-mono font-semibold text-sm text-yellow-400">SAR {investment.netInvestment.toLocaleString()}</p>
+                                  <p className="font-mono font-semibold text-sm text-green-400">SAR {investment.netInvestment.toLocaleString()}</p>
                                 </div>
 
                                 {/* Current Value */}
@@ -468,7 +468,7 @@ export default function InvestorPortfolio() {
             <Card className="col-span-2 bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-teal-900 dark:text-white">
-                  <TrendingUp className="w-5 h-5 text-yellow-400" />
+                  <TrendingUp className="w-5 h-5 text-green-400" />
                   Property-wise Return Breakdown
                 </CardTitle>
                 <CardDescription className="text-teal-700 dark:text-teal-200">Detailed returns from each property investment</CardDescription>
@@ -501,7 +501,7 @@ export default function InvestorPortfolio() {
 
                   {investments.length === 0 && (
                     <div className="text-center py-8">
-                      <TrendingUp className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
+                      <TrendingUp className="w-12 h-12 text-green-400 mx-auto mb-3" />
                       <p className="text-teal-900 dark:text-white">No return data available yet</p>
                       <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see returns</p>
                     </div>
@@ -541,7 +541,7 @@ export default function InvestorPortfolio() {
             <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <PieChart className="w-5 h-5 text-yellow-400" />
+                  <PieChart className="w-5 h-5 text-green-400" />
                   Portfolio Growth
                 </CardTitle>
                 <CardDescription className="text-teal-700 dark:text-teal-200">Investment value over time</CardDescription>
@@ -559,7 +559,7 @@ export default function InvestorPortfolio() {
             <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <Target className="w-5 h-5 text-yellow-400" />
+                  <Target className="w-5 h-5 text-green-400" />
                   Asset Allocation
                 </CardTitle>
                 <CardDescription className="text-teal-700 dark:text-teal-200">Distribution by property type</CardDescription>
@@ -580,7 +580,7 @@ export default function InvestorPortfolio() {
                   ))
                 ) : (
                   <div className="text-center py-8">
-                    <Target className="w-12 h-12 mx-auto mb-3 text-yellow-400 opacity-50" />
+                    <Target className="w-12 h-12 mx-auto mb-3 text-green-400 opacity-50" />
                     <p className="text-white">No allocation data yet</p>
                     <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see distribution</p>
                   </div>

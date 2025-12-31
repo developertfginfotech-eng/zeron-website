@@ -426,7 +426,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <TrendingUp className="w-6 h-6 text-yellow-400" />
+                <TrendingUp className="w-6 h-6 text-green-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-sm font-semibold text-teal-700">
@@ -448,7 +448,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <TrendingUp className="w-6 h-6 text-yellow-400" />
+                <TrendingUp className="w-6 h-6 text-green-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-sm font-semibold text-teal-700">
@@ -470,7 +470,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <TrendingUp className="w-6 h-6 text-yellow-400" />
+                <TrendingUp className="w-6 h-6 text-green-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-sm font-semibold text-teal-700">
@@ -492,7 +492,7 @@ export default function InvestorDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <Building className="w-6 h-6 text-yellow-400" />
+                <Building className="w-6 h-6 text-green-400" />
               </div>
               <div className="flex items-center gap-1 px-3 py-1.5 bg-white/90 rounded-lg">
                 <span className="text-xs font-semibold text-teal-700">+2 this month</span>
@@ -514,7 +514,7 @@ export default function InvestorDashboard() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                <PieChart className="h-6 w-6 text-yellow-400" />
+                <PieChart className="h-6 w-6 text-green-400" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white uppercase tracking-wide">
@@ -549,7 +549,7 @@ export default function InvestorDashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                  <Calendar className="h-6 w-6 text-yellow-400" />
+                  <Calendar className="h-6 w-6 text-green-400" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white uppercase tracking-wide">
@@ -585,7 +585,7 @@ export default function InvestorDashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                  <CheckCircle className="h-6 w-6 text-yellow-400" />
+                  <CheckCircle className="h-6 w-6 text-green-400" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white uppercase tracking-wide">
@@ -656,7 +656,7 @@ export default function InvestorDashboard() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-              <Building className="h-6 w-6 text-yellow-400" />
+              <Building className="h-6 w-6 text-green-400" />
             </div>
             <div>
               <h3 className="text-2xl font-bold text-white uppercase tracking-wide">
@@ -687,7 +687,7 @@ export default function InvestorDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-teal-600/50 flex items-center justify-center border border-teal-500/30">
-                    <Building className="w-6 h-6 text-yellow-400" />
+                    <Building className="w-6 h-6 text-green-400" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-white text-lg">
@@ -753,7 +753,7 @@ export default function InvestorDashboard() {
               <p className="text-sm text-teal-200 uppercase">Across {activeInvestments} properties</p>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-mono font-bold text-yellow-400">SAR {totalInvested.toLocaleString()}</p>
+              <p className="text-3xl font-mono font-bold text-green-400">SAR {totalInvested.toLocaleString()}</p>
               <p className="text-sm text-teal-200 font-medium uppercase">Total Invested</p>
             </div>
           </div>
