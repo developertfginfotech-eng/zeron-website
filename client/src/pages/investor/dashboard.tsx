@@ -170,7 +170,8 @@ export default function InvestorDashboard() {
       if (response.success) {
         toast({
           title: "Withdrawal Request Submitted",
-          description: response.message || `Withdrawal request submitted for admin approval. You will be notified once it's processed.`,
+          description: "Please wait for your withdrawal request to be approved within 24-48 hours.",
+          duration: 6000,
         })
 
         // Refresh all related data
