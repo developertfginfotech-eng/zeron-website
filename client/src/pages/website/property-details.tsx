@@ -270,14 +270,14 @@ export default function PropertyDetailsPage() {
                 {/* Investment Metrics Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
-                    <p className="text-sm text-teal-300 mb-1 uppercase">Price per Share</p>
+                    <p className="text-sm text-teal-300 mb-1 uppercase">Price per Unit</p>
                     <p className="text-2xl font-bold text-green-400">
                       SAR {property.financials?.pricePerShare?.toLocaleString() || 0}
                     </p>
                   </div>
 
                   <div className="bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
-                    <p className="text-sm text-teal-300 mb-1 uppercase">Available Shares</p>
+                    <p className="text-sm text-teal-300 mb-1 uppercase">Available Units</p>
                     <p className="text-2xl font-bold text-blue-400">
                       {property.financials?.availableShares?.toLocaleString() || 0}
                     </p>
