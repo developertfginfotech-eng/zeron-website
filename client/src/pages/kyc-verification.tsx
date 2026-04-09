@@ -248,9 +248,19 @@ const KYCVerificationPage = () => {
         );
       }
 
-      // Check if at least one file is uploaded
-      if (Object.keys(uploadedFiles).length === 0) {
-        throw new Error("Please upload at least one document");
+      // Check mandatory documents
+      const mandatoryDocs: { key: string; label: string }[] = [
+        { key: "nationalId", label: "National ID / Iqama / Passport" },
+        { key: "selfie", label: "Selfie Photo" },
+        { key: "addressProof", label: "National Address" },
+      ];
+      const missingDocs = mandatoryDocs.filter(
+        (doc) => !uploadedFiles[doc.key] && !uploadedFilesStatus[doc.key]
+      );
+      if (missingDocs.length > 0) {
+        throw new Error(
+          `Please upload mandatory documents: ${missingDocs.map((d) => d.label).join(", ")}`
+        );
       }
 
       // Prepare form data
@@ -909,7 +919,7 @@ const KYCVerificationPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FileUploadBox
                     fileType="nationalId"
-                    label="National ID"
+                    label="National ID / Iqama / Passport"
                     required={true}
                   />
                   <FileUploadBox
@@ -918,12 +928,13 @@ const KYCVerificationPage = () => {
                     required={true}
                   />
                   <FileUploadBox
-                    fileType="proofOfIncome"
-                    label="Proof of Income"
+                    fileType="addressProof"
+                    label="National Address"
+                    required={true}
                   />
                   <FileUploadBox
-                    fileType="addressProof"
-                    label="Address Proof"
+                    fileType="proofOfIncome"
+                    label="Proof of Income (Optional)"
                   />
                 </div>
 
