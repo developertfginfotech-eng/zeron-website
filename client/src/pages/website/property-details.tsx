@@ -454,8 +454,8 @@ export default function PropertyDetailsPage() {
                 </div>
 
                 {/* Investment Amount */}
-                <div className="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 rounded-lg">
-                  <p className="text-sm text-teal-700 dark:text-teal-200 mb-1">Investment Amount</p>
+                <div className="p-4 bg-teal-700/40 rounded-lg border border-teal-600/30">
+                  <p className="text-sm text-teal-200 mb-1">Investment Amount</p>
                   <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                     SAR {(calculatorUnits * (property.financials?.pricePerShare || 0)).toLocaleString()}
                   </p>
@@ -500,43 +500,43 @@ export default function PropertyDetailsPage() {
                         <p className="text-sm font-semibold text-teal-200">Annual Returns</p>
 
                         {/* Annual Rental Income */}
-                        <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <div className="flex justify-between items-center p-3 bg-green-900/30 rounded-lg border border-green-700/30">
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
-                            <span className="text-sm text-teal-700 dark:text-teal-200">Rental Yield ({calculatorResults.settings?.rentalYieldPercentage || 0}%)</span>
+                            <TrendingUp className="w-4 h-4 text-green-400" />
+                            <span className="text-sm text-teal-100">Rental Yield ({calculatorResults.settings?.rentalYieldPercentage || 0}%)</span>
                           </div>
-                          <span className="font-bold text-green-600 dark:text-green-400">
+                          <span className="font-bold text-green-400">
                             +SAR {Math.round(calculatorResults.returns?.annualRentalIncome || 0).toLocaleString()}
                           </span>
                         </div>
 
                         {/* Annual Appreciation */}
-                        <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <div className="flex justify-between items-center p-3 bg-blue-900/30 rounded-lg border border-blue-700/30">
                           <div className="flex items-center gap-2">
-                            <Home className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                            <span className="text-sm text-teal-700 dark:text-teal-200">Appreciation ({calculatorResults.settings?.appreciationRatePercentage || 0}%)</span>
+                            <Home className="w-4 h-4 text-blue-400" />
+                            <span className="text-sm text-teal-100">Appreciation ({calculatorResults.settings?.appreciationRatePercentage || 0}%)</span>
                           </div>
-                          <span className="font-bold text-blue-600 dark:text-blue-400">
+                          <span className="font-bold text-blue-400">
                             +SAR {Math.round(calculatorResults.returns?.annualAppreciation || 0).toLocaleString()}
                           </span>
                         </div>
 
                         {/* Total Annual Return */}
-                        <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-100 to-blue-100 dark:from-emerald-900/30 dark:to-blue-900/30 rounded-lg border-2 border-emerald-600 dark:border-emerald-800">
-                          <span className="text-sm font-bold text-teal-900 dark:text-white">Total Annual Return</span>
-                          <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                        <div className="flex justify-between items-center p-4 bg-emerald-900/40 rounded-lg border-2 border-emerald-500/60">
+                          <span className="text-sm font-bold text-white">Total Annual Return</span>
+                          <span className="text-xl font-bold text-emerald-400">
                             +SAR {Math.round(calculatorResults.returns?.totalAnnualReturn || ((calculatorResults.returns?.annualRentalIncome || 0) + (calculatorResults.returns?.annualAppreciation || 0))).toLocaleString()}
                           </span>
                         </div>
 
                         {/* Annual ROI */}
-                        <div className="bg-muted/50 p-3 rounded-lg text-sm">
+                        <div className="bg-teal-900/50 border border-teal-700/40 p-3 rounded-lg text-sm">
                           <div className="flex justify-between">
-                            <span className="text-teal-700 dark:text-teal-200">Investment:</span>
-                            <span className="font-medium text-teal-900 dark:text-white">SAR {calculatorResults.investmentAmount?.toLocaleString() || 0}</span>
+                            <span className="text-teal-300">Investment:</span>
+                            <span className="font-medium text-white">SAR {calculatorResults.investmentAmount?.toLocaleString() || 0}</span>
                           </div>
-                          <div className="flex justify-between pt-2 border-t mt-2">
-                            <span className="font-semibold text-teal-900 dark:text-white">Annual ROI:</span>
+                          <div className="flex justify-between pt-2 border-t border-teal-700/40 mt-2">
+                            <span className="font-semibold text-white">Annual ROI:</span>
                             <span className="font-bold text-emerald-600 dark:text-emerald-400">
                               {(((calculatorResults.returns?.annualRentalIncome || 0) + (calculatorResults.returns?.annualAppreciation || 0)) / (calculatorResults.investmentAmount || 1) * 100).toFixed(1)}%
                             </span>
@@ -551,74 +551,74 @@ export default function PropertyDetailsPage() {
                         <p className="text-sm font-semibold text-teal-200">Bond Investment Returns</p>
 
                         {/* After Locking Period */}
-                        <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg space-y-2">
+                        <div className="p-3 bg-orange-900/30 border border-orange-700/30 rounded-lg space-y-2">
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                              <span className="text-sm font-semibold text-teal-900 dark:text-white">After Locking Period ({calculatorResults.returns?.lockingPeriod?.years || calculatorResults.settings?.lockingPeriodYears || 5} years)</span>
+                              <Clock className="w-4 h-4 text-orange-400" />
+                              <span className="text-sm font-semibold text-white">After Locking Period ({calculatorResults.returns?.lockingPeriod?.years || calculatorResults.settings?.lockingPeriodYears || 5} years)</span>
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="flex justify-between">
-                              <span className="text-teal-700 dark:text-teal-200">Rental Yield:</span>
-                              <span className="text-green-600 dark:text-green-400">+SAR {Math.round(calculatorResults.returns?.lockingPeriod?.rentalYield || 0).toLocaleString()}</span>
+                              <span className="text-teal-300">Rental Yield:</span>
+                              <span className="text-green-400">+SAR {Math.round(calculatorResults.returns?.lockingPeriod?.rentalYield || 0).toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-teal-700 dark:text-teal-200">Appreciation:</span>
-                              <span className="text-blue-600 dark:text-blue-400">+SAR {Math.round(calculatorResults.returns?.lockingPeriod?.appreciation || 0).toLocaleString()}</span>
+                              <span className="text-teal-300">Appreciation:</span>
+                              <span className="text-blue-400">+SAR {Math.round(calculatorResults.returns?.lockingPeriod?.appreciation || 0).toLocaleString()}</span>
                             </div>
                           </div>
-                          <div className="flex justify-between items-center pt-2 border-t border-orange-200 dark:border-orange-700">
-                            <span className="text-sm text-teal-700 dark:text-teal-200">Total Value:</span>
-                            <span className="font-bold text-orange-600 dark:text-orange-400">
+                          <div className="flex justify-between items-center pt-2 border-t border-orange-700/40">
+                            <span className="text-sm text-teal-200">Total Value:</span>
+                            <span className="font-bold text-orange-400">
                               SAR {Math.round(calculatorResults.returns?.lockingPeriod?.projectedValue || 0).toLocaleString()}
                             </span>
                           </div>
                         </div>
 
                         {/* At Bond Maturity */}
-                        <div className="p-4 bg-gradient-to-r from-emerald-100 to-blue-100 dark:from-emerald-900/30 dark:to-blue-900/30 rounded-lg border-2 border-emerald-600 dark:border-emerald-800 space-y-2">
+                        <div className="p-4 bg-emerald-900/40 rounded-lg border-2 border-emerald-500/60 space-y-2">
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
-                              <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                              <span className="text-sm font-bold text-teal-900 dark:text-white">At Bond Maturity ({calculatorResults.returns?.atMaturity?.years || calculatorResults.settings?.bondMaturityYears || 10} years)</span>
+                              <DollarSign className="w-5 h-5 text-emerald-400" />
+                              <span className="text-sm font-bold text-white">At Bond Maturity ({calculatorResults.returns?.atMaturity?.years || calculatorResults.settings?.bondMaturityYears || 10} years)</span>
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="flex justify-between">
-                              <span className="text-teal-700 dark:text-teal-200">Total Rental:</span>
-                              <span className="text-green-600 dark:text-green-400">+SAR {Math.round(calculatorResults.returns?.atMaturity?.rentalYield || 0).toLocaleString()}</span>
+                              <span className="text-teal-300">Total Rental:</span>
+                              <span className="text-green-400">+SAR {Math.round(calculatorResults.returns?.atMaturity?.rentalYield || 0).toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-teal-700 dark:text-teal-200">Total Appreciation:</span>
-                              <span className="text-blue-600 dark:text-blue-400">+SAR {Math.round(calculatorResults.returns?.atMaturity?.appreciation || 0).toLocaleString()}</span>
+                              <span className="text-teal-300">Total Appreciation:</span>
+                              <span className="text-blue-400">+SAR {Math.round(calculatorResults.returns?.atMaturity?.appreciation || 0).toLocaleString()}</span>
                             </div>
                           </div>
-                          <div className="flex justify-between items-center pt-2 border-t border-emerald-300 dark:border-emerald-700">
-                            <span className="text-sm font-semibold text-teal-900 dark:text-white">Final Value:</span>
-                            <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                          <div className="flex justify-between items-center pt-2 border-t border-emerald-600/40">
+                            <span className="text-sm font-semibold text-white">Final Value:</span>
+                            <span className="text-xl font-bold text-emerald-400">
                               SAR {Math.round(calculatorResults.returns?.atMaturity?.projectedValue || 0).toLocaleString()}
                             </span>
                           </div>
                         </div>
 
                         {/* Total Returns Summary */}
-                        <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
+                        <div className="bg-teal-900/50 border border-teal-700/40 p-3 rounded-lg space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-teal-700 dark:text-teal-200">Investment:</span>
-                            <span className="font-medium text-teal-900 dark:text-white">SAR {calculatorResults.investmentAmount?.toLocaleString() || 0}</span>
+                            <span className="text-teal-300">Investment:</span>
+                            <span className="font-medium text-white">SAR {calculatorResults.investmentAmount?.toLocaleString() || 0}</span>
                           </div>
-                          <div className="flex justify-between pt-2 border-t">
-                            <span className="font-semibold text-teal-900 dark:text-white">Total Returns at Maturity:</span>
-                            <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">+SAR {Math.round(calculatorResults.returns?.atMaturity?.totalReturns || 0).toLocaleString()}</span>
+                          <div className="flex justify-between pt-2 border-t border-teal-700/40">
+                            <span className="font-semibold text-white">Total Returns at Maturity:</span>
+                            <span className="font-bold text-lg text-emerald-400">+SAR {Math.round(calculatorResults.returns?.atMaturity?.totalReturns || 0).toLocaleString()}</span>
                           </div>
                         </div>
 
                         {/* Early Withdrawal Warning */}
                         {calculatorResults.earlyWithdrawal && (
-                          <div className="bg-red-50 dark:bg-red-900/20 border border-red-600 dark:border-red-800 p-3 rounded-lg">
-                            <p className="text-xs font-semibold text-red-900 dark:text-red-100">Early Withdrawal Penalty</p>
-                            <p className="text-xs text-red-700 dark:text-red-200 mt-1">
+                          <div className="bg-red-900/30 border border-red-600/50 p-3 rounded-lg">
+                            <p className="text-xs font-semibold text-red-300">Early Withdrawal Penalty</p>
+                            <p className="text-xs text-red-200 mt-1">
                               {calculatorResults.earlyWithdrawal.penaltyPercentage}% penalty if withdrawn before {calculatorResults.earlyWithdrawal.lockingPeriodYears} years
                               (You'd receive: SAR {Math.round(calculatorResults.earlyWithdrawal.amountAfterPenalty || 0).toLocaleString()})
                             </p>
@@ -635,33 +635,33 @@ export default function PropertyDetailsPage() {
                     <p className="text-sm font-semibold text-teal-200">Projected Annual Returns</p>
 
                     {/* Rental Yield */}
-                    <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <div className="flex justify-between items-center p-3 bg-green-900/30 rounded-lg border border-green-700/30">
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
-                        <span className="text-sm text-teal-700 dark:text-teal-200">Rental Yield ({investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0}%)</span>
+                        <TrendingUp className="w-4 h-4 text-green-400" />
+                        <span className="text-sm text-teal-100">Rental Yield ({investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0}%)</span>
                       </div>
-                      <span className="font-bold text-green-600 dark:text-green-400">
+                      <span className="font-bold text-green-400">
                         +SAR {((calculatorUnits * (property.financials?.pricePerShare || 0)) * ((investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0) / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                       </span>
                     </div>
 
                     {/* Appreciation */}
                     {investmentTerms.appreciationRate > 0 && (
-                      <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div className="flex justify-between items-center p-3 bg-blue-900/30 rounded-lg border border-blue-700/30">
                         <div className="flex items-center gap-2">
-                          <Home className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          <span className="text-sm text-teal-700 dark:text-teal-200">Appreciation ({investmentTerms.appreciationRate}%)</span>
+                          <Home className="w-4 h-4 text-blue-400" />
+                          <span className="text-sm text-teal-100">Appreciation ({investmentTerms.appreciationRate}%)</span>
                         </div>
-                        <span className="font-bold text-blue-600 dark:text-blue-400">
+                        <span className="font-bold text-blue-400">
                           +SAR {((calculatorUnits * (property.financials?.pricePerShare || 0)) * (investmentTerms.appreciationRate / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </span>
                       </div>
                     )}
 
                     {/* Total Annual Return */}
-                    <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-2 border-purple-600 dark:border-purple-800">
-                      <span className="text-sm font-semibold text-teal-900 dark:text-white">Total Annual Return</span>
-                      <span className="font-bold text-purple-600 dark:text-purple-400">
+                    <div className="flex justify-between items-center p-3 bg-emerald-900/40 rounded-lg border-2 border-emerald-500/60">
+                      <span className="text-sm font-semibold text-white">Total Annual Return</span>
+                      <span className="font-bold text-emerald-400">
                         +SAR {((calculatorUnits * (property.financials?.pricePerShare || 0)) * (((investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0) + (investmentTerms.appreciationRate || 0)) / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                       </span>
                     </div>
@@ -669,15 +669,15 @@ export default function PropertyDetailsPage() {
                     {/* After Locking Period */}
                     {investmentTerms.lockingPeriodYears > 0 && (
                       <div className="pt-3 border-t">
-                        <div className="flex justify-between items-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                        <div className="flex justify-between items-center p-3 bg-orange-900/30 rounded-lg border border-orange-700/30">
                           <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                            <Clock className="w-4 h-4 text-orange-400" />
                             <div>
-                              <span className="text-sm font-semibold text-teal-900 dark:text-white">After Locking Period</span>
-                              <p className="text-xs text-teal-700 dark:text-teal-200">{investmentTerms.lockingPeriodYears} years</p>
+                              <span className="text-sm font-semibold text-white">After Locking Period</span>
+                              <p className="text-xs text-teal-300">{investmentTerms.lockingPeriodYears} years</p>
                             </div>
                           </div>
-                          <span className="font-bold text-orange-600 dark:text-orange-400">
+                          <span className="font-bold text-orange-400">
                             SAR {(
                               (calculatorUnits * (property.financials?.pricePerShare || 0)) +
                               ((calculatorUnits * (property.financials?.pricePerShare || 0)) *
@@ -691,15 +691,15 @@ export default function PropertyDetailsPage() {
 
                     {/* At Bond Maturity */}
                     {investmentTerms.bondMaturityYears > 0 && (
-                      <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-100 to-blue-100 dark:from-emerald-900/30 dark:to-blue-900/30 rounded-lg">
+                      <div className="flex justify-between items-center p-3 bg-emerald-900/40 rounded-lg border border-emerald-600/40">
                         <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          <DollarSign className="w-4 h-4 text-emerald-400" />
                           <div>
-                            <span className="text-sm font-semibold text-teal-900 dark:text-white">At Bond Maturity</span>
-                            <p className="text-xs text-teal-700 dark:text-teal-200">{investmentTerms.bondMaturityYears} years</p>
+                            <span className="text-sm font-semibold text-white">At Bond Maturity</span>
+                            <p className="text-xs text-teal-300">{investmentTerms.bondMaturityYears} years</p>
                           </div>
                         </div>
-                        <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                        <span className="text-lg font-bold text-emerald-400">
                           SAR {(
                             (calculatorUnits * (property.financials?.pricePerShare || 0)) +
                             ((calculatorUnits * (property.financials?.pricePerShare || 0)) *
@@ -712,9 +712,9 @@ export default function PropertyDetailsPage() {
 
                     {/* Early Withdrawal Warning */}
                     {investmentTerms.graduatedPenalties && investmentTerms.graduatedPenalties.length > 0 && (
-                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-600 dark:border-red-800 p-3 rounded-lg">
-                        <p className="text-xs font-semibold text-red-900 dark:text-red-100">Early Withdrawal Penalty</p>
-                        <p className="text-xs text-red-700 dark:text-red-200 mt-1">
+                      <div className="bg-red-900/30 border border-red-600/50 p-3 rounded-lg">
+                        <p className="text-xs font-semibold text-red-300">Early Withdrawal Penalty</p>
+                        <p className="text-xs text-red-200 mt-1">
                           {investmentTerms.graduatedPenalties[0]?.penaltyPercentage}% penalty if withdrawn before {investmentTerms.lockingPeriodYears} years
                         </p>
                       </div>

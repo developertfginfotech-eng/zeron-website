@@ -34,6 +34,15 @@ import { apiClient, API_ENDPOINTS } from "@/lib/api-client"
 import { useToast } from "@/hooks/use-toast"
 import { useQueryClient } from "@tanstack/react-query"
 
+function formatSAR(value: number): string {
+  const abs = Math.abs(value)
+  if (abs >= 1_000_000_000_000) return (value / 1_000_000_000_000).toFixed(2) + 'T'
+  if (abs >= 1_000_000_000) return (value / 1_000_000_000).toFixed(2) + 'B'
+  if (abs >= 1_000_000) return (value / 1_000_000).toFixed(2) + 'M'
+  if (abs >= 1_000) return (value / 1_000).toFixed(2) + 'K'
+  return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+}
+
 export default function InvestorPortfolio() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
@@ -260,11 +269,11 @@ export default function InvestorPortfolio() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
               <p className="text-white text-sm mb-1 uppercase">Total Value</p>
-              <p className="text-3xl font-mono font-bold text-white">SAR {portfolioValue.toLocaleString()}</p>
+              <p className="text-3xl font-mono font-bold text-white">SAR {formatSAR(portfolioValue)}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
               <p className="text-white text-sm mb-1 uppercase">Total Returns</p>
-              <p className="text-3xl font-mono font-bold text-yellow-400">+SAR {totalReturns.toLocaleString()}</p>
+              <p className="text-3xl font-mono font-bold text-yellow-400">+SAR {formatSAR(totalReturns)}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
               <p className="text-white text-sm mb-1 uppercase">Active Investments</p>
@@ -292,7 +301,7 @@ export default function InvestorPortfolio() {
             <div>
               <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Portfolio Value</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
-                SAR {portfolioValue.toLocaleString()}
+                SAR {formatSAR(portfolioValue)}
               </p>
             </div>
           </div>
@@ -309,7 +318,7 @@ export default function InvestorPortfolio() {
             <div>
               <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Invested</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
-                SAR {totalInvested.toLocaleString()}
+                SAR {formatSAR(totalInvested)}
               </p>
               <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Across {activeInvestments} properties</p>
             </div>
@@ -332,11 +341,11 @@ export default function InvestorPortfolio() {
             <div>
               <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Returns</p>
               <p className="text-2xl font-mono font-bold text-green-600 dark:text-green-400">
-                SAR {totalReturns.toLocaleString()}
+                SAR {formatSAR(totalReturns)}
               </p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-teal-600 dark:text-teal-300 uppercase">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
-                <span className="text-xs text-teal-600 dark:text-teal-300 uppercase">Realized: SAR {realizedGains.toLocaleString()}</span>
+                <span className="text-xs text-teal-600 dark:text-teal-300 uppercase">Unrealized: SAR {formatSAR(unrealizedGains)}</span>
+                <span className="text-xs text-teal-600 dark:text-teal-300 uppercase">Realized: SAR {formatSAR(realizedGains)}</span>
               </div>
             </div>
           </div>
@@ -428,15 +437,15 @@ export default function InvestorPortfolio() {
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                             <p className="text-xs text-emerald-100 mb-1">Total Invested</p>
-                            <p className="text-lg font-mono font-bold">SAR {totalInvestedInProperty.toLocaleString()}</p>
+                            <p className="text-lg font-mono font-bold">SAR {formatSAR(totalInvestedInProperty)}</p>
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                             <p className="text-xs text-emerald-100 mb-1">Current Value</p>
-                            <p className="text-lg font-mono font-bold">SAR {currentValueInProperty.toLocaleString()}</p>
+                            <p className="text-lg font-mono font-bold">SAR {formatSAR(currentValueInProperty)}</p>
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                             <p className="text-xs text-emerald-100 mb-1">Total Returns</p>
-                            <p className="text-lg font-mono font-bold text-yellow-300">+SAR {totalReturnsInProperty.toLocaleString()}</p>
+                            <p className="text-lg font-mono font-bold text-yellow-300">+SAR {formatSAR(totalReturnsInProperty)}</p>
                           </div>
                         </div>
                       </div>
@@ -491,29 +500,29 @@ export default function InvestorPortfolio() {
                                 {/* Invested Amount */}
                                 <div className="text-center">
                                   <p className="text-xs text-teal-200 mb-1">Invested</p>
-                                  <p className="font-mono font-semibold text-sm text-white">SAR {investment.investedAmount.toLocaleString()}</p>
+                                  <p className="font-mono font-semibold text-sm text-white">SAR {formatSAR(investment.investedAmount)}</p>
                                   {investment.managementFee > 0 && (
-                                    <p className="text-xs text-red-400">-SAR {investment.managementFee.toLocaleString()} fee</p>
+                                    <p className="text-xs text-red-400">-SAR {formatSAR(investment.managementFee)} fee</p>
                                   )}
                                 </div>
 
                                 {/* Net Investment */}
                                 <div className="text-center">
                                   <p className="text-xs text-teal-200 mb-1">Net Amount</p>
-                                  <p className="font-mono font-semibold text-sm text-yellow-400">SAR {investment.netInvestment.toLocaleString()}</p>
+                                  <p className="font-mono font-semibold text-sm text-yellow-400">SAR {formatSAR(investment.netInvestment)}</p>
                                 </div>
 
                                 {/* Current Value */}
                                 <div className="text-center">
                                   <p className="text-xs text-teal-200 mb-1">Current</p>
-                                  <p className="font-mono font-semibold text-sm text-white">SAR {investment.currentValue.toLocaleString()}</p>
+                                  <p className="font-mono font-semibold text-sm text-white">SAR {formatSAR(investment.currentValue)}</p>
                                 </div>
 
                                 {/* Returns */}
                                 <div className="text-center">
                                   <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>Returns</p>
                                   <p className={`font-mono font-bold text-sm ${investment.returns >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                    {investment.returns >= 0 ? '+' : ''}SAR {investment.returns.toLocaleString()}
+                                    {investment.returns >= 0 ? '+' : ''}SAR {formatSAR(investment.returns)}
                                   </p>
                                   <p className={`text-xs font-medium ${investment.returnRate >= 0 ? 'text-yellow-300' : 'text-red-300'}`}>
                                     {investment.returnRate >= 0 ? '+' : ''}{investment.returnRate.toFixed(1)}%
