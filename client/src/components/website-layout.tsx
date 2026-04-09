@@ -52,7 +52,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-white/95 dark:bg-slate-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 border-gray-200 dark:border-gray-700">
-        <div className="w-full px-2">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex h-auto py-4 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center" data-testid="link-home">
@@ -191,7 +191,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
       {/* Footer */}
       <footer className="relative border-t" style={{ backgroundColor: '#004743', borderColor: '#004743' }}>
         <div className="relative"  style={{ backgroundColor: '#004743' }}>
-          <div className="w-full px-2 py-12">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
 
             {/* Quick Links */}

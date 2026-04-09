@@ -83,7 +83,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="container mx-auto px-6 relative">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 relative">
           <div className="max-w-4xl mx-auto text-center">
             <div className="mb-6">
               <Badge className="bg-yellow-400 text-gray-900 border-0 mb-4 font-semibold">
@@ -118,7 +118,7 @@ export default function AboutPage() {
 
       {/* Mission Statement */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-white uppercase tracking-wide">Our Mission</h2>
             <p className="text-lg text-teal-100 mb-12 leading-relaxed">
@@ -162,7 +162,7 @@ export default function AboutPage() {
 
       {/* Stats Section */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Our Impact</h2>
             <p className="text-lg text-teal-100 max-w-2xl mx-auto">
@@ -187,7 +187,7 @@ export default function AboutPage() {
 
       {/* Values Section */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Our Values</h2>
             <p className="text-lg text-teal-100 max-w-2xl mx-auto">
@@ -214,7 +214,7 @@ export default function AboutPage() {
 
       {/* Team Section */}
       <section className="py-20" id="team">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Meet Our Team</h2>
             <p className="text-lg text-teal-100 max-w-2xl mx-auto">
@@ -247,7 +247,7 @@ export default function AboutPage() {
 
       {/* Our Story Section */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Our Story</h2>
@@ -322,7 +322,7 @@ export default function AboutPage() {
 
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-br from-teal-800/90 to-emerald-900/90 text-white border-t border-teal-700/50">
-        <div className="container mx-auto px-6 text-center">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 uppercase tracking-wide">Join Our Mission</h2>
           <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
             Be part of Saudi Arabia's real estate transformation. Start your investment journey with us today.

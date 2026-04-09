@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight, Lock, ArrowUpRight, User } from "lucide-react"
+import { ArrowRight, Lock, ArrowUpRight, User, Building2, Shield, PieChart, Users, TrendingUp, Eye, Star, UserPlus, Search, DollarSign, CheckCircle, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 import { useLocation } from "wouter"
 import { useState, useEffect } from "react"
@@ -55,7 +55,6 @@ const getKYCStatus = (): {
 
     const user = JSON.parse(userData);
     const kycStatus = user.kycStatus || 'not_submitted';
-    // Allow access for both submitted and approved KYC
     const isKYCCompleted = kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'approved';
 
     return {
@@ -68,16 +67,80 @@ const getKYCStatus = (): {
   }
 };
 
+const features = [
+  {
+    icon: Building2,
+    title: "Fractional Ownership",
+    subtitle: "Min. SAR 1,000",
+    description: "Invest in premium Saudi properties with as little as SAR 1,000. Own real estate previously accessible only to the ultra-wealthy."
+  },
+  {
+    icon: Shield,
+    title: "Shariah Compliant",
+    subtitle: "100% Halal",
+    description: "Every investment is vetted by leading Islamic scholars, ensuring full compliance with Islamic finance principles."
+  },
+  {
+    icon: PieChart,
+    title: "Diversified Portfolio",
+    subtitle: "Spread Your Risk",
+    description: "Invest across multiple properties, cities, and asset classes to reduce risk and maximize long-term wealth growth."
+  },
+  {
+    icon: Users,
+    title: "Professional Management",
+    subtitle: "Zero Hassle",
+    description: "Expert property managers handle tenant relations, maintenance, and rent collection entirely on your behalf."
+  },
+  {
+    icon: TrendingUp,
+    title: "Monthly Returns",
+    subtitle: "Regular Income",
+    description: "Receive monthly rental distributions directly to your wallet and watch your passive income compound over time."
+  },
+  {
+    icon: Eye,
+    title: "Full Transparency",
+    subtitle: "Real-time Reports",
+    description: "Access detailed financial reports, property updates, and live investment performance dashboards anytime."
+  }
+]
+
+const testimonials = [
+  {
+    returns: "18%",
+    quote: "Zaron has transformed my investment strategy. The platform's transparency and Shariah-compliant options align perfectly with my values. Consistent returns every month.",
+    name: "Ahmed Al-Rashid",
+    role: "Private Equity Investor",
+    city: "Riyadh",
+    initials: "AR"
+  },
+  {
+    returns: "22%",
+    quote: "Minimum ticket sizes were always a barrier in real estate. Zaron changed that completely — I started with SAR 5,000 and have steadily grown a solid portfolio.",
+    name: "Khalid Al-Mutairi",
+    role: "Entrepreneur",
+    city: "Jeddah",
+    initials: "KM"
+  },
+  {
+    returns: "15%",
+    quote: "The platform is incredibly intuitive. I track my entire portfolio in one place and monthly returns land in my wallet like clockwork. Highly recommended.",
+    name: "Nour Al-Saud",
+    role: "Business Consultant",
+    city: "Dammam",
+    initials: "NS"
+  }
+]
+
 export default function WebsiteHome() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
   const [properties, setProperties] = useState<BackendProperty[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Get KYC status
   const { isKYCCompleted } = getKYCStatus()
 
-  // Fetch properties from API
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -85,23 +148,17 @@ export default function WebsiteHome() {
         const endpoint = `${API_BASE_URL}${API_ENDPOINTS.PROPERTIES}`
 
         const response = await fetch(endpoint, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Content-Type': 'application/json' }
         })
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
         const result = await response.json()
 
         if (result.success && result.data.properties) {
-          // Get active and upcoming properties, limit to 3 for home page
           const availableProperties = result.data.properties
             .filter((prop: BackendProperty) => ['active', 'upcoming'].includes(prop.status))
             .slice(0, 3)
-
           setProperties(availableProperties)
         }
       } catch (error) {
@@ -114,7 +171,6 @@ export default function WebsiteHome() {
     fetchProperties()
   }, [])
 
-  // Handler for viewing property details
   const handleViewDetails = (propertyId?: string) => {
     if (propertyId) {
       setLocation(`/website/property/${propertyId}`)
@@ -123,37 +179,25 @@ export default function WebsiteHome() {
     }
   }
 
-  // Handler for invest button
   const handleInvest = () => {
-    // Check if user is logged in
     const userData = localStorage.getItem('zaron_user')
     if (!userData) {
-      toast({
-        title: "Login Required",
-        description: "Please login to start investing",
-        variant: "destructive"
-      })
+      toast({ title: "Login Required", description: "Please login to start investing", variant: "destructive" })
       setLocation('/register')
       return
     }
 
-    // Check KYC status
     try {
       const user = JSON.parse(userData)
       const kycStatus = user.kycStatus || 'not_submitted'
       const isKYCCompleted = kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'approved'
 
       if (!isKYCCompleted) {
-        toast({
-          title: "KYC Verification Required",
-          description: "Complete your KYC verification to start investing",
-          variant: "destructive"
-        })
+        toast({ title: "KYC Verification Required", description: "Complete your KYC verification to start investing", variant: "destructive" })
         setLocation('/kyc-verification')
         return
       }
 
-      // If all checks pass, go to properties page
       setLocation('/website/properties')
     } catch {
       setLocation('/register')
@@ -163,21 +207,25 @@ export default function WebsiteHome() {
   const steps = [
     {
       number: 1,
+      icon: UserPlus,
       title: "Create Your Account",
-      description: "Sign up in minutes with your email. Complete KYC verification for secure investing."
+      description: "Sign up in minutes with your email. Complete KYC verification for secure, compliant investing."
     },
     {
       number: 2,
+      icon: Search,
       title: "Browse Opportunities",
-      description: "Explore vetted properties with detailed information, financial projections, and risk analysis."
+      description: "Explore vetted properties with detailed financials, projections, and risk analysis."
     },
     {
       number: 3,
+      icon: DollarSign,
       title: "Invest & Own",
-      description: "Choose your investment amount and own fractional shares in premium properties."
+      description: "Choose your investment amount and own fractional units in premium Saudi properties."
     },
     {
       number: 4,
+      icon: TrendingUp,
       title: "Earn Returns",
       description: "Receive monthly rental income and watch your investment grow with property appreciation."
     }
@@ -185,85 +233,88 @@ export default function WebsiteHome() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#004743' }}>
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 overflow-hidden" style={{ backgroundColor: '#004743' }}>
-        {/* Background Pattern */}
+
+      {/* ─── Hero Section ─── */}
+      <section className="relative pt-28 pb-32 overflow-hidden" style={{ backgroundColor: '#004743' }}>
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/images/BG%20Image.jpg')",
-            opacity: 0.5
-          }}
-        ></div>
+          style={{ backgroundImage: "url('/images/BG%20Image.jpg')", opacity: 0.4 }}
+        />
 
-        <div className="relative w-full px-2">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
+              {/* Trust badge */}
+              <div
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-7"
+                style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' }}
+              >
+                <CheckCircle className="w-4 h-4" style={{ color: '#d0ac00' }} />
+                <span className="text-sm font-medium text-white">Shariah Compliant · Vision 2030 Aligned</span>
+              </div>
+
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.08]">
                 Invest in
                 <br />
                 <span style={{ color: '#d0ac00' }}>Saudi Arabia's</span>
                 <br />
                 Future
               </h1>
-              <p className="text-xl mb-8 leading-relaxed max-w-xl" style={{ color: '#efefef' }}>
-                Join the real estate crowdfunding revolution. Build wealth through Vision 2030 projects with Shariah-compliant investments.
+              <p className="text-lg md:text-xl mb-10 leading-relaxed max-w-lg" style={{ color: '#c5dfdd' }}>
+                Join the real estate crowdfunding revolution. Build wealth through Vision 2030 projects with Shariah-compliant investments starting from SAR 1,000.
               </p>
 
               {/* Stats Row */}
               <div className="grid grid-cols-3 gap-4 mb-10">
-                <div className="backdrop-blur-sm rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                  <h3 className="text-2xl font-bold text-white">SAR 2.5B+</h3>
-                  <p className="text-sm" style={{ color: '#efefef' }}>Total Invested</p>
-                </div>
-                <div className="backdrop-blur-sm rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                  <h3 className="text-2xl font-bold text-white">15.2%</h3>
-                  <p className="text-sm" style={{ color: '#efefef' }}>Avg. Returns</p>
-                </div>
-                <div className="backdrop-blur-sm rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                  <h3 className="text-2xl font-bold text-white">6+</h3>
-                  <p className="text-sm" style={{ color: '#efefef' }}>Properties Funded</p>
-                </div>
+                {[
+                  { value: 'SAR 2.5B+', label: 'Total Invested' },
+                  { value: '15.2%', label: 'Avg. Returns' },
+                  { value: '6+', label: 'Properties Funded' }
+                ].map((stat, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl p-4 text-center"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
+                  >
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-1">{stat.value}</h3>
+                    <p className="text-xs" style={{ color: '#9ecfcb' }}>{stat.label}</p>
+                  </div>
+                ))}
               </div>
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  className="text-black font-semibold text-lg px-8 border-0 hover:opacity-90 transition-opacity"
+                  className="text-black font-bold text-base px-8 h-14 rounded-xl border-0 shadow-lg hover:opacity-90 hover:-translate-y-0.5 transition-all"
                   style={{ backgroundColor: '#d0ac00' }}
                   onClick={() => {
-                    // Check if user is logged in
                     const userData = localStorage.getItem('zaron_user')
-                    if (userData) {
-                      // User is logged in, go to properties page
-                      setLocation('/website/properties')
-                    } else {
-                      // User is not logged in, go to register page
-                      setLocation('/register')
-                    }
+                    if (userData) { setLocation('/website/properties') } else { setLocation('/register') }
                   }}
                 >
-                  START INVESTING NOW
+                  Start Investing Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-white text-lg px-8 hover:bg-white/10 transition-colors"
-                  style={{ borderColor: '#efefef', borderWidth: '2px' }}
+                  className="text-white text-base px-8 h-14 rounded-xl hover:bg-white/10 transition-all"
+                  style={{ borderColor: 'rgba(255,255,255,0.35)', borderWidth: '2px' }}
                   onClick={() => setLocation('/website/properties')}
                 >
-                  EXPLORE OPPORTUNITIES
+                  Explore Opportunities
                 </Button>
               </div>
             </motion.div>
 
-            {/* Right Visual - Tablet Mockup */}
+            {/* Right Visual */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -282,98 +333,90 @@ export default function WebsiteHome() {
         </div>
       </section>
 
-      {/* Why Choose Section */}
-      <section className="py-20 relative overflow-hidden" style={{ backgroundColor: '#18605c' }}>
-        <div className="w-full px-2">
+      {/* ─── Why Choose Section ─── */}
+      <section className="py-24" style={{ backgroundColor: '#18605c' }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-14"
           >
-            <div className="inline-block px-6 py-2 rounded-full mb-4" style={{ border: '2px solid white' }}>
-              <p className="text-sm font-semibold text-white">
-                Why Choose Real Estate Crowdfunding
-              </p>
+            <div
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-5"
+              style={{ border: '1px solid rgba(255,255,255,0.25)', backgroundColor: 'rgba(255,255,255,0.07)' }}
+            >
+              <Star className="w-4 h-4" style={{ color: '#d0ac00' }} />
+              <p className="text-sm font-semibold text-white">Why Real Estate Crowdfunding</p>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: '#d0ac00' }}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#d0ac00' }}>
               Transform Your Investment Portfolio
             </h2>
-            <p className="text-xl max-w-3xl mx-auto text-white">
-              Access exclusive Saudi real estate opportunities with fractional ownership, professional management, and Shariah-compliant returns.
+            <p className="text-lg text-white/85 max-w-2xl mx-auto">
+              Access exclusive Saudi real estate with fractional ownership, professional management, and Shariah-compliant returns.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array(6).fill(null).map((_, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="overflow-hidden border-0 shadow-2xl h-full rounded-3xl">
-                  <div className="bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 p-5 border-b-2 border-gray-300">
-                    <h3 className="text-xl font-bold" style={{ color: '#004743' }}>Fractional Ownership</h3>
-                    <p className="text-sm" style={{ color: '#004743', opacity: 0.8 }}>Min. SAR 1,000</p>
-                  </div>
-                  <CardContent className="p-6 bg-white">
-                    <div className="flex items-start justify-between gap-4">
-                      <p className="text-base leading-relaxed flex-1" style={{ color: '#004743' }}>
-                        Invest in premium properties with as little as SAR 1,000
-                      </p>
-                      <div className="flex-shrink-0">
-                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                          {/* Person head */}
-                          <circle cx="40" cy="25" r="12" fill="#18605c"/>
-                          {/* Person body */}
-                          <path d="M40 40C30 40 22 44 22 50V58H58V50C58 44 50 40 40 40Z" fill="#18605c"/>
-                          {/* Gear background circle */}
-                          <circle cx="40" cy="57" r="18" fill="#18605c"/>
-                          {/* Gear teeth */}
-                          <path d="M40 42L42 45L40 48L38 45L40 42Z" fill="white"/>
-                          <path d="M48 45L51 47L48 49L45 47L48 45Z" fill="white"/>
-                          <path d="M48 65L51 67L48 69L45 67L48 65Z" fill="white"/>
-                          <path d="M32 45L35 47L32 49L29 47L32 45Z" fill="white"/>
-                          <path d="M32 65L35 67L32 69L29 67L32 65Z" fill="white"/>
-                          {/* Center circle with plus */}
-                          <circle cx="40" cy="57" r="10" fill="white"/>
-                          <path d="M40 52V62M35 57H45" stroke="#18605c" strokeWidth="2.5" strokeLinecap="round"/>
-                        </svg>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => {
+              const Icon = feature.icon
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                  viewport={{ once: true }}
+                >
+                  <Card className="overflow-hidden border-0 shadow-xl h-full rounded-2xl hover:-translate-y-1 transition-all duration-300">
+                    <div className="p-5 flex items-center gap-4" style={{ backgroundColor: '#004743' }}>
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
+                      >
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-white leading-tight">{feature.title}</h3>
+                        <p className="text-xs font-semibold mt-0.5" style={{ color: '#d0ac00' }}>{feature.subtitle}</p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                    <CardContent className="p-5 bg-white">
+                      <p className="text-sm leading-relaxed" style={{ color: '#1a4745' }}>
+                        {feature.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      {/* Exclusive Saudi Projects */}
-      <section className="py-20" style={{ backgroundColor: '#18605c' }}>
-        <div className="w-full px-2">
+      {/* ─── Exclusive Saudi Projects ─── */}
+      <section className="py-24" style={{ backgroundColor: '#18605c' }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-14"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Exclusive Saudi Projects</h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#efefef' }}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">Exclusive Saudi Projects</h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#c5dfdd' }}>
               Premium real estate opportunities in Saudi Arabia's most promising developments. Register to unlock detailed investment information.
             </p>
           </motion.div>
 
           {loading ? (
-            <div className="text-center py-12">
+            <div className="text-center py-16">
               <p className="text-white text-lg">Loading properties...</p>
             </div>
           ) : properties.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-16">
               <p className="text-white text-lg">No properties available at the moment</p>
             </div>
           ) : (
@@ -390,9 +433,9 @@ export default function WebsiteHome() {
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     viewport={{ once: true }}
                   >
-                    <Card className="bg-white overflow-hidden h-full flex flex-col shadow-lg hover:shadow-xl transition-shadow">
+                    <Card className="bg-white overflow-hidden h-full flex flex-col shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl border-0">
                       {/* Property Image */}
-                      <div className="h-48 relative bg-gradient-to-br from-emerald-600 to-teal-600">
+                      <div className="h-52 relative bg-gradient-to-br from-emerald-600 to-teal-600">
                         {primaryImage && (
                           <img
                             src={primaryImage.url}
@@ -400,64 +443,70 @@ export default function WebsiteHome() {
                             className="w-full h-full object-cover"
                           />
                         )}
+                        {/* Status badge */}
+                        <div
+                          className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm"
+                          style={{ backgroundColor: property.status === 'active' ? 'rgba(34,197,94,0.85)' : 'rgba(168,85,247,0.85)' }}
+                        >
+                          {property.status === 'active' ? 'Live' : 'Coming Soon'}
+                        </div>
                         {!isKYCCompleted && (
-                          <div className="absolute top-4 left-4 bg-emerald-800/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold">
-                            <Lock className="inline h-3 w-3 mr-1" />
+                          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                            <Lock className="h-3 w-3" />
                             KYC Required
                           </div>
                         )}
-                        <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm text-emerald-700">
+                        <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full font-bold text-sm shadow-sm" style={{ color: '#18605c' }}>
                           {Math.round(property.fundingProgress)}% Funded
                         </div>
                       </div>
 
                       <CardContent className="p-6 flex-1 flex flex-col">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{property.title}</h3>
-                        <p className="text-gray-600 mb-4 flex items-center">
-                          <span className="mr-1">📍</span>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">{property.title}</h3>
+                        <p className="text-sm text-gray-500 mb-5 flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
                           {property.location.district}, {property.location.city}
                         </p>
 
-                        <div className="grid grid-cols-3 gap-3 mb-4">
-                          <div>
-                            <p className="text-xs text-gray-500">Target Return</p>
-                            <p className="text-lg font-bold text-emerald-600">{property.financials.projectedYield}%</p>
+                        <div className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                          <div className="text-center">
+                            <p className="text-xs text-gray-400 mb-1">Target Return</p>
+                            <p className="text-base font-bold" style={{ color: '#18605c' }}>{property.financials.projectedYield}%</p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500">Min. Investment</p>
-                            <p className="text-sm font-bold text-gray-900">
-                              SAR {(property.financials.minInvestment / 1000).toFixed(0)}K
-                            </p>
+                          <div className="text-center border-x border-gray-200">
+                            <p className="text-xs text-gray-400 mb-1">Min. Invest</p>
+                            <p className="text-sm font-bold text-gray-800">SAR {(property.financials.minInvestment / 1000).toFixed(0)}K</p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500">Investors</p>
-                            <p className="text-sm font-bold text-gray-900">{property.investorCount}</p>
+                          <div className="text-center">
+                            <p className="text-xs text-gray-400 mb-1">Investors</p>
+                            <p className="text-sm font-bold text-gray-800">{property.investorCount}</p>
                           </div>
                         </div>
 
                         {/* Progress Bar */}
-                        <div className="mb-2">
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="mb-1.5">
+                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
-                              style={{ width: `${property.fundingProgress}%` }}
-                            ></div>
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{ width: `${property.fundingProgress}%`, background: 'linear-gradient(to right, #18605c, #004743)' }}
+                            />
                           </div>
                         </div>
-                        <p className="text-xs text-gray-600 mb-6">
+                        <p className="text-xs text-gray-400 mb-6">
                           SAR {(fundedAmount / 1000000).toFixed(2)}M of SAR {(property.financials.totalValue / 1000000).toFixed(0)}M funded
                         </p>
 
                         <div className="flex gap-3 mt-auto">
                           <Button
                             variant="outline"
-                            className="flex-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+                            className="flex-1 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl"
                             onClick={() => handleViewDetails(property._id)}
                           >
                             Learn More
                           </Button>
                           <Button
-                            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
+                            className="flex-1 font-bold text-black hover:opacity-90 rounded-xl"
+                            style={{ backgroundColor: '#d0ac00' }}
                             onClick={handleInvest}
                           >
                             Invest Now
@@ -475,7 +524,8 @@ export default function WebsiteHome() {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-teal-900"
+              className="border-2 text-white hover:bg-white/10 transition-colors px-8 h-14 rounded-xl"
+              style={{ borderColor: 'rgba(255,255,255,0.35)' }}
               onClick={() => setLocation('/website/properties')}
             >
               View All Opportunities
@@ -485,9 +535,9 @@ export default function WebsiteHome() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-gradient-to-b from-teal-900 to-gray-900">
-        <div className="w-full px-2">
+      {/* ─── How It Works ─── */}
+      <section className="py-24 bg-gradient-to-b from-teal-900 to-gray-900">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -495,15 +545,16 @@ export default function WebsiteHome() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Start Your Investment Journey</h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Four simple steps to building wealth through real estate
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">Start Your Investment Journey</h2>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              Four simple steps to building real estate wealth
             </p>
           </motion.div>
 
-          <div>
-            <div className="grid md:grid-cols-4 gap-8 relative">
-              {steps.map((step, index) => (
+          <div className="grid md:grid-cols-4 gap-8 relative">
+            {steps.map((step, index) => {
+              const Icon = step.icon
+              return (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -513,35 +564,42 @@ export default function WebsiteHome() {
                   className="relative"
                 >
                   <div className="text-center">
-                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-2xl font-bold mb-4 shadow-lg">
-                      {step.number}
+                    <div className="relative inline-flex mb-6">
+                      <div
+                        className="h-16 w-16 flex items-center justify-center rounded-full shadow-lg"
+                        style={{ backgroundColor: '#d0ac00' }}
+                      >
+                        <Icon className="w-7 h-7 text-black" />
+                      </div>
+                      <div
+                        className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-md"
+                      >
+                        <span className="text-xs font-bold" style={{ color: '#004743' }}>{step.number}</span>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-                    <p className="text-gray-300 text-sm">{step.description}</p>
+                    <h3 className="text-lg font-bold text-white mb-3">{step.title}</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{step.description}</p>
                   </div>
 
                   {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-yellow-500 to-transparent -translate-x-1/2"></div>
+                    <div
+                      className="hidden md:block absolute top-8 left-full w-full h-0.5 -translate-x-1/2"
+                      style={{ background: 'linear-gradient(to right, rgba(208,172,0,0.6), transparent)' }}
+                    />
                   )}
                 </motion.div>
-              ))}
-            </div>
+              )
+            })}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-16">
             <Button
               size="lg"
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg px-12"
+              className="font-bold text-black text-base px-10 h-14 rounded-xl shadow-lg hover:opacity-90 hover:-translate-y-0.5 transition-all"
+              style={{ backgroundColor: '#d0ac00' }}
               onClick={() => {
-                // Check if user is logged in
                 const userData = localStorage.getItem('zaron_user')
-                if (userData) {
-                  // User is logged in, go to properties page
-                  setLocation('/website/properties')
-                } else {
-                  // User is not logged in, go to register page
-                  setLocation('/register')
-                }
+                if (userData) { setLocation('/website/properties') } else { setLocation('/register') }
               }}
             >
               Start Investing Now
@@ -551,68 +609,74 @@ export default function WebsiteHome() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20" style={{ backgroundColor: '#18605c' }}>
-        <div className="w-full px-2">
+      {/* ─── Testimonials ─── */}
+      <section className="py-24" style={{ backgroundColor: '#18605c' }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-14"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: '#d0ac00' }}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#d0ac00' }}>
               Trusted by Thousands of Investors
             </h2>
-            <p className="text-white text-lg mb-8">
+            <p className="text-white/80 text-lg">
               Join our community of successful real estate investors across Saudi Arabia
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            {[1, 2, 3].map((item, index) => (
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((item, index) => (
               <motion.div
-                key={item}
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="bg-teal-800/60 backdrop-blur-sm border border-teal-700/50 overflow-hidden h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-3xl font-bold text-white mb-1">18%</h3>
-                        <p className="text-teal-200 text-sm">Annual Returns</p>
-                      </div>
-                      <ArrowUpRight className="w-6 h-6 text-teal-300" />
+                <Card
+                  className="h-full rounded-2xl border-0 overflow-hidden shadow-xl"
+                  style={{ backgroundColor: 'rgba(0,55,50,0.55)', border: '1px solid rgba(255,255,255,0.08)' }}
+                >
+                  <CardContent className="p-7 flex flex-col h-full">
+                    {/* Stars */}
+                    <div className="flex gap-1 mb-5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      ))}
                     </div>
 
-                    <p className="text-white/90 italic mb-6 leading-relaxed text-sm">
-                      "Zaron has transformed my investment strategy. The platform's transparency and Shariah-compliant options align perfectly with my values. I've achieved 18% returns consistently."
+                    {/* Return highlight */}
+                    <div className="flex items-baseline gap-3 mb-5">
+                      <span className="text-4xl font-bold text-white">{item.returns}</span>
+                      <div className="flex items-center gap-1.5">
+                        <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+                        <span className="text-sm text-emerald-400 font-medium">Annual Returns</span>
+                      </div>
+                    </div>
+
+                    <p className="text-white/80 italic mb-6 leading-relaxed text-sm flex-1">
+                      "{item.quote}"
                     </p>
 
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-teal-700/50 flex items-center justify-center border border-teal-600/30">
-                        <User className="w-6 h-6 text-white" />
+                    <div className="flex items-center gap-3 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm"
+                        style={{ backgroundColor: '#d0ac00', color: '#004743' }}
+                      >
+                        {item.initials}
                       </div>
                       <div>
-                        <h4 className="text-white font-semibold">Ahmed Al-Rashid</h4>
-                        <p className="text-teal-200 text-xs">Private Equity Investor</p>
-                        <p className="text-teal-300 text-xs">Riyadh</p>
+                        <h4 className="text-white font-semibold text-sm">{item.name}</h4>
+                        <p className="text-white/55 text-xs">{item.role} · {item.city}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
-          </div>
-
-          {/* Carousel Dots */}
-          <div className="flex justify-center gap-2 mt-8">
-            <div className="w-2 h-2 rounded-full bg-white"></div>
-            <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
-            <div className="w-2 h-2 rounded-full bg-white"></div>
           </div>
         </div>
       </section>

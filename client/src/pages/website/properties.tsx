@@ -30,7 +30,8 @@ import {
   Building2,
   DollarSign,
   Zap,
-  ArrowLeft
+  ArrowLeft,
+  ArrowRight
 } from "lucide-react"
 import { useLocation } from "wouter"
 
@@ -200,9 +201,9 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className="bg-white overflow-hidden h-full flex flex-col shadow-lg hover:shadow-xl transition-shadow" data-property-id={property._id}>
+      <Card className="bg-white overflow-hidden h-full flex flex-col shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl border-0" data-property-id={property._id}>
         {/* Property Image */}
-        <div className="h-48 relative bg-gradient-to-br from-emerald-600 to-teal-600 cursor-pointer" onClick={() => onDetailsClick(property)}>
+        <div className="h-52 relative bg-gradient-to-br from-emerald-600 to-teal-600 cursor-pointer" onClick={() => onDetailsClick(property)}>
           {isKYCCompleted ? (
             // Show normal image for KYC-approved users
             <img
@@ -262,50 +263,51 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
         </div>
 
         <CardContent className="p-6 flex-1 flex flex-col">
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">{property.title}</h3>
-          <p className="text-gray-600 mb-4 flex items-center">
-            <span className="mr-1">📍</span>
+          <h3 className="text-xl font-bold text-gray-900 mb-1.5 leading-tight">{property.title}</h3>
+          <p className="text-sm text-gray-500 mb-5 flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
             {property.location.district}, {property.location.city}
           </p>
 
           {isKYCCompleted ? (
             <>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div>
-                  <p className="text-xs text-gray-500">Target Return</p>
-                  <p className="text-lg font-bold text-emerald-600">{property.financials.projectedYield}%</p>
+              <div className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 mb-1">Target Return</p>
+                  <p className="text-base font-bold text-emerald-600">{property.financials.projectedYield}%</p>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500">Min. Investment</p>
-                  <p className="text-sm font-bold text-gray-900">
+                <div className="text-center border-x border-gray-200">
+                  <p className="text-xs text-gray-400 mb-1">Min. Invest</p>
+                  <p className="text-sm font-bold text-gray-800">
                     SAR {(property.financials.minInvestment / 1000).toFixed(0)}K
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500">Investors</p>
-                  <p className="text-sm font-bold text-gray-900">{property.investorCount}</p>
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 mb-1">Investors</p>
+                  <p className="text-sm font-bold text-gray-800">{property.investorCount}</p>
                 </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="mb-2">
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="mb-1.5">
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
-                    style={{ width: `${property.fundingProgress}%` }}
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${property.fundingProgress}%`, background: 'linear-gradient(to right, #18605c, #004743)' }}
                   ></div>
                 </div>
               </div>
-              <p className="text-xs text-gray-600 mb-6">
+              <p className="text-xs text-gray-400 mb-6">
                 SAR {((property.financials.totalValue * property.fundingProgress / 100) / 1000000).toFixed(2)}M of SAR {(property.financials.totalValue / 1000000).toFixed(0)}M funded
               </p>
 
               <div className="flex gap-3 mt-auto">
                 <Button
-                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
+                  className="w-full font-bold text-black hover:opacity-90 rounded-xl"
+                  style={{ backgroundColor: '#d0ac00' }}
                   onClick={() => onDetailsClick(property)}
                 >
-                  Invest Now
+                  View & Invest
                 </Button>
               </div>
             </>
@@ -497,7 +499,7 @@ export default function WebsitePropertiesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800">
-      <div className="w-full px-2 py-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -517,11 +519,11 @@ export default function WebsitePropertiesPage() {
           </div>
 
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-4 uppercase tracking-wide">
-              All Investment Properties
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+              Investment Properties
             </h1>
-            <p className="text-xl text-white max-w-2xl mx-auto">
-              Explore all available real estate investment opportunities in Saudi Arabia
+            <p className="text-lg text-white/80 max-w-2xl mx-auto">
+              Explore premium real estate investment opportunities across Saudi Arabia
             </p>
           </div>
         </motion.div>
@@ -801,24 +803,25 @@ export default function WebsitePropertiesPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-16"
           >
-            <Card className="bg-teal-800/90 border border-teal-700/50">
-              <CardContent className="text-center py-12">
-                <h3 className="text-3xl font-bold mb-4 text-white uppercase">Ready to Start Investing?</h3>
-                <p className="text-teal-200 mb-6 text-lg max-w-2xl mx-auto">
+            <Card className="rounded-2xl border-0 overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,71,67,0.9), rgba(24,96,92,0.9))', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <CardContent className="text-center py-14 px-8">
+                <h3 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to Start Investing?</h3>
+                <p className="text-white/75 mb-8 text-lg max-w-2xl mx-auto">
                   {isKYCCompleted
-                    ? "You have access! Start building wealth through premium real estate opportunities"
-                    : "Complete your KYC verification to unlock full access and start investing"}
+                    ? "You have full access. Start building wealth through premium real estate opportunities."
+                    : "Complete your KYC verification to unlock full access and start investing today."}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {isKYCCompleted ? (
-                    <Button size="lg" className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
+                    <Button size="lg" className="font-bold text-black h-14 px-10 rounded-xl hover:opacity-90" style={{ backgroundColor: '#d0ac00' }}>
                       <DollarSign className="w-5 h-5 mr-2" />
                       Start Investing Now
                     </Button>
                   ) : (
                     <Button
                       size="lg"
-                      className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold"
+                      className="font-bold text-black h-14 px-10 rounded-xl hover:opacity-90"
+                      style={{ backgroundColor: '#d0ac00' }}
                       onClick={() => setLocation('/kyc-verification')}
                     >
                       <Shield className="w-5 h-5 mr-2" />
@@ -828,10 +831,12 @@ export default function WebsitePropertiesPage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white text-white hover:bg-white hover:text-gray-900"
+                    className="h-14 px-10 rounded-xl border-2 text-white hover:bg-white/10"
+                    style={{ borderColor: 'rgba(255,255,255,0.35)' }}
                     onClick={() => setLocation('/website/about')}
                   >
                     Learn More
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </div>
               </CardContent>
