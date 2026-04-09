@@ -738,7 +738,7 @@ export default function PropertyDetailsPage() {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full border-teal-600 text-teal-700 dark:text-teal-200 hover:bg-teal-700/50 hover:text-white"
+                className="w-full border-teal-400 text-teal-200 hover:bg-teal-600/50 hover:text-white"
                 onClick={() => setLocation('/website/properties')}
               >
                 View More Properties
