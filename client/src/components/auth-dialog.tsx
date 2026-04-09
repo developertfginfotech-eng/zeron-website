@@ -142,15 +142,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
       })
       setOpen(false)
 
-      // Redirect based on KYC status
-      const kycStatus = userData.kycStatus || 'not_started'
-      if (kycStatus === 'approved') {
-        // If KYC is approved, go to dashboard
-        setLocation('/investor/dashboard')
-      } else {
-        // If KYC is not approved, go to KYC verification page
-        setLocation('/kyc-verification')
-      }
+      // Redirect to properties page after login
+      setLocation('/website/properties')
     },
     onError: (error: any) => {
       if (error.message.includes('not found')) {
