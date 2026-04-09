@@ -603,16 +603,71 @@ export default function PropertyDetailsPage() {
                         </div>
 
                         {/* Total Returns Summary */}
-                        <div className="bg-teal-900/50 border border-teal-700/40 p-3 rounded-lg space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-teal-300">Investment:</span>
-                            <span className="font-medium text-white">SAR {calculatorResults.investmentAmount?.toLocaleString() || 0}</span>
-                          </div>
-                          <div className="flex justify-between pt-2 border-t border-teal-700/40">
-                            <span className="font-semibold text-white">Total Returns at Maturity:</span>
-                            <span className="font-bold text-lg text-emerald-400">+SAR {Math.round(calculatorResults.returns?.atMaturity?.totalReturns || 0).toLocaleString()}</span>
-                          </div>
-                        </div>
+                        {(() => {
+                          const invested = calculatorResults.investmentAmount || 0;
+                          const rental = Math.round(calculatorResults.returns?.atMaturity?.rentalYield || 0);
+                          const appreciation = Math.round(calculatorResults.returns?.atMaturity?.appreciation || 0);
+                          const totalReturns = rental + appreciation;
+                          const finalValue = invested + totalReturns;
+                          const roi = invested > 0 ? ((totalReturns / invested) * 100).toFixed(1) : '0.0';
+                          const rentalPct = totalReturns > 0 ? (rental / totalReturns) * 100 : 50;
+                          const appreciationPct = 100 - rentalPct;
+                          return (
+                            <div className="bg-teal-900/50 border border-teal-700/40 rounded-lg overflow-hidden text-sm">
+                              {/* Header */}
+                              <div className="px-4 pt-3 pb-2 border-b border-teal-700/40">
+                                <p className="text-xs text-teal-300 uppercase tracking-wide">Returns Breakdown at Maturity</p>
+                              </div>
+                              {/* Breakdown rows */}
+                              <div className="px-4 py-3 space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-teal-300">Capital Invested</span>
+                                  <span className="font-medium text-white">SAR {invested.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span>
+                                    <span className="text-teal-300">Rental Income ({calculatorResults.settings?.rentalYieldPercentage}% × {calculatorResults.returns?.atMaturity?.years}yr)</span>
+                                  </div>
+                                  <span className="font-medium text-green-400">+SAR {rental.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+                                    <span className="text-teal-300">Property Appreciation ({calculatorResults.settings?.appreciationRatePercentage}% compound)</span>
+                                  </div>
+                                  <span className="font-medium text-blue-400">+SAR {appreciation.toLocaleString()}</span>
+                                </div>
+                              </div>
+                              {/* Visual bar */}
+                              <div className="px-4 pb-3">
+                                <div className="w-full h-2 rounded-full overflow-hidden flex">
+                                  <div className="bg-green-400 h-full transition-all" style={{ width: `${rentalPct}%` }}></div>
+                                  <div className="bg-blue-400 h-full transition-all" style={{ width: `${appreciationPct}%` }}></div>
+                                </div>
+                                <div className="flex justify-between text-xs text-teal-400 mt-1">
+                                  <span>Rental {rentalPct.toFixed(0)}%</span>
+                                  <span>Appreciation {appreciationPct.toFixed(0)}%</span>
+                                </div>
+                              </div>
+                              {/* Totals */}
+                              <div className="px-4 py-3 border-t border-teal-700/40 space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-white font-semibold">Total Returns</span>
+                                  <span className="font-bold text-lg text-emerald-400">+SAR {totalReturns.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-teal-300">Final Portfolio Value</span>
+                                  <span className="font-bold text-white">SAR {finalValue.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-1 border-t border-teal-700/30">
+                                  <span className="text-teal-300">ROI over {calculatorResults.returns?.atMaturity?.years} years</span>
+                                  <span className="font-bold text-yellow-400">+{roi}%</span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         {/* Early Withdrawal Warning */}
                         {calculatorResults.earlyWithdrawal && (
