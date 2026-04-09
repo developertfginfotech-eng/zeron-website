@@ -226,8 +226,11 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
         loginForm.setValue('email', registerForm.getValues('email'))
         setActiveTab('login')
       } else if (error.response?.data?.errors) {
-        // Show validation errors from backend
-        const errorMessages = Object.values(error.response.data.errors).join(', ')
+        // Backend returns errors as array [{msg, path}] or object
+        const errors = error.response.data.errors
+        const errorMessages = Array.isArray(errors)
+          ? errors.map((e: any) => e.msg).join('\n')
+          : Object.values(errors).join('\n')
         toast({
           title: "Registration failed",
           description: errorMessages,
@@ -559,12 +562,13 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                                 <Input
                                   {...field}
                                   type="tel"
-                                  placeholder="+966 50 123 4567"
+                                  placeholder="+966 5X XXX XXXX"
                                   className="pl-12 h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
                                   data-testid="input-phone"
                                 />
                               </div>
                             </FormControl>
+                            <p className="text-xs text-muted-foreground mt-1">Saudi number only — e.g. +966 512345678 or 0512345678</p>
                             <FormMessage />
                           </FormItem>
                         )}
