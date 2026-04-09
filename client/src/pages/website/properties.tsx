@@ -27,6 +27,7 @@ import {
   Eye,
   Shield,
   CheckCircle,
+  Clock,
   Building2,
   DollarSign,
   Zap,
@@ -579,9 +580,11 @@ export default function WebsitePropertiesPage() {
                 Find Your Perfect Investment
               </CardTitle>
               <CardDescription className="text-white">
-                {isKYCCompleted
-                  ? "Search and filter properties - you have full access to all details"
-                  : "Browse available properties - complete KYC to unlock full details"}
+                {kycStatus === 'approved'
+                  ? "Search and filter properties — you have full access to all details"
+                  : (kycStatus === 'submitted' || kycStatus === 'under_review')
+                  ? "Your KYC is under review — property details visible once approved"
+                  : "Browse available properties — complete KYC to unlock full details"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -713,10 +716,16 @@ export default function WebsitePropertiesPage() {
             <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
               {properties.filter(p => p.status === 'upcoming').length} Coming Soon
             </Badge>
-            {isKYCCompleted && (
+            {kycStatus === 'approved' && (
               <Badge variant="outline" className="bg-yellow-400 text-gray-900 border-yellow-500 font-bold">
                 <CheckCircle className="w-3 h-3 mr-1" />
                 KYC Verified
+              </Badge>
+            )}
+            {(kycStatus === 'submitted' || kycStatus === 'under_review') && (
+              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                <Clock className="w-3 h-3 mr-1" />
+                KYC Pending
               </Badge>
             )}
           </div>
