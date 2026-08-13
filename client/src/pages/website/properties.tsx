@@ -126,21 +126,21 @@ const getPropertyTags = (property: BackendProperty) => {
   const tags = [];
 
   if (property.status === 'active') {
-    tags.push({ text: 'Live', class: 'bg-blue-500/90' });
+    tags.push({ key: 'status_live', class: 'bg-blue-500/90' });
   } else if (property.status === 'upcoming') {
-    tags.push({ text: 'Coming Soon', class: 'bg-purple-500/90' });
+    tags.push({ key: 'status_coming_soon', class: 'bg-purple-500/90' });
   }
 
   if (property.propertyType === 'commercial') {
-    tags.push({ text: 'Commercial', class: 'bg-emerald-500/90' });
+    tags.push({ key: 'commercial', class: 'bg-emerald-500/90' });
   } else if (property.propertyType === 'residential') {
-    tags.push({ text: 'Residential', class: 'bg-blue-500/90' });
+    tags.push({ key: 'prop_residential', class: 'bg-blue-500/90' });
   } else if (property.propertyType === 'retail') {
-    tags.push({ text: 'Retail', class: 'bg-orange-500/90' });
+    tags.push({ key: 'prop_retail', class: 'bg-orange-500/90' });
   }
 
   if (property.financials.projectedYield >= 15) {
-    tags.push({ text: 'High Yield', class: 'bg-amber-500/90' });
+    tags.push({ key: 'high_yield', class: 'bg-amber-500/90' });
   }
 
   return tags.slice(0, 2); // Limit to 2 tags
@@ -149,6 +149,7 @@ const getPropertyTags = (property: BackendProperty) => {
 // Property Card Component with KYC Lock
 const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: BackendProperty; onInvestClick: (property: BackendProperty) => void; onDetailsClick: (property: BackendProperty) => void }) => {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const remainingDays = getRemainingDays(property.timeline?.fundingDeadline);
   const tags = getPropertyTags(property);
   const [, setLocation] = useLocation();
@@ -232,7 +233,7 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
                   <div className="mx-auto w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-3 backdrop-blur-sm">
                     <Lock className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="font-semibold text-white mb-2 text-sm">KYC Required</h3>
+                  <h3 className="font-semibold text-white mb-2 text-sm">{t("kyc_required")}</h3>
                   <p className="text-xs text-white/80 mb-3">
                     {!isLoggedIn
                       ? "Login and verify your identity"
@@ -274,17 +275,17 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
             <>
               <div className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl bg-gray-50 border border-gray-100">
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 mb-1">Target Return</p>
+                  <p className="text-xs text-gray-400 mb-1">{t("label_target_return")}</p>
                   <p className="text-base font-bold text-emerald-600">{property.financials.projectedYield}%</p>
                 </div>
                 <div className="text-center border-x border-gray-200">
-                  <p className="text-xs text-gray-400 mb-1">Min. Invest</p>
+                  <p className="text-xs text-gray-400 mb-1">{t("label_min_invest")}</p>
                   <p className="text-sm font-bold text-gray-800">
                     SAR {(property.financials.minInvestment / 1000).toFixed(0)}K
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 mb-1">Investors</p>
+                  <p className="text-xs text-gray-400 mb-1">{t("label_investors")}</p>
                   <p className="text-sm font-bold text-gray-800">{property.investorCount}</p>
                 </div>
               </div>
@@ -308,7 +309,7 @@ const PropertyCard = ({ property, onInvestClick, onDetailsClick }: { property: B
                   style={{ backgroundColor: '#d0ac00' }}
                   onClick={() => onDetailsClick(property)}
                 >
-                  View & Invest
+                  {t("prop_view_invest")}
                 </Button>
               </div>
             </>
@@ -515,16 +516,16 @@ export default function WebsitePropertiesPage() {
               className="flex items-center gap-2 text-white hover:bg-teal-700/50"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Invest
+              {t("prop_back_to_invest")}
             </Button>
           </div>
 
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-              Investment Properties
+              {t("prop_page_title")}
             </h1>
             <p className="text-lg text-white/80 max-w-2xl mx-auto">
-              Explore premium real estate investment opportunities across Saudi Arabia
+              {t("prop_page_sub")}
             </p>
           </div>
         </motion.div>
@@ -577,11 +578,11 @@ export default function WebsitePropertiesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <Search className="w-5 h-5 text-yellow-400" />
-                Find Your Perfect Investment
+                {t("prop_find_perfect")}
               </CardTitle>
               <CardDescription className="text-white">
                 {kycStatus === 'approved'
-                  ? "Search and filter properties — you have full access to all details"
+                  ? t("prop_search_filter_full")
                   : (kycStatus === 'submitted' || kycStatus === 'under_review')
                   ? "Your KYC is under review — property details visible once approved"
                   : "Browse available properties — complete KYC to unlock full details"}
@@ -594,7 +595,7 @@ export default function WebsitePropertiesPage() {
                   <div className="relative">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-teal-300" />
                     <Input
-                      placeholder="Search by title or location..."
+                      placeholder={t("prop_search_placeholder")}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-9 bg-teal-700/50 border-teal-600/50 text-white placeholder:text-white/70"
@@ -604,24 +605,24 @@ export default function WebsitePropertiesPage() {
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="bg-teal-700/50 border-teal-600/50 text-white">
                       <Filter className="h-4 w-4 mr-2 text-yellow-400" />
-                      <SelectValue placeholder="Filter by status" />
+                      <SelectValue placeholder={t("prop_filter_status")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Live Properties</SelectItem>
-                      <SelectItem value="upcoming">Coming Soon</SelectItem>
+                      <SelectItem value="all">{t("prop_all_status")}</SelectItem>
+                      <SelectItem value="active">{t("prop_live_properties")}</SelectItem>
+                      <SelectItem value="upcoming">{t("status_coming_soon")}</SelectItem>
                     </SelectContent>
                   </Select>
 
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
                     <SelectTrigger className="bg-teal-700/50 border-teal-600/50 text-white">
-                      <SelectValue placeholder="Property type" />
+                      <SelectValue placeholder={t("prop_property_type")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="residential">Residential</SelectItem>
-                      <SelectItem value="commercial">Commercial</SelectItem>
-                      <SelectItem value="retail">Retail</SelectItem>
+                      <SelectItem value="all">{t("prop_all_types")}</SelectItem>
+                      <SelectItem value="residential">{t("prop_residential")}</SelectItem>
+                      <SelectItem value="commercial">{t("commercial")}</SelectItem>
+                      <SelectItem value="retail">{t("prop_retail")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -631,10 +632,10 @@ export default function WebsitePropertiesPage() {
                   <Select value={cityFilter} onValueChange={setCityFilter}>
                     <SelectTrigger className="bg-teal-700/50 border-teal-600/50 text-white">
                       <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
-                      <SelectValue placeholder="Filter by city" />
+                      <SelectValue placeholder={t("prop_filter_city")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Cities</SelectItem>
+                      <SelectItem value="all">{t("prop_all_cities")}</SelectItem>
                       {uniqueCities.map(city => (
                         <SelectItem key={city} value={city}>
                           {city}
@@ -644,18 +645,18 @@ export default function WebsitePropertiesPage() {
                   </Select>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block text-white">Price: SAR {minPrice}-{maxPrice}</label>
+                    <label className="text-sm font-medium mb-2 block text-white">{t("prop_price_range", { min: minPrice, max: maxPrice })}</label>
                     <div className="flex gap-2">
                       <Input
                         type="number"
-                        placeholder="Min"
+                        placeholder={t("prop_min")}
                         value={minPrice}
                         onChange={(e) => setMinPrice(Math.max(0, parseInt(e.target.value) || 0))}
                         className="bg-teal-700/50 border-teal-600/50 text-white text-xs"
                       />
                       <Input
                         type="number"
-                        placeholder="Max"
+                        placeholder={t("prop_max")}
                         value={maxPrice}
                         onChange={(e) => setMaxPrice(Math.max(minPrice, parseInt(e.target.value) || 100000))}
                         className="bg-teal-700/50 border-teal-600/50 text-white text-xs"
@@ -664,10 +665,10 @@ export default function WebsitePropertiesPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block text-white">Min Return: {minReturn}%</label>
+                    <label className="text-sm font-medium mb-2 block text-white">{t("prop_min_return_label", { value: minReturn })}</label>
                     <Input
                       type="number"
-                      placeholder="Min return %"
+                      placeholder={t("prop_min_return_pct")}
                       value={minReturn}
                       onChange={(e) => setMinReturn(Math.max(0, parseInt(e.target.value) || 0))}
                       className="bg-teal-700/50 border-teal-600/50 text-white"
@@ -688,7 +689,7 @@ export default function WebsitePropertiesPage() {
                       }}
                       className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold border-0"
                     >
-                      Clear All
+                      {t("prop_clear_all")}
                     </Button>
                   </div>
                 </div>
@@ -706,20 +707,20 @@ export default function WebsitePropertiesPage() {
         >
           <h2 className="text-2xl font-semibold text-white">
             {filteredProperties.length > 0
-              ? `${filteredProperties.length} Properties Found`
-              : 'No Properties Found'}
+              ? t("prop_found_count", { count: filteredProperties.length })
+              : t("prop_none_found")}
           </h2>
           <div className="flex gap-2">
             <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-              {properties.filter(p => p.status === 'active').length} Live
+              {t("prop_count_live", { count: properties.filter(p => p.status === 'active').length })}
             </Badge>
             <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-              {properties.filter(p => p.status === 'upcoming').length} Coming Soon
+              {t("prop_count_coming_soon", { count: properties.filter(p => p.status === 'upcoming').length })}
             </Badge>
             {kycStatus === 'approved' && (
               <Badge variant="outline" className="bg-yellow-400 text-gray-900 border-yellow-500 font-bold">
                 <CheckCircle className="w-3 h-3 mr-1" />
-                KYC Verified
+                {t("prop_kyc_verified")}
               </Badge>
             )}
             {(kycStatus === 'submitted' || kycStatus === 'under_review') && (
@@ -737,7 +738,7 @@ export default function WebsitePropertiesPage() {
             <Card className="max-w-md mx-auto bg-teal-800/90 backdrop-blur-sm border border-teal-700/50">
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <Loader2 className="h-12 w-12 animate-spin mb-4 text-yellow-400" />
-                <p className="text-lg text-white">Loading properties...</p>
+                <p className="text-lg text-white">{t("home_loading_properties")}</p>
               </CardContent>
             </Card>
           </div>
@@ -784,7 +785,7 @@ export default function WebsitePropertiesPage() {
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <Search className="h-12 w-12 text-yellow-400 mb-4" />
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-2 text-white">No Properties Found</h3>
+                  <h3 className="text-lg font-semibold mb-2 text-white">{t("prop_none_found")}</h3>
                   <p className="text-teal-200 mb-4">
                     No properties match your current search criteria
                   </p>
@@ -796,7 +797,7 @@ export default function WebsitePropertiesPage() {
                     }}
                     className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold"
                   >
-                    Clear All Filters
+                    {t("prop_clear_all_filters")}
                   </Button>
                 </div>
               </CardContent>
@@ -814,17 +815,17 @@ export default function WebsitePropertiesPage() {
           >
             <Card className="rounded-2xl border-0 overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,71,67,0.9), rgba(24,96,92,0.9))', border: '1px solid rgba(255,255,255,0.1)' }}>
               <CardContent className="text-center py-14 px-8">
-                <h3 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to Start Investing?</h3>
+                <h3 className="text-3xl md:text-4xl font-bold mb-4 text-white">{t("ready_to_start_investing")}</h3>
                 <p className="text-white/75 mb-8 text-lg max-w-2xl mx-auto">
                   {isKYCCompleted
-                    ? "You have full access. Start building wealth through premium real estate opportunities."
+                    ? t("prop_cta_full_access")
                     : "Complete your KYC verification to unlock full access and start investing today."}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {isKYCCompleted ? (
                     <Button size="lg" className="font-bold text-black h-14 px-10 rounded-xl hover:opacity-90" style={{ backgroundColor: '#d0ac00' }}>
                       <DollarSign className="w-5 h-5 mr-2" />
-                      Start Investing Now
+                      {t("start_investing_now")}
                     </Button>
                   ) : (
                     <Button
@@ -844,7 +845,7 @@ export default function WebsitePropertiesPage() {
                     style={{ borderColor: 'rgba(255,255,255,0.35)' }}
                     onClick={() => setLocation('/website/about')}
                   >
-                    Learn More
+                    {t("learn_more")}
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </div>

@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useTranslation } from "@/hooks/use-translation"
+import { SUPPORTED_LANGUAGES } from "@/components/language-provider"
 import { useAuth } from "@/hooks/use-auth"
 import Logo from "@/components/logo"
 import { Mail, User, Phone, Globe, TrendingUp, Building, Shield, Star } from "lucide-react"
@@ -303,8 +304,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                       <TrendingUp className="w-6 h-6 text-emerald-300" />
                     </div>
                     <div>
-                      <p className="font-sans font-bold text-lg">20%+ Average Returns</p>
-                      <p className="font-sans text-blue-200">Proven track record</p>
+                      <p className="font-sans font-bold text-lg">{t("auth_returns_title")}</p>
+                      <p className="font-sans text-blue-200">{t("auth_returns_sub")}</p>
                     </div>
                   </div>
                   
@@ -313,8 +314,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                       <Building className="w-6 h-6 text-blue-300" />
                     </div>
                     <div>
-                      <p className="font-sans font-bold text-lg">Premium Properties</p>
-                      <p className="font-sans text-blue-200">Handpicked real estate</p>
+                      <p className="font-sans font-bold text-lg">{t("premium_properties")}</p>
+                      <p className="font-sans text-blue-200">{t("auth_premium_sub")}</p>
                     </div>
                   </div>
                   
@@ -323,8 +324,8 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                       <Shield className="w-6 h-6 text-purple-300" />
                     </div>
                     <div>
-                      <p className="font-sans font-bold text-lg">Secure Platform</p>
-                      <p className="font-sans text-blue-200">Bank-level security standards</p>
+                      <p className="font-sans font-bold text-lg">{t("auth_secure_title")}</p>
+                      <p className="font-sans text-blue-200">{t("auth_secure_sub")}</p>
                     </div>
                   </div>
                 </div>
@@ -339,9 +340,9 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                     ))}
                   </div>
                   <p className="font-sans text-white text-lg leading-relaxed mb-4">
-                    "Outstanding platform for real estate investment. Professional service and excellent returns."
+                    "{t("auth_testimonial")}"
                   </p>
-                  <p className="font-sans text-blue-200">- Ahmed Al-Rashid, Verified Investor</p>
+                  <p className="font-sans text-blue-200">{t("auth_testimonial_author")}</p>
                 </div>
                 
                 <div className="flex items-center gap-3 justify-center">
@@ -364,10 +365,10 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                     <User className="w-8 h-8 text-white" />
                   </div>
                   <h2 className="font-display text-3xl font-bold text-gray-900 dark:text-white">
-                    START YOUR JOURNEY
+                    {t("auth_start_journey")}
                   </h2>
                   <p className="font-sans text-gray-600 dark:text-gray-300 text-lg">
-                    Join thousands building wealth through real estate
+                    {t("auth_join_building")}
                   </p>
                 </div>
               
@@ -408,13 +409,13 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Password</FormLabel>
+                            <FormLabel className="text-base font-medium">{t("password")}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
                                   {...field}
                                   type="password"
-                                  placeholder="Enter your password"
+                                  placeholder={t("enter_password")}
                                   className="h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
                                   data-testid="input-login-password"
                                 />
@@ -432,11 +433,11 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                           disabled={loginMutation.isPending}
                           data-testid="button-login-submit"
                         >
-                          {loginMutation.isPending ? "Checking account..." : "Continue to Dashboard"}
+                          {loginMutation.isPending ? t("auth_checking_account") : t("auth_continue_dashboard")}
                         </Button>
                         
                         <div className="text-center text-sm text-gray-500">
-                          New to Zaron? Switch to{" "}
+                          {t("auth_new_to_zaron")}{" "}
                           <button 
                             type="button" 
                             onClick={() => setActiveTab('register')}
@@ -526,13 +527,13 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Password</FormLabel>
+                            <FormLabel className="text-base font-medium">{t("password")}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
                                   {...field}
                                   type="password"
-                                  placeholder="Create a strong password"
+                                  placeholder={t("create_strong_password")}
                                   className="h-12 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500"
                                   data-testid="input-register-password"
                                 />
@@ -572,7 +573,7 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                         name="preferredLanguage"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Preferred Language</FormLabel>
+                            <FormLabel className="text-base font-medium">{t("preferred_language")}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Globe className="absolute left-4 top-4 h-5 w-5 text-muted-foreground z-10" />
@@ -581,13 +582,9 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
                                   className="w-full pl-12 pr-4 py-4 h-12 text-base bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                   data-testid="select-language"
                                 >
-                                  <option value="en">English</option>
-                                  <option value="ar">العربية</option>
-                                  <option value="hi">हिन्दी</option>
-                                  <option value="ur">اردو</option>
-                                  <option value="bn">বাংলা</option>
-                                  <option value="ta">தமிழ்</option>
-                                  <option value="te">తెలుగు</option>
+                                  {SUPPORTED_LANGUAGES.map((lang) => (
+                                    <option key={lang.code} value={lang.code}>{lang.name}</option>
+                                  ))}
                                 </select>
                               </div>
                             </FormControl>
@@ -623,16 +620,16 @@ export function AuthDialog({ children, defaultTab = "login" }: AuthDialogProps) 
               </Tabs>
               
               <div className="text-center text-sm text-gray-500 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <p className="mb-3">By continuing, you agree to our Terms of Service and Privacy Policy</p>
+                <p className="mb-3">{t("auth_terms_notice")}</p>
                 <div className="flex items-center gap-3 justify-center">
                   <div className="flex items-center gap-1">
                     <Shield className="w-4 h-4 text-green-600" />
-                    <span className="text-green-600 font-medium">Bank-Level Security</span>
+                    <span className="text-green-600 font-medium">{t("auth_bank_security")}</span>
                   </div>
                   <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
                   <div className="flex items-center gap-1">
                     <Building className="w-4 h-4 text-blue-600" />
-                    <span className="text-blue-600 font-medium">Fully Licensed</span>
+                    <span className="text-blue-600 font-medium">{t("auth_fully_licensed")}</span>
                   </div>
                 </div>
               </div>
