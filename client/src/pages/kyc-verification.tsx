@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "@/hooks/use-translation"
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -35,6 +36,7 @@ import {
 } from "lucide-react";
 
 const KYCVerificationPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [showSkipDialog, setShowSkipDialog] = useState(false);
@@ -558,7 +560,7 @@ const KYCVerificationPage = () => {
         ) : (
           <div>
             <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-            <p className="text-sm text-gray-600">Click to upload</p>
+            <p className="text-sm text-gray-600">{t("kyc_click_upload")}</p>
             <p className="text-xs text-gray-500 mt-1">{description}</p>
           </div>
         )}
@@ -571,7 +573,7 @@ const KYCVerificationPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading your KYC information...</p>
+          <p>{t("kyc_loading")}</p>
         </div>
       </div>
     );
@@ -587,7 +589,7 @@ const KYCVerificationPage = () => {
               <Shield className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">Identity Verification</h1>
+              <h1 className="text-xl font-bold">{t("kyc_identity_verification")}</h1>
               <p className="text-sm text-muted-foreground">
                 Secure your investment account
               </p>
@@ -610,7 +612,7 @@ const KYCVerificationPage = () => {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Complete Your Profile</h2>
+            <h2 className="text-2xl font-bold">{t("kyc_complete_profile")}</h2>
             <Badge variant="secondary">
               {kycCompletionPercentage > 0
                 ? `${kycCompletionPercentage}% Complete`
@@ -625,7 +627,7 @@ const KYCVerificationPage = () => {
           {isLoading && uploadProgress > 0 && (
             <div className="mb-4">
               <div className="flex justify-between text-sm text-muted-foreground mb-1">
-                <span>Uploading documents...</span>
+                <span>{t("kyc_uploading")}</span>
                 <span>{Math.round(uploadProgress)}%</span>
               </div>
               <Progress value={uploadProgress} className="h-2" />
@@ -673,7 +675,7 @@ const KYCVerificationPage = () => {
 
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-900 dark:text-white">KYC Verification</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{t("kyc_page_title")}</span>
                   <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     kycStatus === 'approved'
                       ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
@@ -690,14 +692,14 @@ const KYCVerificationPage = () => {
                 {(kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'pending_review') && (
                   <div className="mt-3 flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
                     <Clock className="h-4 w-4" />
-                    <span>Your documents are being reviewed by our team. This usually takes 1-2 business days.</span>
+                    <span>{t("kyc_under_review")}</span>
                   </div>
                 )}
 
                 {kycStatus === 'approved' && (
                   <div className="mt-3 flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
                     <CheckCircle className="h-4 w-4" />
-                    <span>Your identity has been verified. You now have full access to all platform features.</span>
+                    <span>{t("kyc_verified_msg")}</span>
                   </div>
                 )}
               </div>
@@ -758,7 +760,7 @@ const KYCVerificationPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="fullNameEnglish">
-                    Full Name (English) <span className="text-red-500">*</span>
+                    {t("kyc_full_name_english")} <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="fullNameEnglish"
@@ -771,7 +773,7 @@ const KYCVerificationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fullNameArabic">Full Name (Arabic)</Label>
+                  <Label htmlFor="fullNameArabic">{t("kyc_full_name_arabic")}</Label>
                   <Input
                     id="fullNameArabic"
                     value={formData.fullNameArabic}
@@ -811,7 +813,7 @@ const KYCVerificationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Label htmlFor="phoneNumber">{t("kyc_phone_number")}</Label>
                   <Input
                     id="phoneNumber"
                     value={formData.phoneNumber}
@@ -822,7 +824,7 @@ const KYCVerificationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city">{t("kyc_city")}</Label>
                   <Input
                     id="city"
                     value={formData.city}
@@ -831,18 +833,18 @@ const KYCVerificationPage = () => {
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <Label htmlFor="street">Street Address</Label>
+                  <Label htmlFor="street">{t("kyc_street_address")}</Label>
                   <Input
                     id="street"
                     value={formData.street}
                     onChange={(e) =>
                       handleInputChange("street", e.target.value)
                     }
-                    placeholder="Street address"
+                    placeholder={t("kyc_ph_street")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="region">Region</Label>
+                  <Label htmlFor="region">{t("kyc_region")}</Label>
                   <Input
                     id="region"
                     value={formData.region}
@@ -853,7 +855,7 @@ const KYCVerificationPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="postalCode">Postal Code</Label>
+                  <Label htmlFor="postalCode">{t("kyc_postal_code")}</Label>
                   <Input
                     id="postalCode"
                     value={formData.postalCode}
@@ -898,14 +900,14 @@ const KYCVerificationPage = () => {
                 {formData.documentType && (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="documentNumber">Document Number</Label>
+                      <Label htmlFor="documentNumber">{t("kyc_document_number")}</Label>
                       <Input
                         id="documentNumber"
                         value={formData.documentNumber}
                         onChange={(e) =>
                           handleInputChange("documentNumber", e.target.value)
                         }
-                        placeholder="Enter document number"
+                        placeholder={t("kyc_ph_doc_number")}
                       />
                     </div>
                   </div>
@@ -940,7 +942,7 @@ const KYCVerificationPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label>Income Document Type</Label>
+                    <Label>{t("kyc_income_doc_type")}</Label>
                     <Select
                       value={formData.incomeDocType}
                       onValueChange={(value) =>
@@ -965,7 +967,7 @@ const KYCVerificationPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Address Document Type</Label>
+                    <Label>{t("kyc_address_doc_type")}</Label>
                     <Select
                       value={formData.addressDocType}
                       onValueChange={(value) =>
@@ -1008,7 +1010,7 @@ const KYCVerificationPage = () => {
             {currentStep === 4 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Monthly Income</Label>
+                  <Label>{t("kyc_monthly_income")}</Label>
                   <Select
                     value={formData.monthlyIncome}
                     onValueChange={(value) =>
@@ -1016,19 +1018,19 @@ const KYCVerificationPage = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select income range" />
+                      <SelectValue placeholder={t("kyc_select_income")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="5000">Below SAR 5,000</SelectItem>
-                      <SelectItem value="10000">SAR 5,000 - 15,000</SelectItem>
-                      <SelectItem value="25000">SAR 15,000 - 30,000</SelectItem>
-                      <SelectItem value="40000">SAR 30,000 - 50,000</SelectItem>
-                      <SelectItem value="75000">Above SAR 50,000</SelectItem>
+                      <SelectItem value="5000">{t("kyc_income_below_5k")}</SelectItem>
+                      <SelectItem value="10000">{t("kyc_income_5_15k")}</SelectItem>
+                      <SelectItem value="25000">{t("kyc_income_15_30k")}</SelectItem>
+                      <SelectItem value="40000">{t("kyc_income_30_50k")}</SelectItem>
+                      <SelectItem value="75000">{t("kyc_income_above_50k")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Investment Experience</Label>
+                  <Label>{t("kyc_investment_experience")}</Label>
                   <Select
                     value={formData.investmentExperience}
                     onValueChange={(value) =>
@@ -1036,7 +1038,7 @@ const KYCVerificationPage = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select experience level" />
+                      <SelectValue placeholder={t("kyc_select_experience")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="beginner">

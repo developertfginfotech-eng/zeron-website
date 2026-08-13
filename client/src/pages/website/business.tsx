@@ -181,7 +181,7 @@ export default function BusinessModelPage() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Market Opportunity</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("biz_market_opportunity")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Saudi Arabia's real estate market presents unprecedented opportunities driven by Vision 2030 initiatives.
             </p>
@@ -204,7 +204,7 @@ export default function BusinessModelPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How We Generate Revenue</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("biz_how_revenue")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Our diversified revenue model ensures sustainable growth while aligning our interests with investor success.
             </p>
@@ -236,7 +236,7 @@ export default function BusinessModelPage() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Investment Process</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("biz_investment_process")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               A comprehensive approach that ensures quality investments and maximizes returns for all stakeholders.
             </p>
@@ -275,7 +275,7 @@ export default function BusinessModelPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Competitive Advantages</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("biz_competitive_advantages")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               What sets Zaron apart in the real estate investment landscape.
             </p>
@@ -298,31 +298,31 @@ export default function BusinessModelPage() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Financial Projections</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("biz_financial_projections")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Our growth trajectory and financial outlook for the next five years.
             </p>
           </div>
           <Tabs defaultValue="growth" className="max-w-4xl mx-auto">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="growth" data-testid="tab-growth">Growth Metrics</TabsTrigger>
-              <TabsTrigger value="revenue" data-testid="tab-revenue">Revenue Model</TabsTrigger>
-              <TabsTrigger value="expansion" data-testid="tab-expansion">Expansion Plan</TabsTrigger>
+              <TabsTrigger value="growth" data-testid="tab-growth">{t("biz_growth_metrics")}</TabsTrigger>
+              <TabsTrigger value="revenue" data-testid="tab-revenue">{t("biz_revenue_model")}</TabsTrigger>
+              <TabsTrigger value="expansion" data-testid="tab-expansion">{t("biz_expansion_plan")}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="growth" className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="text-center p-6">
                   <h3 className="text-2xl font-bold text-blue-600 mb-2">100,000+</h3>
-                  <p className="text-muted-foreground">Active Investors by 2026</p>
+                  <p className="text-muted-foreground">{t("biz_active_investors_2026")}</p>
                 </Card>
                 <Card className="text-center p-6">
                   <h3 className="text-2xl font-bold text-emerald-600 mb-2">10B SAR</h3>
-                  <p className="text-muted-foreground">Assets Under Management</p>
+                  <p className="text-muted-foreground">{t("biz_aum")}</p>
                 </Card>
                 <Card className="text-center p-6">
                   <h3 className="text-2xl font-bold text-purple-600 mb-2">500+</h3>
-                  <p className="text-muted-foreground">Properties in Portfolio</p>
+                  <p className="text-muted-foreground">{t("biz_properties_portfolio")}</p>
                 </Card>
               </div>
             </TabsContent>
@@ -330,7 +330,7 @@ export default function BusinessModelPage() {
             <TabsContent value="revenue" className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Year 1-2: Foundation</h3>
+                  <h3 className="text-xl font-bold mb-4">{t("biz_year_1_2")}</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>• Focus on platform growth and user acquisition</li>
                     <li>• Build strong property portfolio</li>
@@ -338,7 +338,7 @@ export default function BusinessModelPage() {
                   </ul>
                 </Card>
                 <Card className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Year 3-5: Scale</h3>
+                  <h3 className="text-xl font-bold mb-4">{t("biz_year_3_5")}</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>• Expand to secondary markets</li>
                     <li>• Launch premium investment products</li>
@@ -351,7 +351,7 @@ export default function BusinessModelPage() {
             <TabsContent value="expansion" className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Geographic Expansion</h3>
+                  <h3 className="text-xl font-bold mb-4">{t("biz_geographic_expansion")}</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>• Phase 1: All major Saudi cities</li>
                     <li>• Phase 2: GCC countries</li>
@@ -359,7 +359,7 @@ export default function BusinessModelPage() {
                   </ul>
                 </Card>
                 <Card className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Product Expansion</h3>
+                  <h3 className="text-xl font-bold mb-4">{t("biz_product_expansion")}</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>• Commercial real estate</li>
                     <li>• REITs and structured products</li>
@@ -376,7 +376,7 @@ export default function BusinessModelPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">Risk Management</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">{t("biz_risk_management")}</h2>
             <p className="text-lg text-muted-foreground mb-12">
               We employ comprehensive risk management strategies to protect investor capital and ensure sustainable returns.
             </p>
@@ -413,7 +413,7 @@ export default function BusinessModelPage() {
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-emerald-600 text-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Partner with Zaron</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("biz_partner_with_zaron")}</h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
             Join us in reshaping the future of real estate investment in Saudi Arabia and beyond.
           </p>

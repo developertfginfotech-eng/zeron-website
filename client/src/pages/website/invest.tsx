@@ -613,7 +613,7 @@ export default function InvestPage() {
           {loading && (
             <div className="text-center py-20">
               <Loader2 className="animate-spin h-12 w-12 text-emerald-600 mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading investment opportunities...</p>
+              <p className="text-muted-foreground">{t("inv_loading")}</p>
             </div>
           )}
 
@@ -667,7 +667,7 @@ export default function InvestPage() {
                                 <div className="mx-auto w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-3 backdrop-blur-sm">
                                   <Lock className="h-6 w-6 text-white" />
                                 </div>
-                                <h3 className="font-semibold text-white mb-2 text-sm">KYC Required</h3>
+                                <h3 className="font-semibold text-white mb-2 text-sm">{t("inv_kyc_required")}</h3>
                                 <p className="text-xs text-white/80 mb-3">
                                   {!isLoggedIn
                                     ? "Login and verify your identity"
@@ -724,7 +724,7 @@ export default function InvestPage() {
                           ) : (
                             <div className="flex items-center text-emerald-200">
                               <MapPin className="w-4 h-4 mr-1" />
-                              <span className="text-sm text-orange-300">Location information pending</span>
+                              <span className="text-sm text-orange-300">{t("inv_location_pending")}</span>
                             </div>
                           )}
                         </div>
@@ -750,7 +750,7 @@ export default function InvestPage() {
                           {/* Progress Bar */}
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">Funding Progress</span>
+                              <span className="text-muted-foreground">{t("inv_funding_progress")}</span>
                               <span className="font-medium">
                                 {isKYCCompleted ? `${property.fundingProgress}%` : '●●%'}
                               </span>
@@ -761,13 +761,13 @@ export default function InvestPage() {
                           {/* Investment Details - Show/Hide based on KYC */}
                           <div className="grid grid-cols-2 gap-4 py-4">
                             <div>
-                              <p className="text-sm text-muted-foreground">Min. Investment</p>
+                              <p className="text-sm text-muted-foreground">{t("inv_min_investment")}</p>
                               <p className="text-lg font-bold">
                                 {isKYCCompleted ? `SAR ${formatCurrency(property.financials.minInvestment)}` : 'SAR ●●●,●●●'}
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm text-muted-foreground">Expected Return</p>
+                              <p className="text-sm text-muted-foreground">{t("inv_expected_return")}</p>
                               <p className="text-lg font-bold text-emerald-600">
                                 {isKYCCompleted ? `${property.financials.projectedYield}%` : '●●%'}
                               </p>
@@ -865,8 +865,8 @@ export default function InvestPage() {
           {!loading && !error && properties.length === 0 && (
             <div className="text-center py-20">
               <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Investment Opportunities Available</h3>
-              <p className="text-muted-foreground mb-6">Check back soon for new property listings</p>
+              <h3 className="text-xl font-semibold mb-2">{t("inv_none_available")}</h3>
+              <p className="text-muted-foreground mb-6">{t("inv_check_back")}</p>
               <Button onClick={fetchProperties} variant="outline">
                 <Eye className="w-4 h-4 mr-2" />
                 Refresh
@@ -987,19 +987,19 @@ export default function InvestPage() {
           >
             <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
               <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">4.9/5</div>
-              <p className="text-muted-foreground">Investor Rating</p>
+              <p className="text-muted-foreground">{t("inv_investor_rating")}</p>
             </div>
             <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
               <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">99.2%</div>
-              <p className="text-muted-foreground">Success Rate</p>
+              <p className="text-muted-foreground">{t("inv_success_rate")}</p>
             </div>
             <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
               <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">72h</div>
-              <p className="text-muted-foreground">Avg. Payout</p>
+              <p className="text-muted-foreground">{t("inv_avg_payout")}</p>
             </div>
             <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border">
               <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">24/7</div>
-              <p className="text-muted-foreground">Support</p>
+              <p className="text-muted-foreground">{t("inv_support")}</p>
             </div>
           </motion.div>
         </div>

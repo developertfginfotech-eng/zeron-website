@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from "@/hooks/use-translation"
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,7 @@ interface RechargeWalletDialogProps {
 const RECHARGE_AMOUNTS = [1000, 5000, 10000, 25000, 50000, 100000];
 
 export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogProps) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState<number>(5000);
   const [method, setMethod] = useState<'bank_transfer' | 'card' | 'other'>('bank_transfer');
   const { mutate: recharge, isPending, isSuccess, error } = useRechargeWallet();
@@ -53,10 +55,10 @@ export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogPr
         {/* Header */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Recharge Wallet
+            {t("rch_title")}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Add funds to your wallet quickly and securely
+            {t("rch_subtitle")}
           </p>
         </div>
 
@@ -64,8 +66,8 @@ export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogPr
           <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
             <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
             <div>
-              <p className="font-medium text-green-900 dark:text-green-100">Recharge Successful!</p>
-              <p className="text-sm text-green-700 dark:text-green-300">Your wallet has been updated.</p>
+              <p className="font-medium text-green-900 dark:text-green-100">{t("rch_success")}</p>
+              <p className="text-sm text-green-700 dark:text-green-300">{t("rch_wallet_updated")}</p>
             </div>
           </div>
         )}
@@ -84,7 +86,7 @@ export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogPr
             {/* Quick Amount Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Quick Amount Selection
+                {t("rch_quick_amount")}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {RECHARGE_AMOUNTS.map((quickAmount) => (
@@ -107,7 +109,7 @@ export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogPr
             {/* Custom Amount Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Custom Amount (SAR)
+                {t("rch_custom_amount")}
               </label>
               <Input
                 type="number"
@@ -117,26 +119,26 @@ export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogPr
                 onChange={(e) => setAmount(Number(e.target.value))}
                 disabled={isPending}
                 className="w-full text-lg"
-                placeholder="Enter custom amount"
+                placeholder={t("rch_ph_custom")}
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Minimum: SAR 1,000 | No maximum limit
+                {t("rch_min_note")}
               </p>
             </div>
 
             {/* Payment Method */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Payment Method
+                {t("rch_payment_method")}
               </label>
               <Select value={method} onValueChange={(value: any) => setMethod(value)} disabled={isPending}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="card">Credit/Debit Card</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="bank_transfer">{t("rch_bank_transfer")}</SelectItem>
+                  <SelectItem value="card">{t("rch_card")}</SelectItem>
+                  <SelectItem value="other">{t("rch_other")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -144,13 +146,13 @@ export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogPr
             {/* Recharge Summary */}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Amount to Recharge</span>
+                <span className="text-gray-600 dark:text-gray-400">{t("rch_amount_to_recharge")}</span>
                 <span className="font-semibold text-gray-900 dark:text-white">
                   SAR {amount.toLocaleString()}
                 </span>
               </div>
               <div className="border-t border-gray-200 dark:border-gray-700 pt-2 flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Payment Method</span>
+                <span className="text-gray-600 dark:text-gray-400">{t("rch_payment_method")}</span>
                 <span className="font-semibold text-gray-900 dark:text-white capitalize">
                   {method.replace('_', ' ')}
                 </span>
@@ -160,7 +162,7 @@ export function RechargeWalletDialog({ isOpen, onClose }: RechargeWalletDialogPr
             {/* Bank Transfer Instructions */}
             {method === 'bank_transfer' && (
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
-                <p className="font-medium text-blue-900 dark:text-blue-100 mb-2">Bank Transfer Details:</p>
+                <p className="font-medium text-blue-900 dark:text-blue-100 mb-2">{t("rch_bank_details")}</p>
                 <div className="space-y-1 text-blue-800 dark:text-blue-200">
                   <p><strong>Bank:</strong> Al Rajhi Bank</p>
                   <p><strong>Account:</strong> Zaron Investment</p>

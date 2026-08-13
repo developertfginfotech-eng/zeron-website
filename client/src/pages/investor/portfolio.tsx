@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useTranslation } from "@/hooks/use-translation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -44,6 +45,7 @@ function formatSAR(value: number): string {
 }
 
 export default function InvestorPortfolio() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -65,7 +67,7 @@ export default function InvestorPortfolio() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600" />
-          <p className="text-muted-foreground">Loading your portfolio...</p>
+          <p className="text-muted-foreground">{t("pf_loading")}</p>
         </div>
       </div>
     )
@@ -254,29 +256,29 @@ export default function InvestorPortfolio() {
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">Investment Portfolio</h1>
-              <p className="text-teal-100 text-lg">Track your real estate investments and returns</p>
+              <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">{t("pf_investment_portfolio")}</h1>
+              <p className="text-teal-100 text-lg">{t("pf_track_investments")}</p>
             </div>
             <Button
               onClick={() => setLocation('/investor/properties')}
               className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold px-8 py-3 h-auto shadow-lg rounded-full uppercase"
             >
               <Building className="w-4 h-4 mr-2" />
-              Explore Properties
+              {t("pf_explore_properties")}
             </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-white text-sm mb-1 uppercase">Total Value</p>
+              <p className="text-white text-sm mb-1 uppercase">{t("pf_total_value")}</p>
               <p className="text-3xl font-mono font-bold text-white">SAR {formatSAR(portfolioValue)}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-white text-sm mb-1 uppercase">Total Returns</p>
+              <p className="text-white text-sm mb-1 uppercase">{t("pf_total_returns")}</p>
               <p className="text-3xl font-mono font-bold text-yellow-400">+SAR {formatSAR(totalReturns)}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-white text-sm mb-1 uppercase">Active Investments</p>
+              <p className="text-white text-sm mb-1 uppercase">{t("pf_active_investments")}</p>
               <p className="text-3xl font-mono font-bold text-white">{activeInvestments}</p>
             </div>
           </div>
@@ -299,7 +301,7 @@ export default function InvestorPortfolio() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Portfolio Value</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("pf_portfolio_value")}</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
                 SAR {formatSAR(portfolioValue)}
               </p>
@@ -316,7 +318,7 @@ export default function InvestorPortfolio() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Invested</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("pf_total_invested")}</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
                 SAR {formatSAR(totalInvested)}
               </p>
@@ -339,7 +341,7 @@ export default function InvestorPortfolio() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Returns</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("pf_total_returns")}</p>
               <p className="text-2xl font-mono font-bold text-green-600 dark:text-green-400">
                 SAR {formatSAR(totalReturns)}
               </p>
@@ -360,11 +362,11 @@ export default function InvestorPortfolio() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Active Properties</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("pf_active_properties")}</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
                 {activeInvestments}
               </p>
-              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Diversified portfolio</p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">{t("pf_diversified")}</p>
             </div>
           </div>
         </div>
@@ -373,9 +375,9 @@ export default function InvestorPortfolio() {
       {/* Tabs */}
       <Tabs defaultValue="investments" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
-          <TabsTrigger value="investments" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">My Investments</TabsTrigger>
-          <TabsTrigger value="returns" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Return Breakdown</TabsTrigger>
-          <TabsTrigger value="overview" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Overview</TabsTrigger>
+          <TabsTrigger value="investments" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">{t("pf_my_investments")}</TabsTrigger>
+          <TabsTrigger value="returns" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">{t("pf_return_breakdown")}</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">{t("pf_overview")}</TabsTrigger>
         </TabsList>
 
         {/* Investments Tab */}
@@ -385,10 +387,10 @@ export default function InvestorPortfolio() {
               <Card className="bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
                 <CardContent className="flex flex-col items-center justify-center py-16">
                   <Building className="w-16 h-16 text-green-400 mb-4" />
-                  <h3 className="text-xl font-semibold mb-2 text-teal-900 dark:text-white">No investments yet</h3>
-                  <p className="text-teal-700 dark:text-teal-200 mb-6">Start investing in real estate properties</p>
+                  <h3 className="text-xl font-semibold mb-2 text-teal-900 dark:text-white">{t("pf_no_investments")}</h3>
+                  <p className="text-teal-700 dark:text-teal-200 mb-6">{t("pf_start_investing_props")}</p>
                   <Button onClick={() => setLocation('/investor/properties')} className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
-                    Explore Properties
+                    {t("pf_explore_properties")}
                   </Button>
                 </CardContent>
               </Card>
@@ -424,7 +426,7 @@ export default function InvestorPortfolio() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-emerald-100 mb-1">Total Investments</p>
+                            <p className="text-sm text-emerald-100 mb-1">{t("pf_total_investments")}</p>
                             <p className="text-2xl font-mono font-bold">{propertyGroup.investments.length}</p>
                           </div>
                         </div>
@@ -432,19 +434,19 @@ export default function InvestorPortfolio() {
                         {/* Property Summary Stats */}
                         <div className="grid grid-cols-4 gap-3 mt-4">
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <p className="text-xs text-emerald-100 mb-1">Total Units</p>
+                            <p className="text-xs text-emerald-100 mb-1">{t("pf_total_units")}</p>
                             <p className="text-lg font-mono font-bold">{totalUnitsInProperty}</p>
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <p className="text-xs text-emerald-100 mb-1">Total Invested</p>
+                            <p className="text-xs text-emerald-100 mb-1">{t("pf_total_invested")}</p>
                             <p className="text-lg font-mono font-bold">SAR {formatSAR(totalInvestedInProperty)}</p>
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <p className="text-xs text-emerald-100 mb-1">Current Value</p>
+                            <p className="text-xs text-emerald-100 mb-1">{t("pf_current_value")}</p>
                             <p className="text-lg font-mono font-bold">SAR {formatSAR(currentValueInProperty)}</p>
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <p className="text-xs text-emerald-100 mb-1">Total Returns</p>
+                            <p className="text-xs text-emerald-100 mb-1">{t("pf_total_returns")}</p>
                             <p className="text-lg font-mono font-bold text-yellow-300">+SAR {formatSAR(totalReturnsInProperty)}</p>
                           </div>
                         </div>
@@ -493,13 +495,13 @@ export default function InvestorPortfolio() {
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
                                 {/* Units */}
                                 <div className="text-center">
-                                  <p className="text-xs text-teal-200 mb-1">Units</p>
+                                  <p className="text-xs text-teal-200 mb-1">{t("pf_units")}</p>
                                   <p className="font-mono font-semibold text-sm text-white">{investment.units}</p>
                                 </div>
 
                                 {/* Invested Amount */}
                                 <div className="text-center">
-                                  <p className="text-xs text-teal-200 mb-1">Invested</p>
+                                  <p className="text-xs text-teal-200 mb-1">{t("pf_invested")}</p>
                                   <p className="font-mono font-semibold text-sm text-white">SAR {formatSAR(investment.investedAmount)}</p>
                                   {investment.managementFee > 0 && (
                                     <p className="text-xs text-red-400">-SAR {formatSAR(investment.managementFee)} fee</p>
@@ -508,19 +510,19 @@ export default function InvestorPortfolio() {
 
                                 {/* Net Investment */}
                                 <div className="text-center">
-                                  <p className="text-xs text-teal-200 mb-1">Net Amount</p>
+                                  <p className="text-xs text-teal-200 mb-1">{t("pf_net_amount")}</p>
                                   <p className="font-mono font-semibold text-sm text-yellow-400">SAR {formatSAR(investment.netInvestment)}</p>
                                 </div>
 
                                 {/* Current Value */}
                                 <div className="text-center">
-                                  <p className="text-xs text-teal-200 mb-1">Current</p>
+                                  <p className="text-xs text-teal-200 mb-1">{t("pf_current")}</p>
                                   <p className="font-mono font-semibold text-sm text-white">SAR {formatSAR(investment.currentValue)}</p>
                                 </div>
 
                                 {/* Returns */}
                                 <div className="text-center">
-                                  <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>Returns</p>
+                                  <p className={`text-xs mb-1 ${investment.returns >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>{t("pf_returns")}</p>
                                   <p className={`font-mono font-bold text-sm ${investment.returns >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>
                                     {investment.returns >= 0 ? '+' : ''}SAR {formatSAR(investment.returns)}
                                   </p>
@@ -531,7 +533,7 @@ export default function InvestorPortfolio() {
 
                                 {/* Investment Date */}
                                 <div className="text-center">
-                                  <p className="text-xs text-teal-200 mb-1">Invested On</p>
+                                  <p className="text-xs text-teal-200 mb-1">{t("pf_invested_on")}</p>
                                   <p className="font-mono text-sm text-white">{investment.investmentDate}</p>
                                 </div>
 
@@ -559,7 +561,7 @@ export default function InvestorPortfolio() {
                                     className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 border-0"
                                   >
                                     <LogOut className="w-4 h-4 mr-2" />
-                                    Exit Investment
+                                    {t("pf_exit_investment")}
                                   </Button>
                                 </div>
                               )}
@@ -584,7 +586,7 @@ export default function InvestorPortfolio() {
                   <TrendingUp className="w-5 h-5 text-green-400" />
                   Property-wise Return Breakdown
                 </CardTitle>
-                <CardDescription className="text-teal-700 dark:text-teal-200">Detailed returns from each property investment</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">{t("pf_detailed_returns")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -615,8 +617,8 @@ export default function InvestorPortfolio() {
                   {investments.length === 0 && (
                     <div className="text-center py-8">
                       <TrendingUp className="w-12 h-12 text-green-400 mx-auto mb-3" />
-                      <p className="text-teal-900 dark:text-white">No return data available yet</p>
-                      <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see returns</p>
+                      <p className="text-teal-900 dark:text-white">{t("pf_no_return_data")}</p>
+                      <p className="text-sm text-teal-700 dark:text-teal-200">{t("pf_start_see_returns")}</p>
                     </div>
                   )}
                 </div>
@@ -625,7 +627,7 @@ export default function InvestorPortfolio() {
                   <div className="mt-6 pt-6 border-t border-teal-200 dark:border-teal-700/50">
                     <div className="flex items-center justify-between p-4 rounded-xl bg-teal-700/50 border border-teal-600/30">
                       <div>
-                        <p className="text-sm font-medium text-white">Total Portfolio Returns</p>
+                        <p className="text-sm font-medium text-white">{t("pf_total_portfolio_returns")}</p>
                         <div className="flex items-center gap-4 mt-1">
                           <span className="text-xs text-teal-700 dark:text-teal-200">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
                           <span className="text-xs text-teal-700 dark:text-teal-200">Realized: SAR {realizedGains.toLocaleString()}</span>
@@ -657,7 +659,7 @@ export default function InvestorPortfolio() {
                   <PieChart className="w-5 h-5 text-green-400" />
                   Portfolio Growth
                 </CardTitle>
-                <CardDescription className="text-teal-700 dark:text-teal-200">Investment value over time</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">{t("pf_value_over_time")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <DashboardChart
@@ -675,7 +677,7 @@ export default function InvestorPortfolio() {
                   <Target className="w-5 h-5 text-green-400" />
                   Asset Allocation
                 </CardTitle>
-                <CardDescription className="text-teal-700 dark:text-teal-200">Distribution by property type</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">{t("pf_distribution_by_type")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {assetAllocation.length > 0 ? (
@@ -694,8 +696,8 @@ export default function InvestorPortfolio() {
                 ) : (
                   <div className="text-center py-8">
                     <Target className="w-12 h-12 mx-auto mb-3 text-green-400 opacity-50" />
-                    <p className="text-white">No allocation data yet</p>
-                    <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see distribution</p>
+                    <p className="text-white">{t("pf_no_allocation")}</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-200">{t("pf_start_see_distribution")}</p>
                   </div>
                 )}
               </CardContent>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/hooks/use-translation"
 import { useRoute } from "wouter"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
@@ -24,6 +25,7 @@ import { useLocation } from "wouter"
 interface PropertyDetailsPageProps {}
 
 export default function PropertyDetailsPage() {
+  const { t } = useTranslation();
   const [, params] = useRoute("/website/property/:id")
   const [, setLocation] = useLocation()
   const { toast } = useToast()
@@ -141,7 +143,7 @@ export default function PropertyDetailsPage() {
       <div className="min-h-screen bg-gradient-to-br from-teal-900 via-emerald-900 to-teal-800 flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="h-12 w-12 animate-spin mx-auto text-green-400" />
-          <p className="text-lg text-teal-200">Loading property details...</p>
+          <p className="text-lg text-teal-200">{t("pd_loading")}</p>
         </div>
       </div>
     )
@@ -265,33 +267,33 @@ export default function PropertyDetailsPage() {
 
             {/* Financial Overview */}
             <div className="rounded-2xl bg-teal-800/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-4">
-              <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-wide">Financial Overview</h2>
+              <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-wide">{t("pd_financial_overview")}</h2>
               <div className="space-y-6">
                 {/* Investment Metrics Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
-                    <p className="text-sm text-teal-300 mb-1 uppercase">Price per Unit</p>
+                    <p className="text-sm text-teal-300 mb-1 uppercase">{t("pd_price_per_unit")}</p>
                     <p className="text-2xl font-bold text-green-400">
                       SAR {property.financials?.pricePerShare?.toLocaleString() || 0}
                     </p>
                   </div>
 
                   <div className="bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
-                    <p className="text-sm text-teal-300 mb-1 uppercase">Available Units</p>
+                    <p className="text-sm text-teal-300 mb-1 uppercase">{t("pd_available_units")}</p>
                     <p className="text-2xl font-bold text-blue-400">
                       {property.financials?.availableShares?.toLocaleString() || 0}
                     </p>
                   </div>
 
                   <div className="bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
-                    <p className="text-sm text-teal-300 mb-1 uppercase">Projected Yield</p>
+                    <p className="text-sm text-teal-300 mb-1 uppercase">{t("pd_projected_yield")}</p>
                     <p className="text-2xl font-bold text-green-400">
                       {property.financials?.projectedYield}%
                     </p>
                   </div>
 
                   <div className="bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
-                    <p className="text-sm text-teal-300 mb-1 uppercase">Total Property Value</p>
+                    <p className="text-sm text-teal-300 mb-1 uppercase">{t("pd_total_property_value")}</p>
                     <p className="text-2xl font-bold text-white">
                       SAR {(property.financials?.totalValue / 1000000)?.toFixed(1)}M
                     </p>
@@ -301,7 +303,7 @@ export default function PropertyDetailsPage() {
                 {/* Funding Progress */}
                 <div className="space-y-3 bg-teal-900/70 p-4 rounded-xl border border-teal-700/50">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-white uppercase">Funding Progress</span>
+                    <span className="font-semibold text-white uppercase">{t("pd_funding_progress")}</span>
                     <span className="text-sm text-teal-200 font-mono">{property.fundingProgress?.toFixed(2)}%</span>
                   </div>
                   <div className="w-full bg-teal-700/30 rounded-full h-3">
@@ -317,14 +319,14 @@ export default function PropertyDetailsPage() {
             {/* Investment Terms */}
             {Object.keys(investmentTerms).length > 0 && (
               <div className="rounded-2xl bg-teal-800/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-4">
-                <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-wide">Investment Terms</h2>
+                <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-wide">{t("pd_investment_terms")}</h2>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     {investmentTerms.rentalYieldRate && (
                       <div className="flex items-start gap-3 bg-teal-900/70 p-3 rounded-xl border border-teal-700/50">
                         <TrendingUp className="w-5 h-5 text-green-400 mt-1" />
                         <div>
-                          <p className="text-sm text-teal-300 uppercase">Annual Rental Yield</p>
+                          <p className="text-sm text-teal-300 uppercase">{t("pd_annual_rental_yield")}</p>
                           <p className="text-lg font-bold text-white">{investmentTerms.rentalYieldRate}%</p>
                         </div>
                       </div>
@@ -333,7 +335,7 @@ export default function PropertyDetailsPage() {
                       <div className="flex items-start gap-3 bg-teal-900/70 p-3 rounded-xl border border-teal-700/50">
                         <Home className="w-5 h-5 text-blue-400 mt-1" />
                         <div>
-                          <p className="text-sm text-teal-300 uppercase">Annual Appreciation</p>
+                          <p className="text-sm text-teal-300 uppercase">{t("pd_annual_appreciation")}</p>
                           <p className="text-lg font-bold text-white">{investmentTerms.appreciationRate}%</p>
                         </div>
                       </div>
@@ -342,7 +344,7 @@ export default function PropertyDetailsPage() {
                       <div className="flex items-start gap-3 bg-teal-900/70 p-3 rounded-xl border border-teal-700/50">
                         <Clock className="w-5 h-5 text-orange-400 mt-1" />
                         <div>
-                          <p className="text-sm text-teal-300 uppercase">Lock-in Period</p>
+                          <p className="text-sm text-teal-300 uppercase">{t("pd_lock_in_period")}</p>
                           <p className="text-lg font-bold text-white">{investmentTerms.lockingPeriodYears} Years</p>
                         </div>
                       </div>
@@ -351,7 +353,7 @@ export default function PropertyDetailsPage() {
                       <div className="flex items-start gap-3 bg-teal-900/70 p-3 rounded-xl border border-teal-700/50">
                         <Clock className="w-5 h-5 text-purple-400 mt-1" />
                         <div>
-                          <p className="text-sm text-teal-300 uppercase">Bond Maturity</p>
+                          <p className="text-sm text-teal-300 uppercase">{t("pd_bond_maturity")}</p>
                           <p className="text-lg font-bold text-white">{investmentTerms.bondMaturityYears} Years</p>
                         </div>
                       </div>
@@ -361,7 +363,7 @@ export default function PropertyDetailsPage() {
                   {/* Graduated Penalties */}
                   {investmentTerms.graduatedPenalties && investmentTerms.graduatedPenalties.length > 0 && (
                     <div className="pt-4 border-t border-teal-700/50">
-                      <p className="font-semibold mb-3 text-white uppercase">Early Withdrawal Penalties</p>
+                      <p className="font-semibold mb-3 text-white uppercase">{t("pd_early_withdrawal_penalties")}</p>
                       <div className="space-y-2">
                         {investmentTerms.graduatedPenalties.map((penalty: any) => (
                           <div key={penalty._id} className="flex justify-between items-center p-3 bg-teal-900/70 rounded-xl border border-teal-700/50">
@@ -381,12 +383,12 @@ export default function PropertyDetailsPage() {
           <div className="lg:col-span-2 space-y-4">
             {/* Key Stats */}
             <div className="rounded-2xl bg-teal-800/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-4">
-              <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-wide">Key Information</h2>
+              <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-wide">{t("pd_key_information")}</h2>
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-3 bg-teal-900/70 rounded-xl border border-teal-700/50">
                   <Users className="w-5 h-5 text-blue-400" />
                   <div>
-                    <p className="text-sm text-teal-300 uppercase">Investors</p>
+                    <p className="text-sm text-teal-300 uppercase">{t("pd_investors")}</p>
                     <p className="font-bold text-white">{property.investorCount || 0}</p>
                   </div>
                 </div>
@@ -394,7 +396,7 @@ export default function PropertyDetailsPage() {
                 <div className="flex items-center gap-3 p-3 bg-teal-900/70 rounded-xl border border-teal-700/50">
                   <Building2 className="w-5 h-5 text-green-400" />
                   <div>
-                    <p className="text-sm text-teal-300 uppercase">Min Investment</p>
+                    <p className="text-sm text-teal-300 uppercase">{t("pd_min_investment")}</p>
                     <p className="font-bold text-white">SAR {property.financials?.minInvestment?.toLocaleString() || 0}</p>
                   </div>
                 </div>
@@ -402,7 +404,7 @@ export default function PropertyDetailsPage() {
                 <div className="flex items-center gap-3 p-3 bg-teal-900/70 rounded-xl border border-teal-700/50">
                   <DollarSign className="w-5 h-5 text-green-400" />
                   <div>
-                    <p className="text-sm text-teal-300 uppercase">Total Invested</p>
+                    <p className="text-sm text-teal-300 uppercase">{t("pd_total_invested")}</p>
                     <p className="font-bold text-white">SAR {property.totalInvested?.toLocaleString() || 0}</p>
                   </div>
                 </div>
@@ -413,14 +415,14 @@ export default function PropertyDetailsPage() {
             <div className="rounded-2xl bg-teal-800/90 backdrop-blur-sm border border-teal-700/50 shadow-xl p-4">
               <div className="flex items-center gap-2 mb-4">
                 <Calculator className="w-5 h-5 text-green-400" />
-                <h2 className="text-2xl font-bold text-white uppercase tracking-wide">Investment Calculator</h2>
+                <h2 className="text-2xl font-bold text-white uppercase tracking-wide">{t("pd_investment_calculator")}</h2>
               </div>
-              <p className="text-teal-200 mb-6">Estimate your returns based on units purchased</p>
+              <p className="text-teal-200 mb-6">{t("pd_calc_desc")}</p>
               <div className="space-y-6">
                 {/* Units Slider */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white">Units to Purchase</span>
+                    <span className="text-sm font-medium text-white">{t("pd_units_to_purchase")}</span>
                     <div className="flex items-center gap-2">
                       <Input
                         type="number"
@@ -455,7 +457,7 @@ export default function PropertyDetailsPage() {
 
                 {/* Investment Amount */}
                 <div className="p-4 bg-teal-700/40 rounded-lg border border-teal-600/30">
-                  <p className="text-sm text-teal-200 mb-1">Investment Amount</p>
+                  <p className="text-sm text-teal-200 mb-1">{t("pd_investment_amount")}</p>
                   <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                     SAR {(calculatorUnits * (property.financials?.pricePerShare || 0)).toLocaleString()}
                   </p>
@@ -465,7 +467,7 @@ export default function PropertyDetailsPage() {
                 {calculatorLoading && (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
-                    <span className="ml-2 text-sm text-teal-200">Calculating...</span>
+                    <span className="ml-2 text-sm text-teal-200">{t("pd_calculating")}</span>
                   </div>
                 )}
 
@@ -481,7 +483,7 @@ export default function PropertyDetailsPage() {
                         className={calculatorView === 'annual' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'border-white text-white hover:bg-teal-700/50 hover:text-white'}
                       >
                         <TrendingUp className="w-4 h-4 mr-2" />
-                        Annual Returns
+                        {t("pd_annual_returns")}
                       </Button>
                       <Button
                         variant={calculatorView === 'bond' ? 'default' : 'outline'}
@@ -497,7 +499,7 @@ export default function PropertyDetailsPage() {
                     {/* Annual Returns View */}
                     {calculatorView === 'annual' && (
                       <div className="space-y-3">
-                        <p className="text-sm font-semibold text-teal-200">Annual Returns</p>
+                        <p className="text-sm font-semibold text-teal-200">{t("pd_annual_returns")}</p>
 
                         {/* Annual Rental Income */}
                         <div className="flex justify-between items-center p-3 bg-green-900/30 rounded-lg border border-green-700/30">
@@ -523,7 +525,7 @@ export default function PropertyDetailsPage() {
 
                         {/* Total Annual Return */}
                         <div className="flex justify-between items-center p-4 bg-emerald-900/40 rounded-lg border-2 border-emerald-500/60">
-                          <span className="text-sm font-bold text-white">Total Annual Return</span>
+                          <span className="text-sm font-bold text-white">{t("pd_total_annual_return")}</span>
                           <span className="text-xl font-bold text-emerald-400">
                             +SAR {Math.round(calculatorResults.returns?.totalAnnualReturn || ((calculatorResults.returns?.annualRentalIncome || 0) + (calculatorResults.returns?.annualAppreciation || 0))).toLocaleString()}
                           </span>
@@ -548,7 +550,7 @@ export default function PropertyDetailsPage() {
                     {/* Bond Investment View */}
                     {calculatorView === 'bond' && (
                       <div className="space-y-3">
-                        <p className="text-sm font-semibold text-teal-200">Bond Investment Returns</p>
+                        <p className="text-sm font-semibold text-teal-200">{t("pd_bond_investment_returns")}</p>
 
                         {/* After Locking Period */}
                         <div className="p-3 bg-orange-900/30 border border-orange-700/30 rounded-lg space-y-2">
@@ -616,12 +618,12 @@ export default function PropertyDetailsPage() {
                             <div className="bg-teal-900/50 border border-teal-700/40 rounded-lg overflow-hidden text-sm">
                               {/* Header */}
                               <div className="px-4 pt-3 pb-2 border-b border-teal-700/40">
-                                <p className="text-xs text-teal-300 uppercase tracking-wide">Returns Breakdown at Maturity</p>
+                                <p className="text-xs text-teal-300 uppercase tracking-wide">{t("pd_returns_at_maturity")}</p>
                               </div>
                               {/* Breakdown rows */}
                               <div className="px-4 py-3 space-y-2">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-teal-300">Capital Invested</span>
+                                  <span className="text-teal-300">{t("pd_capital_invested")}</span>
                                   <span className="font-medium text-white">SAR {invested.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
@@ -653,11 +655,11 @@ export default function PropertyDetailsPage() {
                               {/* Totals */}
                               <div className="px-4 py-3 border-t border-teal-700/40 space-y-2">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-white font-semibold">Total Returns</span>
+                                  <span className="text-white font-semibold">{t("pd_total_returns")}</span>
                                   <span className="font-bold text-lg text-emerald-400">+SAR {totalReturns.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                  <span className="text-teal-300">Final Portfolio Value</span>
+                                  <span className="text-teal-300">{t("pd_final_portfolio_value")}</span>
                                   <span className="font-bold text-white">SAR {finalValue.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between items-center pt-1 border-t border-teal-700/30">
@@ -672,7 +674,7 @@ export default function PropertyDetailsPage() {
                         {/* Early Withdrawal Warning */}
                         {calculatorResults.earlyWithdrawal && (
                           <div className="bg-red-900/30 border border-red-600/50 p-3 rounded-lg">
-                            <p className="text-xs font-semibold text-red-300">Early Withdrawal Penalty</p>
+                            <p className="text-xs font-semibold text-red-300">{t("pd_early_withdrawal_penalty")}</p>
                             <p className="text-xs text-red-200 mt-1">
                               {calculatorResults.earlyWithdrawal.penaltyPercentage}% penalty if withdrawn before {calculatorResults.earlyWithdrawal.lockingPeriodYears} years
                               (You'd receive: SAR {Math.round(calculatorResults.earlyWithdrawal.amountAfterPenalty || 0).toLocaleString()})
@@ -687,7 +689,7 @@ export default function PropertyDetailsPage() {
                 {/* Fallback - Show local calculation if API not loaded */}
                 {!calculatorResults && !calculatorLoading && (
                   <div className="space-y-3">
-                    <p className="text-sm font-semibold text-teal-200">Projected Annual Returns</p>
+                    <p className="text-sm font-semibold text-teal-200">{t("pd_projected_annual_returns")}</p>
 
                     {/* Rental Yield */}
                     <div className="flex justify-between items-center p-3 bg-green-900/30 rounded-lg border border-green-700/30">
@@ -715,7 +717,7 @@ export default function PropertyDetailsPage() {
 
                     {/* Total Annual Return */}
                     <div className="flex justify-between items-center p-3 bg-emerald-900/40 rounded-lg border-2 border-emerald-500/60">
-                      <span className="text-sm font-semibold text-white">Total Annual Return</span>
+                      <span className="text-sm font-semibold text-white">{t("pd_total_annual_return")}</span>
                       <span className="font-bold text-emerald-400">
                         +SAR {((calculatorUnits * (property.financials?.pricePerShare || 0)) * (((investmentTerms.rentalYieldRate || property.financials?.projectedYield || 0) + (investmentTerms.appreciationRate || 0)) / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                       </span>
@@ -728,7 +730,7 @@ export default function PropertyDetailsPage() {
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 text-orange-400" />
                             <div>
-                              <span className="text-sm font-semibold text-white">After Locking Period</span>
+                              <span className="text-sm font-semibold text-white">{t("pd_after_locking")}</span>
                               <p className="text-xs text-teal-300">{investmentTerms.lockingPeriodYears} years</p>
                             </div>
                           </div>
@@ -750,7 +752,7 @@ export default function PropertyDetailsPage() {
                         <div className="flex items-center gap-2">
                           <DollarSign className="w-4 h-4 text-emerald-400" />
                           <div>
-                            <span className="text-sm font-semibold text-white">At Bond Maturity</span>
+                            <span className="text-sm font-semibold text-white">{t("pd_at_bond_maturity")}</span>
                             <p className="text-xs text-teal-300">{investmentTerms.bondMaturityYears} years</p>
                           </div>
                         </div>
@@ -768,7 +770,7 @@ export default function PropertyDetailsPage() {
                     {/* Early Withdrawal Warning */}
                     {investmentTerms.graduatedPenalties && investmentTerms.graduatedPenalties.length > 0 && (
                       <div className="bg-red-900/30 border border-red-600/50 p-3 rounded-lg">
-                        <p className="text-xs font-semibold text-red-300">Early Withdrawal Penalty</p>
+                        <p className="text-xs font-semibold text-red-300">{t("pd_early_withdrawal_penalty")}</p>
                         <p className="text-xs text-red-200 mt-1">
                           {investmentTerms.graduatedPenalties[0]?.penaltyPercentage}% penalty if withdrawn before {investmentTerms.lockingPeriodYears} years
                         </p>

@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useTranslation } from "@/hooks/use-translation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,6 +24,7 @@ export function PropertyDetailsModal({
   onInvest,
   onViewFullDetails
 }: PropertyDetailsModalProps) {
+  const { t } = useTranslation();
   if (!property) return null
 
   // Handle both backend property format and mapped property format
@@ -153,13 +155,13 @@ export function PropertyDetailsModal({
             </Card>
             <Card>
               <CardContent className="pt-6">
-                <p className="text-xs text-muted-foreground mb-1">Price per Unit</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("pdm_price_per_unit")}</p>
                 <p className="text-lg font-bold">SAR {pricePerShare.toLocaleString()}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
-                <p className="text-xs text-muted-foreground mb-1">Available Units</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("pdm_available_units")}</p>
                 <p className="text-lg font-bold">{availableShares} / {totalShares}</p>
               </CardContent>
             </Card>
@@ -174,7 +176,7 @@ export function PropertyDetailsModal({
           {/* Funding Progress */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Funding Progress</CardTitle>
+              <CardTitle className="text-sm">{t("pdm_funding_progress")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="w-full bg-muted rounded-full h-3">
@@ -192,34 +194,34 @@ export function PropertyDetailsModal({
           {/* Investment Terms - Property Specific */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Investment Terms</CardTitle>
+              <CardTitle className="text-sm">{t("pdm_investment_terms")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-start gap-3">
                   <TrendingUp className="w-5 h-5 text-green-600 mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Rental Yield</p>
+                    <p className="text-xs text-muted-foreground">{t("pdm_rental_yield")}</p>
                     <p className="text-lg font-semibold">{rentalYield}%</p>
-                    <p className="text-xs text-muted-foreground">Annual income during locking period</p>
+                    <p className="text-xs text-muted-foreground">{t("pdm_annual_income_locking")}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Appreciation Rate</p>
+                    <p className="text-xs text-muted-foreground">{t("pdm_appreciation_rate")}</p>
                     <p className="text-lg font-semibold">{appreciation}%</p>
-                    <p className="text-xs text-muted-foreground">Annual growth after maturity</p>
+                    <p className="text-xs text-muted-foreground">{t("pdm_annual_growth_after")}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-orange-600 mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Locking Period</p>
+                    <p className="text-xs text-muted-foreground">{t("pdm_locking_period")}</p>
                     <p className="text-lg font-semibold">{lockingPeriod} Years</p>
-                    <p className="text-xs text-muted-foreground">Minimum hold period</p>
+                    <p className="text-xs text-muted-foreground">{t("pdm_min_hold")}</p>
                   </div>
                 </div>
 
@@ -228,7 +230,7 @@ export function PropertyDetailsModal({
                   <div>
                     <p className="text-xs text-muted-foreground">Early Withdrawal Penalty {hasGraduatedPenalties && '(Graduated)'}</p>
                     <p className="text-lg font-semibold">{getPenaltyDisplay()}</p>
-                    <p className="text-xs text-muted-foreground">If withdrawn before maturity</p>
+                    <p className="text-xs text-muted-foreground">{t("pdm_early_withdrawal")}</p>
                   </div>
                 </div>
               </div>
@@ -236,7 +238,7 @@ export function PropertyDetailsModal({
               {/* Info Box */}
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-sm text-blue-900 dark:text-blue-100">
-                  <span className="font-semibold">How it works:</span> During the {lockingPeriod}-year locking period, you earn {rentalYield}% annual rental yield. After maturity, you get both rental yield + {appreciation}% appreciation gains.
+                  <span className="font-semibold">{t("pdm_how_it_works")}</span> During the {lockingPeriod}-year locking period, you earn {rentalYield}% annual rental yield. After maturity, you get both rental yield + {appreciation}% appreciation gains.
                   {hasGraduatedPenalties ? (
                     <span> Early withdrawal incurs graduated penalties: {getPenaltyDisplay()}.</span>
                   ) : (

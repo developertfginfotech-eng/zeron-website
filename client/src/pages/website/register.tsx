@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -30,6 +31,7 @@ const investorRegistrationSchema = z.object({
 type InvestorRegistrationFormData = z.infer<typeof investorRegistrationSchema>;
 
 export default function InvestorRegistrationPage() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -208,7 +210,7 @@ export default function InvestorRegistrationPage() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter a secure password"
+                    placeholder={t("reg_ph_password")}
                     className="pl-4 pr-10 h-11"
                     {...register("password")}
                     disabled={isLoading}
@@ -242,7 +244,7 @@ export default function InvestorRegistrationPage() {
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
+                    placeholder={t("reg_ph_confirm")}
                     className="pl-4 pr-10 h-11"
                     {...register("confirmPassword")}
                     disabled={isLoading}
@@ -279,7 +281,7 @@ export default function InvestorRegistrationPage() {
                     Creating Account...
                   </>
                 ) : (
-                  <>Create Account</>
+                  <>{t("reg_create_account")}</>
                 )}
               </Button>
             </form>

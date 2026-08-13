@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "@/hooks/use-translation"
 import { useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -69,6 +70,7 @@ interface InvestmentModalProps {
 }
 
 export function InvestmentModal({ property, isOpen, onClose, onSuccess }: InvestmentModalProps) {
+  const { t } = useTranslation();
   const [units, setUnits] = useState<string>('');
   const [investmentType, setInvestmentType] = useState<'simple_annual' | 'bond'>('simple_annual'); // Default to annual plan
   const [loading, setLoading] = useState(false);
@@ -264,11 +266,11 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                     <span className="font-semibold">{property.title}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-emerald-700 dark:text-emerald-300">Units Purchased:</span>
+                    <span className="text-emerald-700 dark:text-emerald-300">{t("im_units_purchased")}</span>
                     <span className="font-semibold">{investmentData?.unitsPurchased || units} Units</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-emerald-700 dark:text-emerald-300">Amount Paid:</span>
+                    <span className="text-emerald-700 dark:text-emerald-300">{t("im_amount_paid")}</span>
                     <span className="font-semibold">{formatCurrency(investmentData?.totalAmountPaid || totalAmount)}</span>
                   </div>
                   {investmentData && (
@@ -278,7 +280,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                         <span className="font-semibold">{formatCurrency(investmentData.pricePerUnit || property.financials.pricePerShare)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-emerald-700 dark:text-emerald-300">Investment ID:</span>
+                        <span className="text-emerald-700 dark:text-emerald-300">{t("im_investment_id")}</span>
                         <span className="font-semibold text-sm">{investmentData.investmentId}</span>
                       </div>
                     </>
@@ -341,18 +343,18 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
           {/* Property Overview */}
           <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
             <div className="text-center">
-              <div className="text-sm text-muted-foreground">Property Type</div>
+              <div className="text-sm text-muted-foreground">{t("im_property_type")}</div>
               <div className="font-semibold capitalize">{property.propertyType}</div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-muted-foreground">Expected Yield</div>
+              <div className="text-sm text-muted-foreground">{t("im_expected_yield")}</div>
               <div className="font-semibold text-emerald-600">{property.financials.projectedYield}%</div>
             </div>
           </div>
 
           {/* Investment Type Selection */}
           <div className="space-y-3">
-            <Label className="text-base font-semibold">Choose Your Investment Plan</Label>
+            <Label className="text-base font-semibold">{t("im_choose_plan")}</Label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -477,26 +479,26 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-emerald-600 dark:text-emerald-400">Units to Purchase</div>
+                  <div className="text-sm text-emerald-600 dark:text-emerald-400">{t("im_units_to_purchase")}</div>
                   <div className="font-bold text-lg">{numUnits} Units</div>
                 </div>
                 <div>
-                  <div className="text-sm text-emerald-600 dark:text-emerald-400">Total Amount</div>
+                  <div className="text-sm text-emerald-600 dark:text-emerald-400">{t("im_total_amount")}</div>
                   <div className="font-bold text-lg">{formatCurrency(totalAmount)}</div>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-emerald-600 dark:text-emerald-400">Price per Unit</span>
+                  <span className="text-sm text-emerald-600 dark:text-emerald-400">{t("im_price_per_unit")}</span>
                   <span className="font-semibold">{formatCurrency(property.financials.pricePerShare)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-emerald-600 dark:text-emerald-400">Projected Annual Return</span>
+                  <span className="text-sm text-emerald-600 dark:text-emerald-400">{t("im_projected_annual_return")}</span>
                   <span className="font-semibold">{formatCurrency(projectedReturn)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-emerald-600 dark:text-emerald-400">Expected Yield</span>
+                  <span className="text-sm text-emerald-600 dark:text-emerald-400">{t("im_expected_yield")}</span>
                   <span className="font-semibold">{property.financials.projectedYield}%</span>
                 </div>
               </div>
@@ -532,7 +534,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                   </div>
                   <div className="pt-2 border-t border-purple-200 dark:border-purple-800">
                     <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                      <span>Flexible short-term investment option</span>
+                      <span>{t("im_flexible_short")}</span>
                     </div>
                   </div>
                 </>
@@ -572,7 +574,7 @@ export function InvestmentModal({ property, isOpen, onClose, onSuccess }: Invest
                   <div className="pt-2 border-t border-purple-200 dark:border-purple-800 space-y-2">
                     <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
                       <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-                      <span>Early Withdrawal Penalties (Graduated)</span>
+                      <span>{t("im_early_withdrawal_graduated")}</span>
                     </div>
                     {property.investmentTerms?.graduatedPenalties && property.investmentTerms.graduatedPenalties.length > 0 ? (
                       <div className="ml-5 space-y-1">

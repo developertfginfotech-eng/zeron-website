@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "@/hooks/use-translation"
+import type { TranslationKey } from "@/lib/translations"
 import { useLocation } from "wouter"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -41,7 +42,7 @@ export default function InvestorProfile() {
 
   // Check document upload status
   const getDocumentStatus = (doc: any) => {
-    return doc && doc.uploaded ? 'Completed' : 'Pending'
+    return doc && doc.uploaded ? t("prof_completed") : t("prof_pending")
   }
 
   const docsCompleted = kycData?.documents
@@ -53,38 +54,38 @@ export default function InvestorProfile() {
   const profileSections = [
     {
       id: 'basic',
-      title: 'Basic Information',
-      description: 'Personal details and contact information',
+      title: t("ps_basic_title"),
+      description: t("ps_basic_desc"),
       icon: <User className="w-5 h-5 text-current" />,
       completed: !!(userProfile?.firstName && userProfile?.lastName && userProfile?.email && userProfile?.phone),
       items: [
-        `Full Name: ${kycData?.personalInfo?.fullNameEnglish || `${userProfile?.firstName} ${userProfile?.lastName}` || 'Not provided'}`,
-        `Email Address: ${userProfile?.email || 'Not provided'}`,
-        `Phone Number: ${userProfile?.phone || 'Not provided'}`,
-        `Date of Birth: ${
+        `${t("ps_label_full_name")}: ${kycData?.personalInfo?.fullNameEnglish || `${userProfile?.firstName} ${userProfile?.lastName}` || t("ps_not_provided")}`,
+        `${t("ps_label_email")}: ${userProfile?.email || t("ps_not_provided")}`,
+        `${t("ps_label_phone")}: ${userProfile?.phone || t("ps_not_provided")}`,
+        `${t("ps_label_dob")}: ${
           (userProfile?.dateOfBirth || kycData?.personalInfo?.dateOfBirth)
             ? new Date(userProfile?.dateOfBirth || kycData?.personalInfo?.dateOfBirth || '').toLocaleDateString()
-            : 'Not provided'
+            : t("ps_not_provided")
         }`
       ]
     },
     {
       id: 'kyc',
-      title: 'Identity Verification',
-      description: 'KYC documentation and verification status',
+      title: t("ps_kyc_title"),
+      description: t("ps_kyc_desc"),
       icon: <Shield className="w-5 h-5 text-current" />,
       completed: kycData?.status === 'approved',
       items: [
-        `Government ID: ${getDocumentStatus(kycData?.documents?.nationalId)}`,
-        `Address Proof: ${getDocumentStatus(kycData?.documents?.addressProof)}`,
-        `Selfie Verification: ${getDocumentStatus(kycData?.documents?.selfie)}`,
-        `Income Documentation: ${getDocumentStatus(kycData?.documents?.proofOfIncome)}`
+        `${t("ps_label_gov_id")}: ${getDocumentStatus(kycData?.documents?.nationalId)}`,
+        `${t("ps_label_address_proof")}: ${getDocumentStatus(kycData?.documents?.addressProof)}`,
+        `${t("ps_label_selfie")}: ${getDocumentStatus(kycData?.documents?.selfie)}`,
+        `${t("ps_label_income_doc")}: ${getDocumentStatus(kycData?.documents?.proofOfIncome)}`
       ]
     },
     {
       id: 'investment',
-      title: 'Investment Profile',
-      description: 'Investment experience and risk preferences',
+      title: t("ps_investment_title"),
+      description: t("ps_investment_desc"),
       icon: <Wallet className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.investmentProfile?.completed ||
@@ -93,16 +94,16 @@ export default function InvestorProfile() {
          userProfile?.profileData?.investmentProfile?.investmentGoals) ||
         false,
       items: [
-        'Investment Experience',
-        'Risk Tolerance',
-        'Investment Goals',
-        'Preferred Property Types'
+        t("ps_investment_experience"),
+        t("ps_risk_tolerance"),
+        t("ps_investment_goals"),
+        t("ps_preferred_property_types")
       ]
     },
     {
       id: 'banking',
-      title: 'Banking Details',
-      description: 'Bank account verification for payouts',
+      title: t("ps_banking_title"),
+      description: t("ps_banking_desc"),
       icon: <Wallet className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.bankingDetails?.completed ||
@@ -111,16 +112,16 @@ export default function InvestorProfile() {
          userProfile?.profileData?.bankingDetails?.accountHolder) ||
         false,
       items: [
-        'Bank Account',
-        'IBAN Verification',
-        'Payout Preferences',
-        'Tax Information'
+        t("ps_bank_account"),
+        t("ps_iban_verification"),
+        t("ps_payout_preferences"),
+        t("ps_tax_information")
       ]
     },
     {
       id: 'preferences',
-      title: 'Communication Preferences',
-      description: 'Notification and communication settings',
+      title: t("ps_preferences_title"),
+      description: t("ps_preferences_desc"),
       icon: <Bell className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.communicationPreferences?.completed ||
@@ -128,16 +129,16 @@ export default function InvestorProfile() {
          userProfile?.profileData?.communicationPreferences?.languagePreference) ||
         false,
       items: [
-        'Email Notifications',
-        'SMS Alerts',
-        'Language Preference',
-        'Timezone Settings'
+        t("ps_email_notifications"),
+        t("ps_sms_alerts"),
+        t("ps_language_preference"),
+        t("ps_timezone_settings")
       ]
     },
     {
       id: 'documents',
-      title: 'Additional Documents',
-      description: 'Optional supporting documentation',
+      title: t("ps_documents_title"),
+      description: t("ps_documents_desc"),
       icon: <FileText className="w-5 h-5 text-current" />,
       completed:
         userProfile?.profileData?.employmentPortfolio?.completed ||
@@ -146,10 +147,10 @@ export default function InvestorProfile() {
          userProfile?.profileData?.employmentPortfolio?.jobTitle) ||
         false,
       items: [
-        'Employment Letter',
-        'Salary Certificate',
-        'Bank Statements',
-        'Investment Portfolio'
+        t("ps_employment_letter"),
+        t("ps_salary_certificate"),
+        t("ps_bank_statements"),
+        t("ps_investment_portfolio")
       ]
     }
   ]
@@ -330,7 +331,7 @@ export default function InvestorProfile() {
                       : 'bg-green-500/20 border-green-400/30 text-green-300'
                   }`}>
                     <span className="text-sm font-bold uppercase">
-                      {section.completed ? 'Completed' : 'Pending'}
+                      {section.completed ? t("prof_completed") : t("prof_pending")}
                     </span>
                   </div>
                   <ChevronRight className="w-5 h-5 text-green-400" />
@@ -372,10 +373,10 @@ export default function InvestorProfile() {
             </div>
             <div className="text-right bg-teal-700/50 backdrop-blur-sm rounded-xl p-4 border border-teal-600/30">
               <p className="text-sm font-medium text-teal-200 uppercase">
-                {kycData.completionPercentage}% Complete
+                {kycData.completionPercentage}{t("ps_percent_complete")}
               </p>
               <p className="text-xs text-teal-200 capitalize">
-                Status: {kycData.status}
+                {t("ps_status")} {t(`ps_status_${kycData.status}` as TranslationKey)}
               </p>
             </div>
           </div>
