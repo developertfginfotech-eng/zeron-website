@@ -6,22 +6,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTranslation } from "@/hooks/use-translation"
-import { useLanguage } from "@/components/language-provider"
+import { SUPPORTED_LANGUAGES, useLanguage } from "@/components/language-provider"
 import { useAuth } from "@/hooks/use-auth"
 import { AuthDialog } from "@/components/auth-dialog"
 import Logo from "@/components/logo"
-import { Languages, Globe, Flag, User, LogOut, BarChart3, Wallet } from "lucide-react"
+import { Languages, Globe, User, LogOut, BarChart3, Wallet } from "lucide-react"
 import { Link, useLocation } from "wouter"
-
-const languages = [
-  { code: "en", name: "English" },
-  { code: "ar", name: "العربية" },
-  { code: "ur", name: "اردو" },
-  { code: "hi", name: "हिंदी" },
-  { code: "pa", name: "ਪੰਜਾਬੀ" },
-  { code: "bn", name: "বাংলা" },
-  { code: "ml", name: "മലയാളം" },
-] as const
 
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
@@ -30,15 +20,15 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
   const [location] = useLocation()
 
   const navigation = [
-    { name: "Invest", href: "/" },
-    { name: t("about_us"), href: "/website/about" },
+    { id: "invest", name: t("nav_invest"), href: "/" },
+    { id: "about", name: t("about_us"), href: "/website/about" },
   ]
 
   const authenticatedNavigation = [
-    { name: "Dashboard", href: "/investor/dashboard", icon: BarChart3 },
-    { name: "Properties", href: "/website/properties", icon: Globe },
-    { name: "Portfolio", href: "/investor/portfolio", icon: BarChart3 },
-    { name: "Wallet", href: "/investor/wallet", icon: Wallet },
+    { id: "dashboard", name: t("nav_dashboard"), href: "/investor/dashboard", icon: BarChart3 },
+    { id: "properties", name: t("properties"), href: "/website/properties", icon: Globe },
+    { id: "portfolio", name: t("portfolio"), href: "/investor/portfolio", icon: BarChart3 },
+    { id: "wallet", name: t("nav_wallet"), href: "/investor/wallet", icon: Wallet },
   ]
 
   const isActive = (href: string, exact = false) => {
@@ -64,7 +54,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
             </Link>
 
             {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
               {navigation.map((item) => (
                 <Link
                   key={item.href}
@@ -74,7 +64,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                       ? "text-teal-600 dark:text-teal-400"
                       : "text-muted-foreground"
                   }`}
-                  data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  data-testid={`link-${item.id}`}
                   aria-current={isActive(item.href) ? "page" : undefined}
                 >
                   {item.name}
@@ -83,26 +73,26 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
               {/* Language Switcher */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" data-testid="button-language-switcher">
                     <Languages className="h-4 w-4" />
-                    <span className="ml-2 hidden sm:inline">
-                      {languages.find(l => l.code === language)?.name}
+                    <span className="ml-2 hidden sm:inline rtl:mr-2 rtl:ml-0">
+                      {SUPPORTED_LANGUAGES.find(l => l.code === language)?.name}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {languages.map((lang) => (
+                  {SUPPORTED_LANGUAGES.map((lang) => (
                     <DropdownMenuItem
                       key={lang.code}
-                      onClick={() => setLanguage(lang.code as any)}
+                      onClick={() => setLanguage(lang.code)}
                       className={language === lang.code ? "bg-accent" : ""}
                       data-testid={`option-language-${lang.code}`}
                     >
-                      <Flag className="mr-2 h-4 w-4" />
+                      <span className="mr-2 rtl:ml-2 rtl:mr-0 text-base">{lang.flag}</span>
                       {lang.name}
                     </DropdownMenuItem>
                   ))}
@@ -111,9 +101,9 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 
               {/* Auth Section */}
               {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4 rtl:space-x-reverse">
                   {/* Authenticated Navigation */}
-                  <div className="hidden lg:flex items-center space-x-4">
+                  <div className="hidden lg:flex items-center space-x-4 rtl:space-x-reverse">
                     {authenticatedNavigation.map((item) => {
                       const Icon = item.icon
                       return (
@@ -121,7 +111,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                           key={item.href}
                           href={item.href}
                           className="text-base font-semibold text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400 transition-colors flex items-center gap-1"
-                          data-testid={`link-${item.name.toLowerCase()}`}
+                          data-testid={`link-${item.id}`}
                         >
                           <Icon className="h-4 w-4" />
                           {item.name}
@@ -135,7 +125,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" data-testid="button-user-menu">
                         <User className="h-4 w-4" />
-                        <span className="ml-2 hidden sm:inline">
+                        <span className="ml-2 hidden sm:inline rtl:mr-2 rtl:ml-0">
                           {user?.firstName} {user?.lastName}
                         </span>
                       </Button>
@@ -143,29 +133,29 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
                         <Link href="/investor/profile" data-testid="link-profile">
-                          <User className="mr-2 h-4 w-4" />
-                          Profile
+                          <User className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+                          {t("profile")}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href="/investor/dashboard" data-testid="link-dashboard">
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          Dashboard
+                          <BarChart3 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+                          {t("nav_dashboard")}
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={logout}
                         className="text-red-600 dark:text-red-400"
                         data-testid="button-logout"
                       >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logout
+                        <LogOut className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+                        {t("logout")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               ) : (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <AuthDialog defaultTab="login">
                     <Button variant="ghost" data-testid="button-login">
                       {t("login")}
@@ -196,23 +186,23 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 
             {/* Quick Links */}
             <div className="md:col-span-2">
-              <h3 className="font-bold mb-4 text-white text-lg">Quick Links</h3>
+              <h3 className="font-bold mb-4 text-white text-lg">{t("quick_links")}</h3>
               <ul className="space-y-3 text-sm">
-                <li><Link href="/website/invest" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-invest">Start Investing</Link></li>
+                <li><Link href="/website/invest" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-invest">{t("start_investing")}</Link></li>
                 <li><Link href="/website/about" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-about">{t("about_us")}</Link></li>
                 <li><Link href="/website/business" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-business">{t("business_model")}</Link></li>
-                <li><Link href="/website/properties" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-properties">Properties</Link></li>
+                <li><Link href="/website/properties" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-properties">{t("properties")}</Link></li>
               </ul>
             </div>
 
             {/* Support */}
-            <div className="md:col-span-2 md:ml-12">
-              <h3 className="font-bold mb-4 text-white text-lg">Support</h3>
+            <div className="md:col-span-2 md:ml-12 rtl:md:mr-12 rtl:md:ml-0">
+              <h3 className="font-bold mb-4 text-white text-lg">{t("support_heading")}</h3>
               <ul className="space-y-3 text-sm">
-                <li><Link href="/website/contact" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-contact">Contact Us</Link></li>
-                <li><a href="#" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-help">Help Center</a></li>
-                <li><a href="#" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-faq">FAQ</a></li>
-                <li><a href="#" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-terms">Terms & Conditions</a></li>
+                <li><Link href="/website/contact" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-contact">{t("contact_us")}</Link></li>
+                <li><a href="#" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-help">{t("help_center")}</a></li>
+                <li><a href="#" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-faq">{t("faq")}</a></li>
+                <li><a href="#" className="transition-colors hover:opacity-80" style={{ color: '#efefef' }} data-testid="footer-link-terms">{t("terms_conditions")}</a></li>
               </ul>
             </div>
 
@@ -238,9 +228,9 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 
             {/* Download App */}
             <div className="md:col-span-4">
-              <h3 className="font-bold mb-4 text-white text-lg">Download App</h3>
+              <h3 className="font-bold mb-4 text-white text-lg">{t("download_app")}</h3>
               <p className="text-sm mb-6 leading-relaxed" style={{ color: '#efefef' }}>
-                Get the Zaron mobile app for the best investment experience.
+                {t("download_app_desc")}
               </p>
               <div className="flex gap-6 mb-6">
                 {/* Google Play Store */}
@@ -279,7 +269,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
             </div>
 
             <div className="mt-10 pt-8 text-center text-sm" style={{ borderTop: '1px solid #18605c', color: '#efefef' }}>
-              <p>© 2025 Zaron. All rights reserved. Licensed and regulated in Saudi Arabia.</p>
+              <p>{t("copyright_text")}</p>
             </div>
           </div>
         </div>

@@ -5,6 +5,9 @@ import { motion } from "framer-motion"
 import { useLocation } from "wouter"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { useTranslation } from "@/hooks/use-translation"
+import type { TranslationKey } from "@/lib/translations"
+import { localized } from "@/lib/localize"
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-client"
 
 // Backend property interface
@@ -13,6 +16,8 @@ interface BackendProperty {
   title: string
   titleAr?: string
   description: string
+  /** Machine translations cached by the API, keyed by language code. */
+  translations?: Record<string, Record<string, string>> | null
   location: {
     city: string
     district: string
@@ -67,75 +72,27 @@ const getKYCStatus = (): {
   }
 };
 
+// Copy lives in translations.ts; these only carry the non-textual bits plus the
+// keys used to look each string up in the active language.
 const features = [
-  {
-    icon: Building2,
-    title: "Fractional Ownership",
-    subtitle: "Min. SAR 1,000",
-    description: "Invest in premium Saudi properties with as little as SAR 1,000. Own real estate previously accessible only to the ultra-wealthy."
-  },
-  {
-    icon: Shield,
-    title: "Shariah Compliant",
-    subtitle: "100% Halal",
-    description: "Every investment is vetted by leading Islamic scholars, ensuring full compliance with Islamic finance principles."
-  },
-  {
-    icon: PieChart,
-    title: "Diversified Portfolio",
-    subtitle: "Spread Your Risk",
-    description: "Invest across multiple properties, cities, and asset classes to reduce risk and maximize long-term wealth growth."
-  },
-  {
-    icon: Users,
-    title: "Professional Management",
-    subtitle: "Zero Hassle",
-    description: "Expert property managers handle tenant relations, maintenance, and rent collection entirely on your behalf."
-  },
-  {
-    icon: TrendingUp,
-    title: "Monthly Returns",
-    subtitle: "Regular Income",
-    description: "Receive monthly rental distributions directly to your wallet and watch your passive income compound over time."
-  },
-  {
-    icon: Eye,
-    title: "Full Transparency",
-    subtitle: "Real-time Reports",
-    description: "Access detailed financial reports, property updates, and live investment performance dashboards anytime."
-  }
-]
+  { icon: Building2, slug: "fractional" },
+  { icon: Shield, slug: "shariah" },
+  { icon: PieChart, slug: "diversified" },
+  { icon: Users, slug: "management" },
+  { icon: TrendingUp, slug: "monthly" },
+  { icon: Eye, slug: "transparency" }
+] as const
 
 const testimonials = [
-  {
-    returns: "18%",
-    quote: "Zaron has transformed my investment strategy. The platform's transparency and Shariah-compliant options align perfectly with my values. Consistent returns every month.",
-    name: "Ahmed Al-Rashid",
-    role: "Private Equity Investor",
-    city: "Riyadh",
-    initials: "AR"
-  },
-  {
-    returns: "22%",
-    quote: "Minimum ticket sizes were always a barrier in real estate. Zaron changed that completely — I started with SAR 5,000 and have steadily grown a solid portfolio.",
-    name: "Khalid Al-Mutairi",
-    role: "Entrepreneur",
-    city: "Jeddah",
-    initials: "KM"
-  },
-  {
-    returns: "15%",
-    quote: "The platform is incredibly intuitive. I track my entire portfolio in one place and monthly returns land in my wallet like clockwork. Highly recommended.",
-    name: "Nour Al-Saud",
-    role: "Business Consultant",
-    city: "Dammam",
-    initials: "NS"
-  }
-]
+  { returns: "18%", quoteKey: "testimonial_1_quote", name: "Ahmed Al-Rashid", roleKey: "role_private_equity", cityKey: "riyadh", initials: "AR" },
+  { returns: "22%", quoteKey: "testimonial_2_quote", name: "Khalid Al-Mutairi", roleKey: "role_entrepreneur", cityKey: "jeddah", initials: "KM" },
+  { returns: "15%", quoteKey: "testimonial_3_quote", name: "Nour Al-Saud", roleKey: "role_business_consultant", cityKey: "dammam", initials: "NS" }
+] as const
 
 export default function WebsiteHome() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
+  const { t, language } = useTranslation()
   const [properties, setProperties] = useState<BackendProperty[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -182,7 +139,7 @@ export default function WebsiteHome() {
   const handleInvest = () => {
     const userData = localStorage.getItem('zaron_user')
     if (!userData) {
-      toast({ title: "Login Required", description: "Please login to start investing", variant: "destructive" })
+      toast({ title: t("toast_login_required"), description: t("toast_login_required_desc"), variant: "destructive" })
       setLocation('/register')
       return
     }
@@ -193,7 +150,7 @@ export default function WebsiteHome() {
       const isKYCCompleted = kycStatus === 'submitted' || kycStatus === 'under_review' || kycStatus === 'approved'
 
       if (!isKYCCompleted) {
-        toast({ title: "KYC Verification Required", description: "Complete your KYC verification to start investing", variant: "destructive" })
+        toast({ title: t("toast_kyc_required"), description: t("toast_kyc_required_desc"), variant: "destructive" })
         setLocation('/kyc-verification')
         return
       }
@@ -205,31 +162,11 @@ export default function WebsiteHome() {
   }
 
   const steps = [
-    {
-      number: 1,
-      icon: UserPlus,
-      title: "Create Your Account",
-      description: "Sign up in minutes with your email. Complete KYC verification for secure, compliant investing."
-    },
-    {
-      number: 2,
-      icon: Search,
-      title: "Browse Opportunities",
-      description: "Explore vetted properties with detailed financials, projections, and risk analysis."
-    },
-    {
-      number: 3,
-      icon: DollarSign,
-      title: "Invest & Own",
-      description: "Choose your investment amount and own fractional units in premium Saudi properties."
-    },
-    {
-      number: 4,
-      icon: TrendingUp,
-      title: "Earn Returns",
-      description: "Receive monthly rental income and watch your investment grow with property appreciation."
-    }
-  ]
+    { number: 1, icon: UserPlus, slug: "create_account" },
+    { number: 2, icon: Search, slug: "browse" },
+    { number: 3, icon: DollarSign, slug: "invest_own" },
+    { number: 4, icon: TrendingUp, slug: "earn" }
+  ] as const
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#004743' }}>
@@ -256,26 +193,26 @@ export default function WebsiteHome() {
                 style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' }}
               >
                 <CheckCircle className="w-4 h-4" style={{ color: '#d0ac00' }} />
-                <span className="text-sm font-medium text-white">Shariah Compliant · Vision 2030 Aligned</span>
+                <span className="text-sm font-medium text-white">{t("home_badge")}</span>
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.08]">
-                Invest in
+                {t("home_title_line1")}
                 <br />
-                <span style={{ color: '#d0ac00' }}>Saudi Arabia's</span>
+                <span style={{ color: '#d0ac00' }}>{t("home_title_line2")}</span>
                 <br />
-                Future
+                {t("home_title_line3")}
               </h1>
               <p className="text-lg md:text-xl mb-10 leading-relaxed max-w-lg" style={{ color: '#c5dfdd' }}>
-                Join the real estate crowdfunding revolution. Build wealth through Vision 2030 projects with Shariah-compliant investments starting from SAR 1,000.
+                {t("home_subtitle")}
               </p>
 
               {/* Stats Row */}
               <div className="grid grid-cols-3 gap-4 mb-10">
                 {[
-                  { value: 'SAR 2.5B+', label: 'Total Invested' },
-                  { value: '15.2%', label: 'Avg. Returns' },
-                  { value: '6+', label: 'Properties Funded' }
+                  { value: 'SAR 2.5B+', label: t("home_stat_total_invested") },
+                  { value: '15.2%', label: t("home_stat_avg_returns") },
+                  { value: '6+', label: t("home_stat_properties_funded") }
                 ].map((stat, i) => (
                   <div
                     key={i}
@@ -299,8 +236,8 @@ export default function WebsiteHome() {
                     if (userData) { setLocation('/website/properties') } else { setLocation('/register') }
                   }}
                 >
-                  Start Investing Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  {t("start_investing_now")}
+                  <ArrowRight className="ml-2 h-5 w-5 rtl:mr-2 rtl:ml-0 rtl:rotate-180" />
                 </Button>
                 <Button
                   size="lg"
@@ -309,7 +246,7 @@ export default function WebsiteHome() {
                   style={{ borderColor: 'rgba(255,255,255,0.35)', borderWidth: '2px' }}
                   onClick={() => setLocation('/website/properties')}
                 >
-                  Explore Opportunities
+                  {t("explore_opportunities")}
                 </Button>
               </div>
             </motion.div>
@@ -348,13 +285,13 @@ export default function WebsiteHome() {
               style={{ border: '1px solid rgba(255,255,255,0.25)', backgroundColor: 'rgba(255,255,255,0.07)' }}
             >
               <Star className="w-4 h-4" style={{ color: '#d0ac00' }} />
-              <p className="text-sm font-semibold text-white">Why Real Estate Crowdfunding</p>
+              <p className="text-sm font-semibold text-white">{t("home_why_badge")}</p>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#d0ac00' }}>
-              Transform Your Investment Portfolio
+              {t("home_why_title")}
             </h2>
             <p className="text-lg text-white/85 max-w-2xl mx-auto">
-              Access exclusive Saudi real estate with fractional ownership, professional management, and Shariah-compliant returns.
+              {t("home_why_subtitle")}
             </p>
           </motion.div>
 
@@ -378,13 +315,13 @@ export default function WebsiteHome() {
                         <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-base font-bold text-white leading-tight">{feature.title}</h3>
-                        <p className="text-xs font-semibold mt-0.5" style={{ color: '#d0ac00' }}>{feature.subtitle}</p>
+                        <h3 className="text-base font-bold text-white leading-tight">{t(`feat_${feature.slug}_title` as TranslationKey)}</h3>
+                        <p className="text-xs font-semibold mt-0.5" style={{ color: '#d0ac00' }}>{t(`feat_${feature.slug}_sub` as TranslationKey)}</p>
                       </div>
                     </div>
                     <CardContent className="p-5 bg-white">
                       <p className="text-sm leading-relaxed" style={{ color: '#1a4745' }}>
-                        {feature.description}
+                        {t(`feat_${feature.slug}_desc` as TranslationKey)}
                       </p>
                     </CardContent>
                   </Card>
@@ -405,19 +342,19 @@ export default function WebsiteHome() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">Exclusive Saudi Projects</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">{t("home_projects_title")}</h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: '#c5dfdd' }}>
-              Premium real estate opportunities in Saudi Arabia's most promising developments. Register to unlock detailed investment information.
+              {t("home_projects_subtitle")}
             </p>
           </motion.div>
 
           {loading ? (
             <div className="text-center py-16">
-              <p className="text-white text-lg">Loading properties...</p>
+              <p className="text-white text-lg">{t("home_loading_properties")}</p>
             </div>
           ) : properties.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-white text-lg">No properties available at the moment</p>
+              <p className="text-white text-lg">{t("home_no_properties")}</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -448,37 +385,41 @@ export default function WebsiteHome() {
                           className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm"
                           style={{ backgroundColor: property.status === 'active' ? 'rgba(34,197,94,0.85)' : 'rgba(168,85,247,0.85)' }}
                         >
-                          {property.status === 'active' ? 'Live' : 'Coming Soon'}
+                          {property.status === 'active' ? t("status_live") : t("status_coming_soon")}
                         </div>
                         {!isKYCCompleted && (
                           <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                             <Lock className="h-3 w-3" />
-                            KYC Required
+                            {t("kyc_required")}
                           </div>
                         )}
                         <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full font-bold text-sm shadow-sm" style={{ color: '#18605c' }}>
-                          {Math.round(property.fundingProgress)}% Funded
+                          {Math.round(property.fundingProgress)}% {t("label_funded")}
                         </div>
                       </div>
 
                       <CardContent className="p-6 flex-1 flex flex-col">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">{property.title}</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
+                          {localized(property, "title", language)}
+                        </h3>
                         <p className="text-sm text-gray-500 mb-5 flex items-center gap-1.5">
                           <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
-                          {property.location.district}, {property.location.city}
+                          {[property.location.district, localized(property, "city", language) || property.location.city]
+                            .filter(Boolean)
+                            .join(", ")}
                         </p>
 
                         <div className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl bg-gray-50 border border-gray-100">
                           <div className="text-center">
-                            <p className="text-xs text-gray-400 mb-1">Target Return</p>
+                            <p className="text-xs text-gray-400 mb-1">{t("label_target_return")}</p>
                             <p className="text-base font-bold" style={{ color: '#18605c' }}>{property.financials.projectedYield}%</p>
                           </div>
                           <div className="text-center border-x border-gray-200">
-                            <p className="text-xs text-gray-400 mb-1">Min. Invest</p>
+                            <p className="text-xs text-gray-400 mb-1">{t("label_min_invest")}</p>
                             <p className="text-sm font-bold text-gray-800">SAR {(property.financials.minInvestment / 1000).toFixed(0)}K</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-xs text-gray-400 mb-1">Investors</p>
+                            <p className="text-xs text-gray-400 mb-1">{t("label_investors")}</p>
                             <p className="text-sm font-bold text-gray-800">{property.investorCount}</p>
                           </div>
                         </div>
@@ -493,7 +434,10 @@ export default function WebsiteHome() {
                           </div>
                         </div>
                         <p className="text-xs text-gray-400 mb-6">
-                          SAR {(fundedAmount / 1000000).toFixed(2)}M of SAR {(property.financials.totalValue / 1000000).toFixed(0)}M funded
+                          {t("label_funded_of", {
+                            funded: (fundedAmount / 1000000).toFixed(2),
+                            total: (property.financials.totalValue / 1000000).toFixed(0)
+                          })}
                         </p>
 
                         <div className="flex gap-3 mt-auto">
@@ -502,14 +446,14 @@ export default function WebsiteHome() {
                             className="flex-1 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl"
                             onClick={() => handleViewDetails(property._id)}
                           >
-                            Learn More
+                            {t("learn_more")}
                           </Button>
                           <Button
                             className="flex-1 font-bold text-black hover:opacity-90 rounded-xl"
                             style={{ backgroundColor: '#d0ac00' }}
                             onClick={handleInvest}
                           >
-                            Invest Now
+                            {t("invest_now")}
                           </Button>
                         </div>
                       </CardContent>
@@ -528,8 +472,8 @@ export default function WebsiteHome() {
               style={{ borderColor: 'rgba(255,255,255,0.35)' }}
               onClick={() => setLocation('/website/properties')}
             >
-              View All Opportunities
-              <ArrowRight className="ml-2 h-5 w-5" />
+              {t("view_all_opportunities")}
+              <ArrowRight className="ml-2 h-5 w-5 rtl:mr-2 rtl:ml-0 rtl:rotate-180" />
             </Button>
           </div>
         </div>
@@ -545,9 +489,9 @@ export default function WebsiteHome() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">Start Your Investment Journey</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">{t("home_journey_title")}</h2>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-              Four simple steps to building real estate wealth
+              {t("home_journey_subtitle")}
             </p>
           </motion.div>
 
@@ -577,8 +521,8 @@ export default function WebsiteHome() {
                         <span className="text-xs font-bold" style={{ color: '#004743' }}>{step.number}</span>
                       </div>
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-3">{step.title}</h3>
-                    <p className="text-gray-300 text-sm leading-relaxed">{step.description}</p>
+                    <h3 className="text-lg font-bold text-white mb-3">{t(`step_${step.slug}_title` as TranslationKey)}</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{t(`step_${step.slug}_desc` as TranslationKey)}</p>
                   </div>
 
                   {index < steps.length - 1 && (
@@ -602,8 +546,8 @@ export default function WebsiteHome() {
                 if (userData) { setLocation('/website/properties') } else { setLocation('/register') }
               }}
             >
-              Start Investing Now
-              <ArrowRight className="ml-2 h-5 w-5" />
+              {t("start_investing_now")}
+              <ArrowRight className="ml-2 h-5 w-5 rtl:mr-2 rtl:ml-0 rtl:rotate-180" />
             </Button>
           </div>
         </div>
@@ -620,10 +564,10 @@ export default function WebsiteHome() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#d0ac00' }}>
-              Trusted by Thousands of Investors
+              {t("home_testimonials_title")}
             </h2>
             <p className="text-white/80 text-lg">
-              Join our community of successful real estate investors across Saudi Arabia
+              {t("home_testimonials_subtitle")}
             </p>
           </motion.div>
 
@@ -652,13 +596,13 @@ export default function WebsiteHome() {
                     <div className="flex items-baseline gap-3 mb-5">
                       <span className="text-4xl font-bold text-white">{item.returns}</span>
                       <div className="flex items-center gap-1.5">
-                        <ArrowUpRight className="w-4 h-4 text-emerald-400" />
-                        <span className="text-sm text-emerald-400 font-medium">Annual Returns</span>
+                        <ArrowUpRight className="w-4 h-4 text-emerald-400 rtl:-scale-x-100" />
+                        <span className="text-sm text-emerald-400 font-medium">{t("annual_returns")}</span>
                       </div>
                     </div>
 
                     <p className="text-white/80 italic mb-6 leading-relaxed text-sm flex-1">
-                      "{item.quote}"
+                      "{t(item.quoteKey)}"
                     </p>
 
                     <div className="flex items-center gap-3 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -670,7 +614,7 @@ export default function WebsiteHome() {
                       </div>
                       <div>
                         <h4 className="text-white font-semibold text-sm">{item.name}</h4>
-                        <p className="text-white/55 text-xs">{item.role} · {item.city}</p>
+                        <p className="text-white/55 text-xs">{t(item.roleKey)} · {t(item.cityKey)}</p>
                       </div>
                     </div>
                   </CardContent>

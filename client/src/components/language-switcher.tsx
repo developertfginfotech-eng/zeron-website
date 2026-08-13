@@ -6,27 +6,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Globe } from "lucide-react"
-import { useLanguage } from "@/components/language-provider"
-import { useTranslation } from "@/hooks/use-translation"
-
-const languages = [
-  { code: "en", flag: "🇺🇸", name: "english" },
-  { code: "ar", flag: "🇸🇦", name: "arabic" },
-  { code: "hi", flag: "🇮🇳", name: "hindi" }
-] as const
+import { SUPPORTED_LANGUAGES, useLanguage } from "@/components/language-provider"
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage()
-  const { t } = useTranslation()
-
-  const currentLanguage = languages.find(lang => lang.code === language)
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-9 w-9"
           data-testid="button-language-switcher"
         >
@@ -35,7 +25,7 @@ export function LanguageSwitcher() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        {languages.map((lang) => (
+        {SUPPORTED_LANGUAGES.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
@@ -43,7 +33,9 @@ export function LanguageSwitcher() {
             data-testid={`language-option-${lang.code}`}
           >
             <span className="text-lg">{lang.flag}</span>
-            <span className="flex-1">{t(lang.name as keyof typeof import("@/lib/translations").translations.en)}</span>
+            {/* Each language is listed in its own script so it stays findable
+                no matter which language the UI is currently rendering in. */}
+            <span className="flex-1">{lang.name}</span>
             {language === lang.code && (
               <div className="w-2 h-2 rounded-full bg-primary" />
             )}

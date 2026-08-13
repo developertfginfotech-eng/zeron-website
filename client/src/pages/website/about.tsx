@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useTranslation } from "@/hooks/use-translation"
+import type { TranslationKey } from "@/lib/translations"
 import { Link } from "wouter"
 import { 
   Building2, 
@@ -18,62 +19,48 @@ import {
   Flag
 } from "lucide-react"
 
+// Copy lives in translations.ts; these carry only the non-textual bits plus the
+// keys used to look each string up in the active language.
 const values = [
-  {
-    icon: Shield,
-    title: "Trust & Transparency",
-    description: "We believe in complete transparency in all our dealings, providing clear information about every investment opportunity."
-  },
-  {
-    icon: Heart,
-    title: "Shariah Compliance",
-    description: "All our investments are carefully vetted to ensure they meet the highest standards of Islamic finance principles."
-  },
-  {
-    icon: Lightbulb,
-    title: "Innovation",
-    description: "We leverage cutting-edge technology to make real estate investment accessible, efficient, and rewarding."
-  },
-  {
-    icon: Users,
-    title: "Community First",
-    description: "We're committed to building a community of informed investors who grow together and support each other."
-  }
-]
+  { icon: Shield, slug: "trust" },
+  { icon: Heart, slug: "compliance" },
+  { icon: Lightbulb, slug: "innovation" },
+  { icon: Users, slug: "community" }
+] as const
 
 const stats = [
-  { label: "Active Investors", value: "10,000+", icon: Users },
-  { label: "Total Investments", value: "2.5B SAR", icon: TrendingUp },
-  { label: "Completed Projects", value: "150+", icon: Building2 },
-  { label: "Average Returns", value: "14.5%", icon: Target }
-]
+  { labelKey: "stat_active_investors", value: "10,000+", icon: Users },
+  { labelKey: "stat_total_investments", value: "2.5B SAR", icon: TrendingUp },
+  { labelKey: "stat_completed_projects", value: "150+", icon: Building2 },
+  { labelKey: "stat_average_returns", value: "14.5%", icon: Target }
+] as const
 
 const team = [
   {
     name: "Ahmed Al-Rashid",
-    role: "CEO & Co-Founder",
-    bio: "15+ years in real estate development and fintech. Former VP at SAMA.",
+    roleKey: "team_role_ceo",
+    bioKey: "team_bio_ahmed",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
   },
   {
     name: "Sarah Al-Mansouri",
-    role: "CTO & Co-Founder", 
-    bio: "Tech leader with experience at Careem and STC. MIT Computer Science graduate.",
+    roleKey: "team_role_cto",
+    bioKey: "team_bio_sarah",
     image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=300&fit=crop&crop=face"
   },
   {
     name: "Dr. Omar Bin Laden",
-    role: "Head of Islamic Finance",
-    bio: "Islamic finance scholar and Shariah board member. PhD from King Saud University.",
+    roleKey: "team_role_islamic_finance",
+    bioKey: "team_bio_omar",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face"
   },
   {
     name: "Fatima Al-Zahra",
-    role: "Head of Operations",
-    bio: "Operations expert with 12+ years at McKinsey and Saudi Aramco. Harvard MBA.",
+    roleKey: "team_role_operations",
+    bioKey: "team_bio_fatima",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face"
   }
-]
+] as const
 
 export default function AboutPage() {
   const { t } = useTranslation()
@@ -88,27 +75,26 @@ export default function AboutPage() {
             <div className="mb-6">
               <Badge className="bg-yellow-400 text-gray-900 border-0 mb-4 font-semibold">
                 <Flag className="w-4 h-4 mr-2" />
-                Proudly Saudi
+                {t("about_badge_saudi")}
               </Badge>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
               {t("about_us")}
             </h1>
             <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
-              We're on a mission to democratize real estate investment in Saudi Arabia, making it accessible, 
-              transparent, and profitable for everyone.
+              {t("about_hero_sub")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/website/invest">
                 <Button size="lg" className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-semibold" data-testid="button-our-story">
                   <Heart className="w-5 h-5 mr-2" />
-                  Our Story
+                  {t("about_our_story_btn")}
                 </Button>
               </Link>
               <Link href="#team">
                 <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" data-testid="button-meet-team">
-                  Meet Our Team
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  {t("about_meet_team")}
+                  <ArrowRight className="w-5 h-5 ml-2 rtl:mr-2 rtl:ml-0 rtl:rotate-180" />
                 </Button>
               </Link>
             </div>
@@ -120,39 +106,36 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-white uppercase tracking-wide">Our Mission</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-white uppercase tracking-wide">{t("about_mission_title")}</h2>
             <p className="text-lg text-teal-100 mb-12 leading-relaxed">
-              At Zaron, we believe that everyone should have the opportunity to participate in Saudi Arabia's
-              incredible economic transformation. Through our platform, we're making premium real estate
-              investment accessible to retail investors while maintaining the highest standards of
-              transparency and Shariah compliance.
+              {t("about_mission_body")}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Card className="text-center p-6 hover-elevate bg-gradient-to-br from-teal-800/90 to-emerald-900/90 border-teal-700/50" data-testid="card-vision">
                 <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Target className="w-8 h-8 text-gray-900" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-white">Vision 2030 Aligned</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">{t("about_vision2030_title")}</h3>
                 <p className="text-teal-200">
-                  Supporting Saudi Arabia's transformation through strategic real estate investments.
+                  {t("about_vision2030_desc")}
                 </p>
               </Card>
               <Card className="text-center p-6 hover-elevate bg-gradient-to-br from-teal-800/90 to-emerald-900/90 border-teal-700/50" data-testid="card-accessibility">
                 <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-gray-900" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-white">Democratized Access</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">{t("about_democratized_title")}</h3>
                 <p className="text-teal-200">
-                  Making premium real estate investment accessible to everyone, not just the wealthy.
+                  {t("about_democratized_desc")}
                 </p>
               </Card>
               <Card className="text-center p-6 hover-elevate bg-gradient-to-br from-teal-800/90 to-emerald-900/90 border-teal-700/50" data-testid="card-compliance">
                 <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Shield className="w-8 h-8 text-gray-900" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-white">Shariah Compliant</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">{t("feat_shariah_title")}</h3>
                 <p className="text-teal-200">
-                  Every investment is carefully vetted to ensure full compliance with Islamic principles.
+                  {t("about_shariah_desc")}
                 </p>
               </Card>
             </div>
@@ -164,9 +147,9 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Our Impact</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">{t("about_impact_title")}</h2>
             <p className="text-lg text-teal-100 max-w-2xl mx-auto">
-              Since our launch, we've helped thousands of investors build wealth through real estate.
+              {t("about_impact_sub")}
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -178,7 +161,7 @@ export default function AboutPage() {
                 <div className="text-3xl font-bold mb-2 text-yellow-400">
                   {stat.value}
                 </div>
-                <p className="text-sm text-teal-200">{stat.label}</p>
+                <p className="text-sm text-teal-200">{t(stat.labelKey)}</p>
               </Card>
             ))}
           </div>
@@ -189,9 +172,9 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Our Values</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">{t("about_values_title")}</h2>
             <p className="text-lg text-teal-100 max-w-2xl mx-auto">
-              The principles that guide everything we do at Zaron.
+              {t("about_values_sub")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
@@ -202,8 +185,8 @@ export default function AboutPage() {
                     <value.icon className="w-6 h-6 text-gray-900" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-3 text-white">{value.title}</h3>
-                    <p className="text-teal-200 leading-relaxed">{value.description}</p>
+                    <h3 className="text-xl font-bold mb-3 text-white">{t(`value_${value.slug}_title` as TranslationKey)}</h3>
+                    <p className="text-teal-200 leading-relaxed">{t(`value_${value.slug}_desc` as TranslationKey)}</p>
                   </div>
                 </div>
               </Card>
@@ -216,9 +199,9 @@ export default function AboutPage() {
       <section className="py-20" id="team">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Meet Our Team</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">{t("about_meet_team")}</h2>
             <p className="text-lg text-teal-100 max-w-2xl mx-auto">
-              Experienced professionals dedicated to transforming real estate investment in Saudi Arabia.
+              {t("about_team_sub")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -234,10 +217,10 @@ export default function AboutPage() {
                 </div>
                 <CardHeader>
                   <CardTitle className="text-lg text-white">{member.name}</CardTitle>
-                  <CardDescription className="text-yellow-400 font-medium">{member.role}</CardDescription>
+                  <CardDescription className="text-yellow-400 font-medium">{t(member.roleKey)}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-teal-200">{member.bio}</p>
+                  <p className="text-sm text-teal-200">{t(member.bioKey)}</p>
                 </CardContent>
               </Card>
             ))}
@@ -250,28 +233,26 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">Our Story</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white uppercase tracking-wide">{t("about_our_story_btn")}</h2>
               <p className="text-lg text-teal-100">
-                How we started and where we're going.
+                {t("about_story_sub")}
               </p>
             </div>
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <h3 className="text-2xl font-bold mb-4 text-white">The Beginning</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-white">{t("story_beginning_title")}</h3>
                   <p className="text-teal-200 mb-4">
-                    Founded in 2022 by a team of real estate and fintech experts, Zaron was born from a simple
-                    observation: Saudi Arabia's booming real estate market was only accessible to the wealthy elite.
+                    {t("story_beginning_p1")}
                   </p>
                   <p className="text-teal-200">
-                    We saw an opportunity to democratize this access and align it with Vision 2030's goals of
-                    economic diversification and increased retail investment participation.
+                    {t("story_beginning_p2")}
                   </p>
                 </div>
                 <Card className="p-6 bg-gradient-to-br from-teal-700/50 to-emerald-800/50 border-teal-600/50">
                   <div className="text-center">
                     <div className="text-4xl font-bold text-yellow-400 mb-2">2022</div>
-                    <p className="text-teal-200">Zaron Founded</p>
+                    <p className="text-teal-200">{t("story_founded_label")}</p>
                   </div>
                 </Card>
               </div>
@@ -280,38 +261,35 @@ export default function AboutPage() {
                 <Card className="p-6 bg-gradient-to-br from-emerald-800/50 to-teal-700/50 border-emerald-600/50 md:order-first">
                   <div className="text-center">
                     <div className="text-4xl font-bold text-yellow-400 mb-2">2024</div>
-                    <p className="text-teal-200">Platform Launch</p>
+                    <p className="text-teal-200">{t("story_launch_title")}</p>
                   </div>
                 </Card>
                 <div>
-                  <h3 className="text-2xl font-bold mb-4 text-white">Platform Launch</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-white">{t("story_launch_title")}</h3>
                   <p className="text-teal-200 mb-4">
-                    After two years of development and regulatory approval, we launched our platform with
-                    our first set of curated investment opportunities.
+                    {t("story_launch_p1")}
                   </p>
                   <p className="text-teal-200">
-                    Within months, we had onboarded thousands of investors and facilitated millions in
-                    real estate investments, all while maintaining our commitment to Shariah compliance.
+                    {t("story_launch_p2")}
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <h3 className="text-2xl font-bold mb-4 text-white">The Future</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-white">{t("story_future_title")}</h3>
                   <p className="text-teal-200 mb-4">
-                    We're just getting started. Our roadmap includes expanding to international markets,
-                    adding new asset classes, and continuing to innovate in the Islamic fintech space.
+                    {t("story_future_p1")}
                   </p>
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-sm text-teal-200">Licensed & Regulated in Saudi Arabia</span>
+                    <span className="text-sm text-teal-200">{t("about_licensed")}</span>
                   </div>
                 </div>
                 <Card className="p-6 bg-gradient-to-br from-teal-700/50 to-emerald-800/50 border-teal-600/50">
                   <div className="text-center">
                     <div className="text-4xl font-bold text-yellow-400 mb-2">2025+</div>
-                    <p className="text-teal-200">Global Expansion</p>
+                    <p className="text-teal-200">{t("story_global_label")}</p>
                   </div>
                 </Card>
               </div>
@@ -323,14 +301,14 @@ export default function AboutPage() {
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-br from-teal-800/90 to-emerald-900/90 text-white border-t border-teal-700/50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 uppercase tracking-wide">Join Our Mission</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 uppercase tracking-wide">{t("about_cta_title")}</h2>
           <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
-            Be part of Saudi Arabia's real estate transformation. Start your investment journey with us today.
+            {t("about_cta_sub")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/website/properties">
               <Button size="lg" className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-semibold" data-testid="button-start-investing">
-                Start Investing
+                {t("start_investing")}
               </Button>
             </Link>
             <Link href="/website/contact">
