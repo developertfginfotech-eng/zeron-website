@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useTranslation } from "@/hooks/use-translation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -50,6 +51,7 @@ import {
 } from "lucide-react"
 
 export default function InvestorDashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth()
   const [, setLocation] = useLocation()
   const { toast } = useToast()
@@ -74,7 +76,7 @@ export default function InvestorDashboard() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading your dashboard...</p>
+          <p className="text-muted-foreground">{t("dash_loading")}</p>
         </div>
       </div>
     )
@@ -336,7 +338,7 @@ export default function InvestorDashboard() {
             <div className="flex items-center gap-6 pt-4">
               <div className="flex items-center gap-2 bg-teal-700/50 backdrop-blur-sm rounded-full px-4 py-2 border border-yellow-400/30">
                 <div className="w-3 h-3 rounded-full bg-yellow-400 animate-pulse" />
-                <span className="font-semibold text-yellow-200">Portfolio Active</span>
+                <span className="font-semibold text-yellow-200">{t("dash_portfolio_active")}</span>
               </div>
               <div className="flex items-center gap-2 text-emerald-100">
                 <Clock className="w-4 h-4" />
@@ -347,7 +349,7 @@ export default function InvestorDashboard() {
           
           <div className="flex flex-col items-end gap-4">
             <div className="text-right bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <p className="text-emerald-100 text-sm font-medium">Total Portfolio Value</p>
+              <p className="text-emerald-100 text-sm font-medium">{t("dash_total_portfolio_value")}</p>
               <p className="text-3xl font-mono font-bold">SAR {portfolioValue.toLocaleString()}</p>
               <div className="flex items-center gap-2 mt-2">
                 <ArrowUpRight className="w-4 h-4 text-yellow-300" />
@@ -394,7 +396,7 @@ export default function InvestorDashboard() {
                   <p className="text-2xl font-mono font-bold text-orange-700 dark:text-orange-300">
                     {profileCompletion}%
                   </p>
-                  <p className="text-sm text-orange-600">Complete</p>
+                  <p className="text-sm text-orange-600">{t("dash_complete")}</p>
                 </div>
                 <Button
                   onClick={() => setLocation('/investor/profile')}
@@ -436,7 +438,7 @@ export default function InvestorDashboard() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Portfolio Value</p>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">{t("dash_portfolio_value")}</p>
               <p className="text-2xl font-mono font-bold text-white">
                 SAR {portfolioValue.toLocaleString()}
               </p>
@@ -458,7 +460,7 @@ export default function InvestorDashboard() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Total Invested</p>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">{t("dash_total_invested")}</p>
               <p className="text-2xl font-mono font-bold text-white">
                 SAR {totalInvested.toLocaleString()}
               </p>
@@ -480,7 +482,7 @@ export default function InvestorDashboard() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Total Returns</p>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">{t("dash_total_returns")}</p>
               <p className="text-2xl font-mono font-bold text-white">
                 SAR {totalReturns.toLocaleString()}
               </p>
@@ -500,7 +502,7 @@ export default function InvestorDashboard() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">Active Investments</p>
+              <p className="text-sm font-medium text-teal-200 uppercase tracking-wide">{t("dash_active_investments")}</p>
               <p className="text-2xl font-mono font-bold text-white">
                 {activeInvestments}
               </p>
@@ -527,7 +529,7 @@ export default function InvestorDashboard() {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-teal-200 uppercase">ROI</p>
+              <p className="text-sm text-teal-200 uppercase">{t("dash_roi")}</p>
               <p className="text-2xl font-mono font-bold text-white">
                 {totalReturnPercentage >= 0 ? '+' : ''}{totalReturnPercentage.toFixed(1)}%
               </p>
@@ -562,12 +564,12 @@ export default function InvestorDashboard() {
               <div className="bg-teal-700/50 rounded-xl p-4 border border-teal-600/30">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-teal-200 uppercase text-sm">Next Payout</p>
+                    <p className="font-semibold text-teal-200 uppercase text-sm">{t("dash_next_payout")}</p>
                     <p className="text-sm text-white font-mono">{nextPayout}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-mono font-bold text-white">SAR {pendingReturns.toLocaleString()}</p>
-                    <p className="text-xs text-teal-200 font-medium uppercase">Estimated</p>
+                    <p className="text-xs text-teal-200 font-medium uppercase">{t("dash_estimated")}</p>
                   </div>
                 </div>
               </div>
@@ -597,7 +599,7 @@ export default function InvestorDashboard() {
 
               <div className="bg-teal-700/50 rounded-xl p-4 border border-teal-600/30">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-white uppercase">KYC Verification</span>
+                  <span className="font-medium text-white uppercase">{t("dash_kyc_verification")}</span>
                   <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                     user?.kycStatus === 'approved'
                       ? 'bg-green-500/20 border-green-400/30'
@@ -623,7 +625,7 @@ export default function InvestorDashboard() {
                 {(user?.kycStatus === 'submitted' || user?.kycStatus === 'under_review' || user?.kycStatus === 'pending_review') && (
                   <div className="mt-3 flex items-center gap-2 text-sm text-teal-200">
                     <Clock className="h-4 w-4" />
-                    <span>Your documents are being reviewed. This usually takes 1-2 business days.</span>
+                    <span>{t("dash_docs_reviewing")}</span>
                   </div>
                 )}
               </div>
@@ -702,19 +704,19 @@ export default function InvestorDashboard() {
 
                 <div className="text-right flex items-center gap-6">
                   <div>
-                    <p className="text-sm text-teal-200 uppercase">Invested</p>
+                    <p className="text-sm text-teal-200 uppercase">{t("dash_invested")}</p>
                     <p className="text-lg font-mono font-semibold text-white">
                       SAR {investment.amount.toLocaleString()}
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-teal-200 uppercase">Current Value</p>
+                    <p className="text-sm text-teal-200 uppercase">{t("dash_current_value")}</p>
                     <p className="text-lg font-mono font-bold text-white">
                       SAR {investment.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-teal-200 uppercase">Returns</p>
+                    <p className="text-sm text-teal-200 uppercase">{t("dash_returns")}</p>
                     <p className={`text-lg font-mono font-bold ${investment.returns >= 0 ? 'text-yellow-300' : 'text-red-300'}`}>
                       +SAR {investment.returns.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
@@ -750,12 +752,12 @@ export default function InvestorDashboard() {
         <div className="mt-6 p-4 bg-teal-700/50 rounded-xl border border-teal-600/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-white uppercase">Total Active Investments</p>
+              <p className="font-semibold text-white uppercase">{t("dash_total_active_investments")}</p>
               <p className="text-sm text-teal-200 uppercase">Across {activeInvestments} properties</p>
             </div>
             <div className="text-right">
               <p className="text-3xl font-mono font-bold text-yellow-400">SAR {totalInvested.toLocaleString()}</p>
-              <p className="text-sm text-teal-200 font-medium uppercase">Total Invested</p>
+              <p className="text-sm text-teal-200 font-medium uppercase">{t("dash_total_invested")}</p>
             </div>
           </div>
         </div>
@@ -776,7 +778,7 @@ export default function InvestorDashboard() {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-red-900">Pre-Maturity Exit Fee</p>
+                      <p className="font-semibold text-red-900">{t("dash_pre_maturity_fee")}</p>
                       <p className="text-sm text-red-700 mt-1">
                         You are exiting before the maturity date. A pre-maturity exit fee of {getActualPenaltyRate()}% will be applied.
                       </p>
@@ -787,19 +789,19 @@ export default function InvestorDashboard() {
 
               <div className="space-y-3 bg-gray-50 rounded-lg p-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Property:</span>
+                  <span className="text-gray-600">{t("dash_property")}</span>
                   <span className="font-semibold text-gray-900">{selectedInvestment?.property}</span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Principal Amount:</span>
+                  <span className="text-gray-600">{t("dash_principal_amount")}</span>
                   <span className="font-mono font-semibold text-gray-900">
                     SAR {selectedInvestment?.amount?.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Rental Yield Earned:</span>
+                  <span className="text-gray-600">{t("dash_rental_yield_earned")}</span>
                   <span className="font-mono font-semibold text-yellow-600">
                     +SAR {(withdrawalDetails?.rentalYield?.netRentalYield || selectedInvestment?.returns || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -825,7 +827,7 @@ export default function InvestorDashboard() {
 
                 <div className="pt-3 border-t border-gray-300">
                   <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-900">You will receive:</span>
+                    <span className="font-semibold text-gray-900">{t("dash_you_will_receive")}</span>
                     <span className="font-mono font-bold text-emerald-600 text-lg">
                       SAR {(withdrawalDetails?.netWithdrawalAmount || estimatedWithdrawal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
@@ -839,7 +841,7 @@ export default function InvestorDashboard() {
                 </p>
               ) : (
                 <p className="text-sm text-gray-600">
-                  <strong>Note:</strong> Maturity date is {new Date(selectedInvestment?.maturityDate).toLocaleDateString()}.
+                  <strong>{t("dash_note")}</strong> Maturity date is {new Date(selectedInvestment?.maturityDate).toLocaleDateString()}.
                   Withdrawing now means you will not receive appreciation gains.
                 </p>
               )}

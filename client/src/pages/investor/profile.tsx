@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "@/hooks/use-translation"
 import { useLocation } from "wouter"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -22,6 +23,7 @@ import {
 import { ProfileCompletionWizard } from "@/components/profile-completion-wizard"
 
 export default function InvestorProfile() {
+  const { t } = useTranslation();
   const [, navigate] = useLocation()
   const { user } = useAuth()
   const { data: userProfile, isLoading: userProfileLoading } = useUserProfile()
@@ -166,7 +168,7 @@ export default function InvestorProfile() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading your profile...</p>
+          <p className="text-muted-foreground">{t("prof_loading")}</p>
         </div>
       </div>
     )
@@ -206,18 +208,18 @@ export default function InvestorProfile() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 bg-teal-700/50 backdrop-blur-sm rounded-full px-4 py-2 border border-green-400/30">
                   <div className="w-3 h-3 rounded-full bg-yellow-400 animate-pulse" />
-                  <span className="font-semibold text-green-200">Active Investor</span>
+                  <span className="font-semibold text-green-200">{t("prof_active_investor")}</span>
                 </div>
                 {kycData?.status === 'approved' && (
                   <div className="flex items-center gap-2 bg-green-500/20 border border-green-400/30 rounded-full px-4 py-2">
                     <Shield className="w-4 h-4 text-green-400" />
-                    <span className="font-semibold text-green-200">Verified</span>
+                    <span className="font-semibold text-green-200">{t("prof_verified")}</span>
                   </div>
                 )}
                 {kycData?.status === 'pending' && (
                   <div className="flex items-center gap-2 bg-green-500/20 border border-green-400/30 rounded-full px-4 py-2">
                     <Clock className="w-4 h-4 text-green-300" />
-                    <span className="font-semibold text-green-200">Verification Pending</span>
+                    <span className="font-semibold text-green-200">{t("prof_verification_pending")}</span>
                   </div>
                 )}
               </div>
@@ -225,7 +227,7 @@ export default function InvestorProfile() {
           </div>
 
           <div className="text-right bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <p className="text-emerald-100 text-sm font-medium uppercase tracking-wide">Profile Completion</p>
+            <p className="text-emerald-100 text-sm font-medium uppercase tracking-wide">{t("prof_completion")}</p>
             <p className="text-3xl font-mono font-bold text-white">{profileCompletion}%</p>
             {profileCompletion < 100 && (
               <Button
@@ -264,7 +266,7 @@ export default function InvestorProfile() {
                   <p className="text-2xl font-mono font-bold text-white" data-testid="text-completion-percentage">
                     {profileCompletion}%
                   </p>
-                  <p className="text-sm text-teal-200">Complete</p>
+                  <p className="text-sm text-teal-200">{t("prof_complete")}</p>
                 </div>
               </div>
             </div>
@@ -292,7 +294,7 @@ export default function InvestorProfile() {
 
       {/* Profile Sections */}
       <div className="grid gap-6">
-        <h2 className="text-2xl font-semibold text-white uppercase tracking-wide">Profile Sections</h2>
+        <h2 className="text-2xl font-semibold text-white uppercase tracking-wide">{t("prof_sections")}</h2>
 
         <div className="grid gap-4">
           {profileSections.map((section) => (
@@ -364,8 +366,8 @@ export default function InvestorProfile() {
                 <Shield className="h-6 w-6 text-green-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white uppercase tracking-wide">KYC Information</h3>
-                <p className="text-teal-200">Your identity verification and personal details</p>
+                <h3 className="text-xl font-bold text-white uppercase tracking-wide">{t("prof_kyc_information")}</h3>
+                <p className="text-teal-200">{t("prof_personal_desc")}</p>
               </div>
             </div>
             <div className="text-right bg-teal-700/50 backdrop-blur-sm rounded-xl p-4 border border-teal-600/30">
@@ -380,7 +382,7 @@ export default function InvestorProfile() {
           <div className="space-y-6">
             {/* Personal Information */}
             <div className="bg-teal-900/70 rounded-xl p-4 border border-teal-700/50">
-              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">Personal Information</h4>
+              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">{t("prof_personal_information")}</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-teal-200">Full Name (English)</p>
@@ -391,7 +393,7 @@ export default function InvestorProfile() {
                   <p className="font-medium text-white">{kycData.personalInfo?.fullNameArabic || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-teal-200">Date of Birth</p>
+                  <p className="text-xs text-teal-200">{t("prof_date_of_birth")}</p>
                   <p className="font-medium text-white">
                     {kycData.personalInfo?.dateOfBirth
                       ? new Date(kycData.personalInfo.dateOfBirth).toLocaleDateString()
@@ -399,15 +401,15 @@ export default function InvestorProfile() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-teal-200">Nationality</p>
+                  <p className="text-xs text-teal-200">{t("prof_nationality")}</p>
                   <p className="font-medium text-white capitalize">{kycData.personalInfo?.nationality || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-teal-200">Occupation</p>
+                  <p className="text-xs text-teal-200">{t("prof_occupation")}</p>
                   <p className="font-medium text-white">{kycData.personalInfo?.occupation || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-teal-200">Monthly Income</p>
+                  <p className="text-xs text-teal-200">{t("prof_monthly_income")}</p>
                   <p className="font-medium text-white">
                     SAR {(kycData.personalInfo?.monthlyIncome || 0).toLocaleString()}
                   </p>
@@ -417,18 +419,18 @@ export default function InvestorProfile() {
 
             {/* Address Information */}
             <div className="bg-teal-900/70 rounded-xl p-4 border border-teal-700/50">
-              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">Address</h4>
+              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">{t("prof_address")}</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-teal-200">Country</p>
+                  <p className="text-xs text-teal-200">{t("prof_country")}</p>
                   <p className="font-medium text-white">{kycData.address?.country || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-teal-200">City</p>
+                  <p className="text-xs text-teal-200">{t("prof_city")}</p>
                   <p className="font-medium text-white">{kycData.address?.city || 'Not provided'}</p>
                 </div>
                 <div className="md:col-span-2">
-                  <p className="text-xs text-teal-200">Address</p>
+                  <p className="text-xs text-teal-200">{t("prof_address")}</p>
                   <p className="font-medium text-white">{kycData.address?.address || 'Not provided'}</p>
                 </div>
               </div>
@@ -436,68 +438,68 @@ export default function InvestorProfile() {
 
             {/* Document Uploads */}
             <div className="bg-teal-900/70 rounded-xl p-4 border border-teal-700/50">
-              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">Document Uploads</h4>
+              <h4 className="font-semibold mb-3 text-sm text-white uppercase tracking-wide">{t("prof_document_uploads")}</h4>
               <div className="space-y-2">
                 {kycData.documents?.nationalId && (
                   <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
-                    <span className="text-white">National ID</span>
+                    <span className="text-white">{t("prof_national_id")}</span>
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.nationalId.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
                         : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.nationalId.uploaded ? (
-                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_uploaded")}</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_pending")}</span></>
                       )}
                     </div>
                   </div>
                 )}
                 {kycData.documents?.addressProof && (
                   <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
-                    <span className="text-white">Address Proof</span>
+                    <span className="text-white">{t("prof_address_proof")}</span>
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.addressProof.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
                         : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.addressProof.uploaded ? (
-                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_uploaded")}</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_pending")}</span></>
                       )}
                     </div>
                   </div>
                 )}
                 {kycData.documents?.selfie && (
                   <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
-                    <span className="text-white">Selfie Verification</span>
+                    <span className="text-white">{t("prof_selfie_verification")}</span>
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.selfie.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
                         : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.selfie.uploaded ? (
-                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_uploaded")}</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_pending")}</span></>
                       )}
                     </div>
                   </div>
                 )}
                 {kycData.documents?.proofOfIncome && (
                   <div className="flex items-center justify-between p-3 bg-teal-800/50 rounded-lg border border-teal-700/30">
-                    <span className="text-white">Proof of Income</span>
+                    <span className="text-white">{t("prof_proof_of_income")}</span>
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       kycData.documents.proofOfIncome.uploaded
                         ? 'bg-green-500/20 border-green-400/30'
                         : 'bg-green-500/20 border-green-400/30'
                     }`}>
                       {kycData.documents.proofOfIncome.uploaded ? (
-                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Uploaded</span></>
+                        <><CheckCircle className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_uploaded")}</span></>
                       ) : (
-                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">Pending</span></>
+                        <><Clock className="w-3 h-3 text-green-600 dark:text-green-300" /><span className="text-sm font-semibold text-green-600 dark:text-green-300">{t("prof_pending")}</span></>
                       )}
                     </div>
                   </div>
@@ -515,8 +517,8 @@ export default function InvestorProfile() {
             <FileText className="h-6 w-6 text-green-400" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white uppercase tracking-wide">Quick Actions</h3>
-            <p className="text-teal-200">Manage your account and preferences</p>
+            <h3 className="text-xl font-bold text-white uppercase tracking-wide">{t("prof_quick_actions")}</h3>
+            <p className="text-teal-200">{t("prof_manage_account")}</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -525,8 +527,8 @@ export default function InvestorProfile() {
             data-testid="button-update-password"
           >
             <div className="text-left">
-              <div className="font-medium">Update Password</div>
-              <div className="text-sm opacity-80">Change your account password</div>
+              <div className="font-medium">{t("prof_update_password")}</div>
+              <div className="text-sm opacity-80">{t("prof_change_password_desc")}</div>
             </div>
           </Button>
           <Button
@@ -534,8 +536,8 @@ export default function InvestorProfile() {
             data-testid="button-notification-settings"
           >
             <div className="text-left">
-              <div className="font-medium">Notification Settings</div>
-              <div className="text-sm opacity-80">Manage your preferences</div>
+              <div className="font-medium">{t("prof_notification_settings")}</div>
+              <div className="text-sm opacity-80">{t("prof_manage_preferences")}</div>
             </div>
           </Button>
           <Button
@@ -543,8 +545,8 @@ export default function InvestorProfile() {
             data-testid="button-download-data"
           >
             <div className="text-left">
-              <div className="font-medium">Download Data</div>
-              <div className="text-sm opacity-80">Export your information</div>
+              <div className="font-medium">{t("prof_download_data")}</div>
+              <div className="text-sm opacity-80">{t("prof_export_info")}</div>
             </div>
           </Button>
         </div>

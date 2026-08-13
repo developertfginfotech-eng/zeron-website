@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useTranslation } from "@/hooks/use-translation"
+import type { TranslationKey } from "@/lib/translations"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -34,80 +35,27 @@ const contactFormSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactFormSchema>
 
+// Copy lives in translations.ts; only the icon and the literal contact value
+// (phone/email, which are not translated) stay here.
 const contactMethods = [
-  {
-    icon: Phone,
-    title: "Phone Support",
-    description: "Speak with our investment experts",
-    value: "+966 11 123 4567",
-    action: "Call Now",
-    available: "Sunday - Thursday, 9 AM - 6 PM"
-  },
-  {
-    icon: Mail,
-    title: "Email Support", 
-    description: "Get detailed responses to your questions",
-    value: "support@zaron.sa",
-    action: "Send Email",
-    available: "24/7 - Response within 2 hours"
-  },
-  {
-    icon: MessageSquare,
-    title: "Live Chat",
-    description: "Instant help from our support team",
-    value: "Available on website",
-    action: "Start Chat",
-    available: "Sunday - Thursday, 9 AM - 10 PM"
-  },
-  {
-    icon: Building2,
-    title: "Office Visit",
-    description: "Meet our team in person",
-    value: "King Fahd District, Riyadh",
-    action: "Get Directions",
-    available: "By appointment only"
-  }
-]
+  { icon: Phone, slug: "phone", value: "+966 11 123 4567" },
+  { icon: Mail, slug: "email", value: "support@zaron.sa" },
+  { icon: MessageSquare, slug: "chat", valueKey: "cm_chat_value" },
+  { icon: Building2, slug: "office", valueKey: "cm_office_value" }
+] as const
 
 const officeLocations = [
-  {
-    city: "Riyadh",
-    address: "King Fahd District, Riyadh 12234, Saudi Arabia",
-    phone: "+966 11 123 4567",
-    hours: "Sunday - Thursday: 9:00 AM - 6:00 PM"
-  },
-  {
-    city: "Jeddah",
-    address: "Al Corniche District, Jeddah 21589, Saudi Arabia", 
-    phone: "+966 12 456 7890",
-    hours: "Sunday - Thursday: 9:00 AM - 6:00 PM"
-  },
-  {
-    city: "Dammam",
-    address: "King Abdulaziz District, Dammam 32245, Saudi Arabia",
-    phone: "+966 13 789 0123", 
-    hours: "Sunday - Thursday: 9:00 AM - 6:00 PM"
-  }
-]
+  { cityKey: "riyadh", addressKey: "office_riyadh_address", phone: "+966 11 123 4567" },
+  { cityKey: "jeddah", addressKey: "office_jeddah_address", phone: "+966 12 456 7890" },
+  { cityKey: "dammam", addressKey: "office_dammam_address", phone: "+966 13 789 0123" }
+] as const
 
 const faqs = [
-  {
-    question: "What is the minimum investment amount?",
-    answer: "You can start investing with as little as 1,000 SAR in any of our properties."
-  },
-  {
-    question: "Are all investments Shariah compliant?",
-    answer: "Yes, all our investments are vetted and certified by our Shariah board to ensure full compliance."
-  },
-  {
-    question: "How often are returns distributed?",
-    answer: "Rental income is typically distributed monthly, while capital appreciation is realized upon property sale or exit."
-  },
-  {
-    question: "Can I sell my shares anytime?",
-    answer: "Yes, our platform provides liquidity options through our secondary market for most investments."
-  }
-]
+  { q: "faq_q1", a: "faq_a1" },
+  { q: "faq_q2", a: "faq_a2" },
+  { q: "faq_q3", a: "faq_a3" },
+  { q: "faq_q4", a: "faq_a4" }
+] as const
 
 export default function ContactPage() {
   const { t } = useTranslation()
@@ -158,9 +106,9 @@ export default function ContactPage() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Get in Touch</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("contact_get_in_touch")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Choose your preferred way to reach us. We're committed to providing prompt and helpful responses.
+              {t("contact_get_in_touch_sub")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -169,12 +117,12 @@ export default function ContactPage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <method.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">{method.title}</h3>
-                <p className="text-muted-foreground text-sm mb-3">{method.description}</p>
-                <p className="font-semibold text-blue-600 mb-2">{method.value}</p>
-                <p className="text-xs text-muted-foreground mb-4">{method.available}</p>
-                <Button size="sm" variant="outline" className="w-full" data-testid={`button-${method.action.toLowerCase().replace(/\s+/g, '-')}`}>
-                  {method.action}
+                <h3 className="text-xl font-bold mb-2">{t(`cm_${method.slug}_title` as TranslationKey)}</h3>
+                <p className="text-muted-foreground text-sm mb-3">{t(`cm_${method.slug}_desc` as TranslationKey)}</p>
+                <p className="font-semibold text-blue-600 mb-2">{"value" in method ? method.value : t(method.valueKey as TranslationKey)}</p>
+                <p className="text-xs text-muted-foreground mb-4">{t(`cm_${method.slug}_available` as TranslationKey)}</p>
+                <Button size="sm" variant="outline" className="w-full" data-testid={`button-${method.slug}`}>
+                  {t(`cm_${method.slug}_action` as TranslationKey)}
                 </Button>
               </Card>
             ))}
@@ -187,9 +135,9 @@ export default function ContactPage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Send Us a Message</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("contact_form_title")}</h2>
               <p className="text-lg text-muted-foreground">
-                Fill out the form below and we'll get back to you within 24 hours.
+                {t("contact_form_sub")}
               </p>
             </div>
             <Card className="p-8">
@@ -201,9 +149,9 @@ export default function ContactPage() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Name *</FormLabel>
+                          <FormLabel>{t("contact_label_name")}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter your full name" {...field} data-testid="input-name" />
+                            <Input placeholder={t("contact_ph_name")} {...field} data-testid="input-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -214,9 +162,9 @@ export default function ContactPage() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email Address *</FormLabel>
+                          <FormLabel>{t("contact_label_email")}</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="Enter your email" {...field} data-testid="input-email" />
+                            <Input type="email" placeholder={t("contact_ph_email")} {...field} data-testid="input-email" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -230,7 +178,7 @@ export default function ContactPage() {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone Number *</FormLabel>
+                          <FormLabel>{t("contact_label_phone")}</FormLabel>
                           <FormControl>
                             <Input type="tel" placeholder="+966 5X XXX XXXX" {...field} data-testid="input-phone" />
                           </FormControl>
@@ -243,19 +191,19 @@ export default function ContactPage() {
                       name="inquiry_type"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Inquiry Type *</FormLabel>
+                          <FormLabel>{t("contact_label_inquiry")}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-inquiry-type">
-                                <SelectValue placeholder="Select inquiry type" />
+                                <SelectValue placeholder={t("contact_select_inquiry")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="investment">Investment Questions</SelectItem>
-                              <SelectItem value="account">Account Support</SelectItem>
-                              <SelectItem value="technical">Technical Issues</SelectItem>
-                              <SelectItem value="partnership">Partnership Inquiry</SelectItem>
-                              <SelectItem value="media">Media/Press</SelectItem>
+                              <SelectItem value="investment">{t("inquiry_investment")}</SelectItem>
+                              <SelectItem value="account">{t("inquiry_account")}</SelectItem>
+                              <SelectItem value="technical">{t("inquiry_technical")}</SelectItem>
+                              <SelectItem value="partnership">{t("inquiry_partnership")}</SelectItem>
+                              <SelectItem value="media">{t("inquiry_media")}</SelectItem>
                               <SelectItem value="other">Other</SelectItem>
                             </SelectContent>
                           </Select>
@@ -270,9 +218,9 @@ export default function ContactPage() {
                     name="subject"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Subject *</FormLabel>
+                        <FormLabel>{t("contact_label_subject")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Brief description of your inquiry" {...field} data-testid="input-subject" />
+                          <Input placeholder={t("contact_ph_subject")} {...field} data-testid="input-subject" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -284,10 +232,10 @@ export default function ContactPage() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message *</FormLabel>
+                        <FormLabel>{t("contact_label_message")}</FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Please provide details about your inquiry..."
+                            placeholder={t("contact_ph_message")}
                             className="min-h-[120px]"
                             {...field}
                             data-testid="textarea-message"
@@ -300,7 +248,7 @@ export default function ContactPage() {
 
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span>We'll respond within 24 hours during business days</span>
+                    <span>{t("contact_respond_note")}</span>
                   </div>
 
                   <Button 
@@ -323,9 +271,9 @@ export default function ContactPage() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Offices</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("contact_offices_title")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Visit us at any of our locations across Saudi Arabia.
+              {t("contact_offices_sub")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -334,25 +282,25 @@ export default function ContactPage() {
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center">
                     <MapPin className="w-5 h-5 mr-2 text-blue-600" />
-                    {office.city}
+                    {t(office.cityKey)}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Address</p>
-                    <p className="text-sm">{office.address}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("office_label_address")}</p>
+                    <p className="text-sm">{t(office.addressKey)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Phone</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("office_label_phone")}</p>
                     <p className="text-sm font-medium text-blue-600">{office.phone}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Hours</p>
-                    <p className="text-sm">{office.hours}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("office_label_hours")}</p>
+                    <p className="text-sm">{t("office_hours_value")}</p>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full" data-testid={`button-directions-${office.city.toLowerCase()}`}>
-                    <MapPin className="w-4 h-4 mr-2" />
-                    Get Directions
+                  <Button variant="outline" size="sm" className="w-full" data-testid={`button-directions-${office.cityKey}`}>
+                    <MapPin className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                    {t("cm_office_action")}
                   </Button>
                 </CardContent>
               </Card>
@@ -366,25 +314,25 @@ export default function ContactPage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("faq_title")}</h2>
               <p className="text-lg text-muted-foreground">
-                Quick answers to common questions about Zaron and real estate investment.
+                {t("faq_sub")}
               </p>
             </div>
             <div className="space-y-6">
               {faqs.map((faq, index) => (
                 <Card key={index} className="p-6 hover-elevate" data-testid={`card-faq-${index}`}>
-                  <h3 className="text-lg font-semibold mb-3">{faq.question}</h3>
-                  <p className="text-muted-foreground">{faq.answer}</p>
+                  <h3 className="text-lg font-semibold mb-3">{t(faq.q)}</h3>
+                  <p className="text-muted-foreground">{t(faq.a)}</p>
                 </Card>
               ))}
             </div>
             <div className="text-center mt-12">
               <p className="text-muted-foreground mb-4">
-                Don't see your question answered?
+                {t("faq_no_answer")}
               </p>
               <Button variant="outline" data-testid="button-view-all-faqs">
-                View All FAQs
+                {t("faq_view_all")}
               </Button>
             </div>
           </div>
@@ -395,7 +343,7 @@ export default function ContactPage() {
       <section className="py-12 bg-gradient-to-r from-blue-600 to-emerald-600 text-white">
         <div className="container mx-auto px-6">
           <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4">Need Urgent Support?</h3>
+            <h3 className="text-2xl font-bold mb-4">{t("contact_urgent_title")}</h3>
             <p className="mb-6">
               For urgent account or investment issues, contact our 24/7 emergency support line.
             </p>

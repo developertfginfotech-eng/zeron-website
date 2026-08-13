@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "@/hooks/use-translation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,6 +36,7 @@ import {
 } from "lucide-react"
 
 export default function InvestorWallet() {
+  const { t } = useTranslation();
   const [depositAmount, setDepositAmount] = useState("")
   const [withdrawAmount, setWithdrawAmount] = useState("")
   const [isDepositOpen, setIsDepositOpen] = useState(false)
@@ -225,7 +227,7 @@ export default function InvestorWallet() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600" />
-          <p className="text-muted-foreground">Loading wallet data...</p>
+          <p className="text-muted-foreground">{t("wal_loading")}</p>
         </div>
       </div>
     )
@@ -241,8 +243,8 @@ export default function InvestorWallet() {
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">My Wallet</h1>
-              <p className="text-teal-100 text-lg">Manage your funds and track returns</p>
+              <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">{t("wal_my_wallet")}</h1>
+              <p className="text-teal-100 text-lg">{t("wal_manage_funds")}</p>
             </div>
 
             <div className="flex gap-3">
@@ -259,12 +261,12 @@ export default function InvestorWallet() {
                 <DialogTrigger asChild>
                   <Button className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold px-6 h-auto">
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Funds
+                    {t("wal_add_funds")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Deposit Funds</DialogTitle>
+                    <DialogTitle>{t("wal_deposit_funds")}</DialogTitle>
                     <DialogDescription>
                       Add money to your wallet to invest in properties
                     </DialogDescription>
@@ -298,7 +300,7 @@ export default function InvestorWallet() {
                       ) : (
                         <>
                           <Plus className="w-4 h-4 mr-2" />
-                          Deposit Funds
+                          {t("wal_deposit_funds")}
                         </>
                       )}
                     </Button>
@@ -314,12 +316,12 @@ export default function InvestorWallet() {
                     disabled={balance < 1000}
                   >
                     <Minus className="w-4 h-4 mr-2" />
-                    Withdraw
+                    {t("wal_withdraw")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Withdraw Funds</DialogTitle>
+                    <DialogTitle>{t("wal_withdraw_funds")}</DialogTitle>
                     <DialogDescription>
                       Transfer money from your wallet to your bank account
                     </DialogDescription>
@@ -358,7 +360,7 @@ export default function InvestorWallet() {
                       ) : (
                         <>
                           <Minus className="w-4 h-4 mr-2" />
-                          Withdraw Funds
+                          {t("wal_withdraw_funds")}
                         </>
                       )}
                     </Button>
@@ -370,15 +372,15 @@ export default function InvestorWallet() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-white text-sm mb-1 uppercase">Available Balance</p>
+              <p className="text-white text-sm mb-1 uppercase">{t("wal_available_balance")}</p>
               <p className="text-3xl font-mono font-bold">SAR {balance.toLocaleString()}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-white text-sm mb-1 uppercase">Total Returns</p>
+              <p className="text-white text-sm mb-1 uppercase">{t("wal_total_returns")}</p>
               <p className="text-3xl font-mono font-bold text-yellow-400">+SAR {totalReturns.toLocaleString()}</p>
             </div>
             <div className="bg-teal-700/50 backdrop-blur-sm rounded-2xl p-4 border border-teal-600/30">
-              <p className="text-white text-sm mb-1 uppercase">Pending</p>
+              <p className="text-white text-sm mb-1 uppercase">{t("wal_pending")}</p>
               <p className="text-3xl font-mono font-bold">SAR {pendingBalance.toLocaleString()}</p>
             </div>
           </div>
@@ -396,11 +398,11 @@ export default function InvestorWallet() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Available Balance</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("wal_available_balance")}</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
                 SAR {balance.toLocaleString()}
               </p>
-              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Ready to invest</p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">{t("wal_ready_to_invest")}</p>
             </div>
           </div>
         </div>
@@ -414,11 +416,11 @@ export default function InvestorWallet() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Total Returns</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("wal_total_returns")}</p>
               <p className="text-2xl font-mono font-bold text-yellow-400">
                 +SAR {totalReturns.toLocaleString()}
               </p>
-              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">From all investments</p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">{t("wal_from_all_investments")}</p>
             </div>
           </div>
         </div>
@@ -432,11 +434,11 @@ export default function InvestorWallet() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Unrealized Gains</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("wal_unrealized_gains")}</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
                 SAR {unrealizedGains.toLocaleString()}
               </p>
-              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Current investments</p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">{t("wal_current_investments")}</p>
             </div>
           </div>
         </div>
@@ -450,11 +452,11 @@ export default function InvestorWallet() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">Realized Gains</p>
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-200 uppercase tracking-wide">{t("wal_realized_gains")}</p>
               <p className="text-2xl font-mono font-bold text-teal-900 dark:text-white">
                 SAR {realizedGains.toLocaleString()}
               </p>
-              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">Withdrawn returns</p>
+              <p className="text-xs text-teal-600 dark:text-teal-300 mt-1 uppercase">{t("wal_withdrawn_returns")}</p>
             </div>
           </div>
         </div>
@@ -463,9 +465,9 @@ export default function InvestorWallet() {
       {/* Tabs */}
       <Tabs defaultValue="transactions" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-white dark:bg-teal-800/90 border border-teal-200 dark:border-teal-700/50">
-          <TabsTrigger value="transactions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Transactions</TabsTrigger>
-          <TabsTrigger value="returns" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Property Returns</TabsTrigger>
-          <TabsTrigger value="actions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">Quick Actions</TabsTrigger>
+          <TabsTrigger value="transactions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">{t("wal_transactions")}</TabsTrigger>
+          <TabsTrigger value="returns" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">{t("wal_property_returns")}</TabsTrigger>
+          <TabsTrigger value="actions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-gray-900">{t("wal_quick_actions")}</TabsTrigger>
         </TabsList>
 
         {/* Transactions Tab */}
@@ -476,15 +478,15 @@ export default function InvestorWallet() {
                 <Clock className="w-5 h-5 text-yellow-400" />
                 Transaction History
               </CardTitle>
-              <CardDescription className="text-teal-700 dark:text-teal-200">View all your wallet transactions</CardDescription>
+              <CardDescription className="text-teal-700 dark:text-teal-200">{t("wal_view_all_tx")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {allItems.length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
-                    <p className="text-teal-900 dark:text-white">No transactions yet</p>
-                    <p className="text-sm text-teal-700 dark:text-teal-200">Your transactions will appear here</p>
+                    <p className="text-teal-900 dark:text-white">{t("wal_no_tx")}</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-200">{t("wal_tx_appear_here")}</p>
                   </div>
                 ) : (
                   allItems.map((item: any) => {
@@ -573,15 +575,15 @@ export default function InvestorWallet() {
                 <TrendingUp className="w-5 h-5 text-yellow-400" />
                 Property-wise Returns
               </CardTitle>
-              <CardDescription className="text-teal-700 dark:text-teal-200">Detailed breakdown of returns from each property</CardDescription>
+              <CardDescription className="text-teal-700 dark:text-teal-200">{t("wal_returns_breakdown")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {propertyReturns.length === 0 ? (
                   <div className="text-center py-8">
                     <Building className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
-                    <p className="text-teal-900 dark:text-white">No property investments yet</p>
-                    <p className="text-sm text-teal-700 dark:text-teal-200">Start investing to see returns</p>
+                    <p className="text-teal-900 dark:text-white">{t("wal_no_property_investments")}</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-200">{t("wal_start_investing_returns")}</p>
                   </div>
                 ) : (
                   propertyReturns.map((item: any) => (
@@ -613,7 +615,7 @@ export default function InvestorWallet() {
                   <div className="mt-6 pt-6 border-t border-teal-700/50">
                     <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-br from-teal-800/90 to-emerald-900/90 border border-teal-700/50">
                       <div>
-                        <p className="text-sm font-medium text-white uppercase">Total Returns</p>
+                        <p className="text-sm font-medium text-white uppercase">{t("wal_total_returns")}</p>
                         <div className="flex items-center gap-4 mt-1">
                           <span className="text-xs text-teal-200 font-medium">Unrealized: SAR {unrealizedGains.toLocaleString()}</span>
                           <span className="text-xs text-teal-200 font-medium">Realized: SAR {realizedGains.toLocaleString()}</span>
@@ -639,16 +641,16 @@ export default function InvestorWallet() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
                   <ArrowDownLeft className="w-5 h-5 text-yellow-400" />
-                  Deposit Funds
+                  {t("wal_deposit_funds")}
                 </CardTitle>
-                <CardDescription className="text-teal-700 dark:text-teal-200">Add money to your wallet</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">{t("wal_add_money")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Dialog open={isDepositOpen} onOpenChange={setIsDepositOpen}>
                   <DialogTrigger asChild>
                     <Button className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold">
                       <Plus className="w-4 h-4 mr-2" />
-                      Add Funds
+                      {t("wal_add_funds")}
                     </Button>
                   </DialogTrigger>
                 </Dialog>
@@ -659,9 +661,9 @@ export default function InvestorWallet() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg text-teal-900 dark:text-white">
                   <ArrowUpRight className="w-5 h-5 text-yellow-400" />
-                  Withdraw Funds
+                  {t("wal_withdraw_funds")}
                 </CardTitle>
-                <CardDescription className="text-teal-700 dark:text-teal-200">Transfer money to your bank</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">{t("wal_transfer_bank")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
@@ -672,7 +674,7 @@ export default function InvestorWallet() {
                       disabled={balance < 1000}
                     >
                       <Minus className="w-4 h-4 mr-2" />
-                      Withdraw Funds
+                      {t("wal_withdraw_funds")}
                     </Button>
                   </DialogTrigger>
                 </Dialog>
@@ -690,14 +692,14 @@ export default function InvestorWallet() {
                   <CreditCard className="w-5 h-5 text-yellow-400" />
                   Payment Methods
                 </CardTitle>
-                <CardDescription className="text-teal-700 dark:text-teal-200">Manage payment options</CardDescription>
+                <CardDescription className="text-teal-700 dark:text-teal-200">{t("wal_manage_payment")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button variant="outline" className="w-full bg-teal-700/50 border-teal-600/50 text-teal-600 dark:text-teal-300" disabled>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Add Method
                 </Button>
-                <p className="text-xs text-teal-600 dark:text-teal-300 mt-2">Coming soon</p>
+                <p className="text-xs text-teal-600 dark:text-teal-300 mt-2">{t("wal_coming_soon")}</p>
               </CardContent>
             </Card>
           </div>
