@@ -745,7 +745,7 @@ export const translations = {
     // Navigation
     home: "الرئيسية",
     properties: "العقارات",
-    portfolio: "المحفظة", 
+    portfolio: "المحفظة الاستثمارية", 
     profile: "الملف الشخصي",
     chat: "المحادثة",
     ai_advisor: "المستشار الذكي",
@@ -828,7 +828,7 @@ export const translations = {
     learn_more_cta: "اعرف المزيد",
     register_now: "سجل الآن",
     login: "تسجيل الدخول",
-    about_us: "عنا",
+    about_us: "من نحن",
     business_model: "نموذج الأعمال",
     download_app: "تحميل التطبيق",
     how_it_works: "كيف يعمل",
